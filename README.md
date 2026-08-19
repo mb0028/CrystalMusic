@@ -10,7 +10,7 @@ Android music player app designed for local library, simplicity & performance, w
 - 🪶 Simple UI, easy to navigate
 - ✨ Play any audio format, include mp3, m4a, flac, wav, ogg, ...
 - 📃 Live notification with lyrics
-- 📺 
+- 📺 Small video player
 - 🍃 Material 3 expressive inspired design
 - 🟢 Android 10+
 
