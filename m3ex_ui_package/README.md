@@ -21,7 +21,8 @@ More coming soon!
 > This package is only for my apps. I might constantly change the code without documenting it.
 
 ```yaml
-m3ex_ui_package:
-  git:
-    url: https://github.com/mb0028/CrystalMusic/tree/main/m3ex_ui_package
+  m3ex_ui_package:
+    git:
+      url: https://github.com/mb0028/CrystalMusic
+      path: m3ex_ui_package/
 ```
