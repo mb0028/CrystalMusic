@@ -23,5 +23,5 @@ More coming soon!
 ```yaml
 m3ex_ui_package:
   git:
-    url: https://github.com/mb0028/Crystal-Music/tree/main/m3ex_ui_package
+    url: https://github.com/mb0028/CrystalMusic/tree/main/m3ex_ui_package
 ```
