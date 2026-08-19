@@ -1,0 +1,32 @@
+name: crystal_music
+description: ""
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  m3ex_ui_package:
+    path: m3ex_ui_package/
+
+  flutter_taglib: ^1.5.2
+
+  dynamic_color: ^1.9.0
+  silky_scroll: ^2.6.4
+  flutter_lyric: ^3.0.7
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - Assets/Unknown.png
