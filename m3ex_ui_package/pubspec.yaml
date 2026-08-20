@@ -1,6 +1,6 @@
 name: m3ex_ui_package
-description: "Material 3 Expressive widgets package for all Crystal apps."
-version: 1.2.0
+description: "Material 3 Expressive widgets"
+version: 1.2.1
 homepage:
 
 environment:

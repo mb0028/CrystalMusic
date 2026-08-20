@@ -2,29 +2,37 @@ import 'package:flutter/material.dart';
 
 Future<bool> showM3exDialog(BuildContext context, String title,
   {List<Widget>? children, String ok = "Ok", String cancel = "Cancel"}) async {
-  return await showDialog(context: context, builder: (context) => SimpleDialog(
-    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-    title: Text(title, textAlign: .center),
-    contentPadding: .symmetric(horizontal: 20, vertical: 15),
-    insetPadding: .all(20),
-    children: [
-      ...?children,
-      SizedBox(height: 20, width: 600),
-      Row(
-        spacing: 15,
-        mainAxisAlignment: .end,
+  return await showDialog(context: context, builder: (context) => TweenAnimationBuilder(
+    duration: Duration(milliseconds: 500),
+    tween: Tween<double>(begin: 0.75, end: 1),
+    curve: Curves.easeOutCirc,
+    builder: (context, value, child) => Transform.scale(
+      scale: value,
+      child: SimpleDialog(
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        title: Text(title, textAlign: .center),
+        contentPadding: .symmetric(horizontal: 20, vertical: 15),
+        insetPadding: .all(30),
         children: [
-          OutlinedButton(
-            child: Text(cancel),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          FilledButton(
-            child: Text(ok),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      )
-    ]),
+          ...?children,
+          SizedBox(height: 20, width: 600),
+          Row(
+            spacing: 15,
+            mainAxisAlignment: .end,
+            children: [
+              OutlinedButton(
+                child: Text(cancel),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              FilledButton(
+                child: Text(ok),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          )
+        ]),
+    ),
+  ),
   ) ?? false;
 }
 
