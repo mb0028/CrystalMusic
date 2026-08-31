@@ -3,7 +3,7 @@
 Android music player app designed for local library, simplicity & performance, without any unnecessary futures.
 
 > [!Note]
-> Development is on progress
+> Development is in progress
 
 ## Futures
 
