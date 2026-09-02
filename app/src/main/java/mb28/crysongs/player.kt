@@ -26,20 +26,30 @@ import mb28.music.LrcParser
 import kotlin.time.Duration.Companion.milliseconds
 
 var player by mutableStateOf(MediaPlayer())
-
 var nowPlayingI by mutableIntStateOf(-1)
 var nowPlaying: Track? by mutableStateOf(null)
+
 var lrcParser: LrcParser? by mutableStateOf(null)
 var lastLrcLine by mutableStateOf("")
-var isReloading by mutableStateOf(false)
+var lastLrcLineI by mutableIntStateOf(-1)
 
+
+private const val NO_LYRIC = "No lyrics..."
 private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
 
 var tracks = mutableStateListOf<Track>()
-var displayQuery = mutableStateListOf<Track>()
 var playerQuery = mutableStateListOf<Track>()
+var displayQuery = mutableStateListOf<Track>()
+
+var displayQueryMB by mutableIntStateOf(0)
+var displayQueryMA by mutableIntStateOf(0)
+
+var isReloading by mutableStateOf(false)
+var isPlaying by mutableStateOf(false)
+var position by mutableIntStateOf(0)
+var duration by mutableIntStateOf(0)
 
 fun setAndPlay(track: Track, resetQuery: Boolean) {
     try {
@@ -64,36 +74,35 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
     isReloading = false
 }
 
-
-
 fun playerLoop(nm: NotificationManager, context: Activity, color: Color) = scope.launch {
     while (true) {
-        if (nowPlaying != null) {
-            val pos = player.currentPosition
+        isPlaying = player.isPlaying
+        // Pos needs to update even when player is paused for seekbar
+        position = player.currentPosition
 
+        if (nowPlaying != null && isPlaying) {
             if (lrcParser != null) {
-                val line = lrcParser!!.LineByAudioPosition(pos)
+                val line = lrcParser!!.LineByAudioPosition(position)
+                lastLrcLineI = lrcParser!!.LineIndex(position)
+
                 // On lyric line changes
                 if (line != lastLrcLine) {
                     updateNotification(nm, context, nowPlaying!!.title + "$tagsSpacer${nowPlaying!!.artist}", line,
-                        line, color, pos.milliseconds, player.duration.milliseconds)
+                        line, color, position.milliseconds, player.duration.milliseconds)
                     lastLrcLine = line
                 }
             } else {
                 lastLrcLine = NO_LYRIC
                 updateNotification(nm, context, nowPlaying!!.title, nowPlaying!!.artist,
-                    nowPlaying!!.title, color, pos.milliseconds, player.duration.milliseconds)
+                    nowPlaying!!.title, color, position.milliseconds, player.duration.milliseconds)
             }
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
                 hasLrc = nowPlaying!!.hasLRC
-                lrcParser = if (hasLrc) {
-                    LrcParser(nowPlaying!!.lrcPath)
-                } else {
-                    null
-                }
+                lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }
 
+                duration = player.duration
                 lastNowPlaying = nowPlaying
             }
         }
@@ -103,10 +112,12 @@ fun playerLoop(nm: NotificationManager, context: Activity, color: Color) = scope
 }
 
 fun updateDisplayQuery() {
-    displayQuery = playerQuery.subList(
-        (nowPlayingI - 4).coerceAtLeast(0),
-        (nowPlayingI + 11).coerceAtMost(playerQuery.count())
-    ).toMutableStateList()
+    val pqc = playerQuery.count()
+    val first = (nowPlayingI - 4).coerceAtLeast(0)
+    val last = (nowPlayingI + 11).coerceAtMost(pqc)
+    displayQuery = playerQuery.subList(first,last).toMutableStateList()
+    displayQueryMB = playerQuery.subList(0, first).count()
+    displayQueryMA = playerQuery.subList(last, pqc).count()
 }
 
 fun refreshTracksList(context: Context) {
@@ -121,7 +132,8 @@ fun refreshTracksList(context: Context) {
         MediaStore.Video.Media.GENRE,
         MediaStore.Video.Media.COMPOSER,
         MediaStore.Video.Media.DURATION,
-        MediaStore.Video.Media.BITRATE
+        MediaStore.Video.Media.BITRATE,
+        MediaStore.Video.Media.YEAR,
     )
 
     context.contentResolver.query(
@@ -144,6 +156,7 @@ fun refreshTracksList(context: Context) {
         val composerC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
         val durationC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
         val bitrateC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BITRATE)
+        val yearC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
 
         while (cursor.moveToNext()) {
             val id = cursor.getLong(idc)
@@ -163,10 +176,9 @@ fun refreshTracksList(context: Context) {
                 cursor.getString(composerC) ?: "???",
                 cursor.getLong(durationC),
                 cursor.getInt(bitrateC),
+                cursor.getString(yearC) ?: "???",
             )
             tracks += track
         }
     }
 }
-
-const val NO_LYRIC = "No lyric..."

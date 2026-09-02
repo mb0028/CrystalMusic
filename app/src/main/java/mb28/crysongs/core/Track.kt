@@ -17,6 +17,7 @@ data class Track(
     val composer: String,
     val duration: Long,
     val bitrate: Int,
+    val year: String,
 ) {
     val lrcPath = path.substring(0, path.lastIndexOf('.')) + ".lrc"
     val hasLRC = File(lrcPath).exists()

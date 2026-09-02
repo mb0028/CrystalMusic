@@ -12,22 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.displayQuery
-import mb28.crysongs.icons.queue_music
+import mb28.crysongs.displayQueryMA
+import mb28.crysongs.displayQueryMB
 import mb28.crysongs.isReloading
-import mb28.crysongs.playerQuery
-import mb28.crysongs.setAndPlay
-import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.ShuffleButton
 import mb28.crysongs.ui.other.TrackTile
 
@@ -69,8 +64,22 @@ fun QueryPage() {
         }
         else if (displayQuery.isNotEmpty() && !isReloading) {
             val count = displayQuery.count()
+            item {
+                Text(
+                    "+ $displayQueryMB",
+                    fontSize = 16.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             items(count) { i ->
                 TrackTile(displayQuery[i], i, count, false)
+            }
+            item {
+                Text(
+                    "+ $displayQueryMA",
+                    fontSize = 16.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
         else {

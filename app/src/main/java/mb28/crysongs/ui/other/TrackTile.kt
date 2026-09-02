@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.nowPlaying
@@ -62,6 +63,7 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
         modifier = Modifier
             .padding(bottom = 5.dp)
             .padding(horizontal = 10.dp)
+            .height(82.dp)
             .background(
                 Brush.horizontalGradient(
                     listOf(
@@ -75,7 +77,7 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
         colors = ListItemDefaults.segmentedColors(
             containerColor = Color.Transparent
         ),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(5.dp),
         leadingContent = {
             if (coverPath != null) {
                 Image(
@@ -83,12 +85,11 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
                     "Track cover",
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
-                        .height(80.dp)
-                        .width(80.dp)
+                        .height(73.dp).width(73.dp)
                         .clip(RoundedCornerShape(25.dp))
                 )
             } else {
-                NoCoverImage()
+                NoCoverImage(73.dp)
             }
         },
         onClick = {
@@ -114,7 +115,7 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
                     modifier = Modifier.fillMaxWidth(0.4f)
                 )
                 Text(
-                    Settings.tagsSpacer, fontSize = 26.sp,
+                    tagsSpacer, fontSize = 18.sp,
                     modifier = Modifier.fillMaxWidth(0.2f)
                 )
                 Text(
@@ -126,11 +127,11 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
                 )
             }
 
-            val dura by remember { mutableStateOf(formatDurationMs(t.duration.milliseconds)) }
-            val bitrate by remember { mutableIntStateOf((t.bitrate / 1000f).roundToInt()) }
+            val dura = formatDurationMs(t.duration.milliseconds)
+            val bitrate = (t.bitrate / 1000f).roundToInt()
             Text(
-                "$dura${Settings.tagsSpacer}${bitrate} kbps${Settings.tagsSpacer}${t.genre}" +
-                        if (t.hasLRC) "${Settings.tagsSpacer}LRC" else "",
+                "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t.year}${tagsSpacer}${t.genre}" +
+                        if (t.hasLRC) "${tagsSpacer}LRC" else "",
                 maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth()
             )

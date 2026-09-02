@@ -32,7 +32,6 @@ class LrcParser {
                 } else {
                     LyricLines.add(LyricLine(-1f, line))
                 }
-                println(LyricLines.last().Lyric)
             }
         }
         IsGettingLineInRealtimePossible = !Has0Timestomps
@@ -42,12 +41,12 @@ class LrcParser {
         return this.startsWith('[') && this.contains(':') && this.contains('.')
     }
 
-    fun String.IsTagsSection() : Boolean {
+    fun String.IsTagsSection(): Boolean {
         return this.startsWith("[re:") || this.startsWith("[ti:") || this.startsWith("[ar:") ||
             this.startsWith("[offset:") || this.startsWith("[au:") || this.startsWith("[al:")
     }
 
-    fun LineByAudioPosition(audioPosInMillisecond: Int) : String {
+    fun LineByAudioPosition(audioPosInMillisecond: Int): String {
         if (IsGettingLineInRealtimePossible) {
             val audioPosInSeconds = audioPosInMillisecond / 1000f
             if (audioPosInSeconds <= LyricLines.first().TimeStomp)
@@ -57,6 +56,18 @@ class LrcParser {
             return LyricLines[LyricLines.indexOf(LyricLines.find { audioPosInSeconds <= it.TimeStomp }) - 1].Lyric
         }
         return "No lyrics..."
+    }
+
+    fun LineIndex(audioPosInMillisecond: Int): Int {
+        if (IsGettingLineInRealtimePossible) {
+            val audioPosInSeconds = audioPosInMillisecond / 1000f
+            if (audioPosInSeconds <= LyricLines.first().TimeStomp)
+                return 0
+            if (audioPosInSeconds >= LyricLines.last().TimeStomp)
+                return LyricLines.count() - 1
+            return LyricLines.indexOf(LyricLines.find { audioPosInSeconds <= it.TimeStomp }) - 1
+        }
+        return -1
     }
 }
 

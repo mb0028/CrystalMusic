@@ -12,18 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.R
 
 @Composable
-fun NoCoverImage() {
+fun NoCoverImage(sizeXY: Dp = 80.dp, roundness: Dp = 25.dp) {
     Box(
         Modifier
-            .height(80.dp)
-            .width(80.dp)
+            .height(sizeXY)
+            .width(sizeXY)
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
-                RoundedCornerShape(25.dp)
+                RoundedCornerShape(roundness)
             )
     ) {
         Image(

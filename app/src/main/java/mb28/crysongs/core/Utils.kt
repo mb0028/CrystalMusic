@@ -75,7 +75,11 @@ fun Activity.setupPermissions() {
     nm.createNotificationChannel(channel)
 }
 
-
+fun inverseLerp(a: Float, b: Float, value: Float): Float {
+    if (a != b)
+        return ((value - a) / (b - a)).coerceIn(0f, 1f)
+    return 0f
+}
 
 
 

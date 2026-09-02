@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -50,9 +51,7 @@ import mb28.crysongs.ui.theme.CrySongsTheme
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.isAppearanceLightStatusBars = true
-        controller.isAppearanceLightNavigationBars = true
+        enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
         requestAllFilesAccessOrFinish()
@@ -114,7 +113,7 @@ fun NavBar(selectedIndex: MutableIntState) {
         ).padding(horizontal = 15.dp)
             .height(65.dp),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
-            toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.9f)
+            toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.95f)
         ),
     ) {
         NavigationBarItem(
