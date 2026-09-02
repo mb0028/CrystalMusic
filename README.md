@@ -3,7 +3,9 @@
 Android music player app designed for local library, simplicity & performance, without any unnecessary futures.
 
 > [!Note]
-> Development is in progress
+> Development is in progress.
+> </br>
+> Download pre-release versions from release page but remember these versions are only for testing and might have bugs or unfinished features.
 
 ## Futures
 

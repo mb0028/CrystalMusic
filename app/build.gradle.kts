@@ -16,13 +16,15 @@ android {
         minSdk = 33
         targetSdk = 37
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "v0.0.1-pre-release"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             optimization {
                 enable = false
             }

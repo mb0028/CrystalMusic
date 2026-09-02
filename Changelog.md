@@ -1,2 +1,2 @@
-## v1.0.0
-- First version
+## v0.0.1-pre-release
+- First test version
