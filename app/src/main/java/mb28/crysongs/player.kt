@@ -134,6 +134,7 @@ fun refreshTracksList(context: Context) {
         MediaStore.Video.Media.DURATION,
         MediaStore.Video.Media.BITRATE,
         MediaStore.Video.Media.YEAR,
+        MediaStore.Video.Media.ALBUM_ARTIST,
     )
 
     context.contentResolver.query(
@@ -157,6 +158,7 @@ fun refreshTracksList(context: Context) {
         val durationC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
         val bitrateC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BITRATE)
         val yearC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+        val aaC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ARTIST)
 
         while (cursor.moveToNext()) {
             val id = cursor.getLong(idc)
@@ -177,6 +179,7 @@ fun refreshTracksList(context: Context) {
                 cursor.getLong(durationC),
                 cursor.getInt(bitrateC),
                 cursor.getString(yearC) ?: "???",
+                cursor.getString(aaC) ?: "???",
             )
             tracks += track
         }

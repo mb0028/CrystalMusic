@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +69,7 @@ import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 const val EXTRA_SKIP_LOAD = "EXTRA_SKIP_LOAD"
 
@@ -94,7 +96,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
 
 @Composable
 fun Pager(innerPadding: PaddingValues, activity: Activity) {
-    val selectedTab = rememberPagerState(0) { 2 }
+    val selectedTab = rememberPagerState(1) { 3 }
     val fsPlayerCover = try {
             BitmapFactory.decodeFile(Track.createOrGetThumbnail(nowPlaying!!.path)).asImageBitmap()
         } catch (_: Exception) {
@@ -113,64 +115,72 @@ fun Pager(innerPadding: PaddingValues, activity: Activity) {
         HorizontalPager(
             selectedTab
         ) { page ->
-            if (page == 0) {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(horizontal = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Spacer(Modifier.height(15.dp))
+            when(page) {
+                1 -> {
+                   Column(
+                       Modifier
+                           .fillMaxSize()
+                           .padding(innerPadding)
+                           .padding(horizontal = 20.dp),
+                       horizontalAlignment = Alignment.CenterHorizontally,
+                       verticalArrangement = Arrangement.SpaceBetween
+                   ) {
+                       Spacer(Modifier.height(15.dp))
 
-                    Column(Modifier.fillMaxWidth()) {
-                        Cover(Modifier.align(Alignment.CenterHorizontally), fsPlayerCover)
-                        Spacer(Modifier.height(15.dp))
-                        Text(nowPlaying?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(10.dp))
-                        Text(nowPlaying?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(nowPlaying?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
+                       Column(Modifier.fillMaxWidth()) {
+                           Cover(Modifier.align(Alignment.CenterHorizontally), fsPlayerCover)
+                           Spacer(Modifier.height(15.dp))
+                           Text(nowPlaying?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Spacer(Modifier.height(10.dp))
+                           Text(nowPlaying?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Text(nowPlaying?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                       }
 
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row {
-                            TextButton(
-                                { player.seekTo(position - 5000) }
-                            ) {
-                                Text(formatDurationMs(position.milliseconds))
-                            }
-                            Slider(
-                                if (isPlaying) position.toFloat() / duration else 0f,
-                                { player.seekTo((it * duration).roundToInt()) },
-                                enabled = isPlaying,
-                                modifier = Modifier
-                                    .fillMaxWidth(0.75f)
-                                    .padding(horizontal = 10.dp)
-                            )
-                            TextButton(
-                                { player.seekTo(position + 5000) }
-                            ) {
-                                Text(formatDurationMs(duration.milliseconds))
-                            }
-                        }
-                        Spacer(Modifier.height(15.dp))
-                        PlayerButtonsRow()
-                        Spacer(Modifier.height(15.dp))
-                        Text(
-                            lastLrcLine,
-                            Modifier.height(45.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                       Column(
+                           Modifier.fillMaxWidth(),
+                           horizontalAlignment = Alignment.CenterHorizontally
+                       ) {
+                           Row {
+                               TextButton(
+                                   { player.seekTo(position - 5000) }
+                               ) {
+                                   Text(formatDurationMs(position.milliseconds))
+                               }
+                               val pos = position.toFloat()
+                               Slider(
+                                   (pos / duration).takeIf { pos != 0f } ?: 0f,
+                                   { player.seekTo((it * duration).roundToInt()) },
+                                   modifier = Modifier
+                                       .fillMaxWidth(0.75f)
+                                       .padding(horizontal = 10.dp)
+                               )
+                               TextButton(
+                                   { player.seekTo(position + 5000) }
+                               ) {
+                                   Text(formatDurationMs(duration.milliseconds))
+                               }
+                           }
+                           Spacer(Modifier.height(15.dp))
+                           PlayerButtonsRow()
+                           Spacer(Modifier.height(15.dp))
+                           Text(
+                               lastLrcLine,
+                               Modifier.height(45.dp),
+                               textAlign = TextAlign.Center
+                           )
+                       }
+                   }
                 }
-            }
-
-            else {
-                LyricsTab(Modifier.fillMaxSize().padding(horizontal = 20.dp))
+                2 -> {
+                    LyricsTab(Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp))
+                }
+                0 -> {
+                    TagsTab(Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp))
+                }
             }
         }
         ChangePageRow(
@@ -184,34 +194,34 @@ fun Pager(innerPadding: PaddingValues, activity: Activity) {
 
 @Composable
 private fun ChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState) {
+    val tabs = listOf("Details", "Player", "Lyrics")
     Row(
         modifier
-            .size(180.dp, 40.dp)
+            .size(270.dp, 40.dp)
             .background(
-                MaterialTheme.colorScheme.surfaceBright.copy(0.6f),
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
                 RoundedCornerShape(35.dp)
             ),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Surface(
-            onClick = {selectedTab.requestScrollToPage(0)},
-            modifier = Modifier.size(80.dp, 30.dp),
-            color = if (selectedTab.currentPage == 0) MaterialTheme.colorScheme.secondaryContainer
+        tabs.forEachIndexed { i, tab ->
+            Surface(
+                onClick = {selectedTab.requestScrollToPage(i)},
+                modifier = Modifier.size(80.dp, 30.dp),
+                color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondaryContainer
                 else MaterialTheme.colorScheme.surface.copy(0.5f),
-            shape = RoundedCornerShape(35.dp)
-        ) { Text("Player", modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 2.dp), textAlign = TextAlign.Center) }
-        Surface(
-            onClick = {selectedTab.requestScrollToPage(1)},
-            modifier = Modifier.size(80.dp, 30.dp),
-            color = if (selectedTab.currentPage == 1) MaterialTheme.colorScheme.secondaryContainer
-            else MaterialTheme.colorScheme.surface.copy(0.5f),
-            shape = RoundedCornerShape(35.dp)
-        ) { Text("Lyrics", modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 2.dp), textAlign = TextAlign.Center) }
+                shape = RoundedCornerShape(35.dp)
+            ) {
+                Text(
+                    tab,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 2.dp)
+                )
+            }
+        }
     }
 }
 
@@ -337,7 +347,9 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
                 ) {
                     Text(
                         line.Lyric,
-                        modifier = Modifier.fillMaxWidth().padding(5.dp, 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp, 8.dp),
                         textAlign = TextAlign.Center,
                         fontSize = textSize.value.sp
                     )
@@ -361,6 +373,40 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
                 fontSize = 16.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+    }
+}
+
+@Composable
+private fun TagsTab(modifier: Modifier = Modifier) {
+    val tags = listOf(
+        "Title: ${nowPlaying!!.title}",
+        "Artist: ${nowPlaying!!.artist}",
+        "Album: ${nowPlaying!!.album}",
+        "Composer: ${nowPlaying!!.composer}",
+        "Genre: ${nowPlaying!!.genre}",
+        " ",
+        "Duration: ${nowPlaying!!.duration.milliseconds}",
+        "Bitrate: ${(nowPlaying!!.bitrate / 1000f).roundToInt()} kbps",
+        "Year: ${nowPlaying!!.year}",
+        " ",
+        "Album artist: ${nowPlaying!!.albumArtist}",
+        " ",
+        "Path:\n${nowPlaying!!.path.removePrefix("/storage/emulated/")}",
+        "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath}" else "No lrc file found"}",
+    )
+    if (nowPlaying != null) {
+        LazyColumn(
+            modifier,
+            contentPadding = PaddingValues(vertical = 200.dp)
+        ) {
+            items(tags.count()) { i ->
+                Text(
+                    tags[i],
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
         }
     }
 }

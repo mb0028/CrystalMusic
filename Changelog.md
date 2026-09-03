@@ -1,4 +1,4 @@
-## v0.0.2-pre-release (Upcoming)
+## v0.0.2-pre-release
 - Add fullscreen player
 - Mini-player improvements
 - Better app performance
