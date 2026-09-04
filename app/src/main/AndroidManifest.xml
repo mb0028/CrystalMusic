@@ -41,7 +41,7 @@
             android:name=".FullscreenPlayerActivity"
             android:exported="false"
             android:label="@string/title_activity_fullscreen_player"
-            android:theme="@style/Theme.CrySongs"
+            android:theme="@style/Theme.Transparent"
             android:windowSoftInputMode="adjustResize" />
 
     </application>

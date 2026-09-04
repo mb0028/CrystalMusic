@@ -2,9 +2,11 @@ package mb28.crysongs
 
 import android.app.NotificationManager
 import android.os.Bundle
+import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -24,8 +27,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -38,11 +45,16 @@ import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.requestAllFilesAccessOrFinish
 import mb28.crysongs.core.setupPermissions
+import mb28.crysongs.icons.album
+import mb28.crysongs.icons.artist
 import mb28.crysongs.icons.folder
 import mb28.crysongs.icons.library_music
 import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.music_note_2
 import mb28.crysongs.icons.queue_music
+import mb28.crysongs.icons.search
+import mb28.crysongs.icons.stylus_brush
+import mb28.crysongs.icons.theater_comedy
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.TracksList
@@ -53,6 +65,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
+        window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
 
         requestAllFilesAccessOrFinish()
         setupPermissions()
@@ -62,7 +75,15 @@ class MainActivity : ComponentActivity() {
         val nm = getSystemService<NotificationManager>()!!
 
         player.setOnCompletionListener {
-            nm.cancel(0)
+            try {
+                nm.cancel(0)
+                setAndPlay(
+                    playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
+                    false
+                )
+            } catch (_: Exception) {
+
+            }
         }
 
         playerLoop(nm, this, Color(0xffcdb5de))
@@ -74,21 +95,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             CrySongsTheme {
                 val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
+                val selectedSet = remember { mutableStateOf(false) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.surface,
                     bottomBar = {
                         Column {
-                            MiniPlayer()
+                            MiniPlayer(selectedSet)
                             Spacer(Modifier.height(3.dp))
-                            NavBar(selectedIndex)
+                            NavBar(selectedIndex, selectedSet)
                         }
                     }
                 ) { innerPadding ->
                     when (selectedIndex.intValue) {
                         0 -> TracksList(Modifier.padding(innerPadding))
                         1 -> QueryPage()
-                        else -> {}
+                        4 -> SearchPage()
+                        else -> {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Coming soon!")
+                            }
+                        }
                     }
 
                 }
@@ -104,7 +131,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NavBar(selectedIndex: MutableIntState) {
+fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
+    val firstTabs = rememberSaveable { listOf("Tracks", "Query", "Playlists", "Folders", "Search") }
+    val secondTabs = rememberSaveable { listOf("Artists", "Albums", "Genres", "Composers", "Other") }
     HorizontalFloatingToolbar(
         expanded = true,
         contentPadding = PaddingValues(horizontal = 10.dp),
@@ -116,36 +145,50 @@ fun NavBar(selectedIndex: MutableIntState) {
             toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.95f)
         ),
     ) {
-        NavigationBarItem(
-            selected = selectedIndex.intValue == 0,
-            onClick = { selectedIndex.intValue = 0 },
-            icon = { Icon(music_note_2, null) },
-            label = { Text("Tracks") },
-        )
-        NavigationBarItem(
-            selected = selectedIndex.intValue == 1,
-            onClick = { selectedIndex.intValue = 1 },
-            icon = { Icon(queue_music, null) },
-            label = { Text("Query") },
-        )
-        NavigationBarItem(
-            selected = selectedIndex.intValue == 2,
-            onClick = { selectedIndex.intValue = 2 },
-            icon = { Icon(library_music, null) },
-            label = { Text("Playlists") },
-        )
-        NavigationBarItem(
-            selected = selectedIndex.intValue == 3,
-            onClick = { selectedIndex.intValue = 3 },
-            icon = { Icon(folder, null) },
-            label = { Text("Folders") },
-        )
-        NavigationBarItem(
-            selected = selectedIndex.intValue == 4,
-            onClick = { selectedIndex.intValue = 4 },
-            icon = { Icon(list_2, null) },
-            label = { Text("Other") },
-        )
+        if (!secondSet.value) {
+            firstTabs.forEachIndexed { index, label ->
+                NavigationBarItem(
+                    selected = selectedIndex.intValue == index,
+                    onClick = { selectedIndex.intValue = index },
+                    icon = {
+                        Icon(
+                            when(index) {
+                                0 -> music_note_2
+                                1 -> queue_music
+                                2 -> library_music
+                                3 -> folder
+                                4 -> search
+                                else -> throw Exception()
+                            },
+                            null
+                        )
+                    },
+                    label = { Text(label) },
+                )
+            }
+        }
+        else {
+            secondTabs.forEachIndexed { index, label ->
+                NavigationBarItem(
+                    selected = selectedIndex.intValue == index + 5,
+                    onClick = { selectedIndex.intValue = index + 5 },
+                    icon = {
+                        Icon(
+                            when(index + 5) {
+                                5 -> artist
+                                6 -> album
+                                7 -> theater_comedy
+                                8 -> stylus_brush
+                                9 -> list_2
+                                else -> throw Exception()
+                            },
+                            null
+                        )
+                    },
+                    label = { Text(label) },
+                )
+            }
+        }
     }
 }
 

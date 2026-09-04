@@ -19,10 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -32,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
@@ -42,7 +37,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true) {
+fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true, onBeforeClick: () -> Unit = {}) {
     val coverPath = Track.createOrGetThumbnail(t.path)
     val defaultShape = RoundedCornerShape(15.dp)
     val shape = when {
@@ -93,6 +88,7 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
             }
         },
         onClick = {
+            onBeforeClick()
             setAndPlay(t, resetQueryOnClick)
         }
     ) {

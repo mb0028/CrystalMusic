@@ -1,5 +1,6 @@
 package mb28.crysongs.ui
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.activity.compose.LocalActivity
@@ -26,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +54,7 @@ import mb28.crysongs.icons.play_circle
 import mb28.crysongs.icons.search
 import mb28.crysongs.icons.skip_next
 import mb28.crysongs.icons.skip_previous
+import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.player
@@ -62,7 +65,7 @@ import mb28.crysongs.ui.other.NoCoverImage
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun MiniPlayer() {
+fun MiniPlayer(secondSet: MutableState<Boolean>) {
     val context = LocalActivity.current!!
     Row (
         Modifier.padding(horizontal = 15.dp),
@@ -70,11 +73,11 @@ fun MiniPlayer() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         FloatingActionButton(
-            {},
+            { secondSet.value = !secondSet.value },
             elevation = FloatingActionButtonDefaults.elevation(
                 0.dp, 0.dp)
         ) {
-            Icon(search, null)
+            Icon(swap_horiz, null)
         }
 
         Row(
@@ -90,7 +93,7 @@ fun MiniPlayer() {
                 .clickable {
                     val intent = Intent(context, FullscreenPlayerActivity::class.java)
                         .putExtra(EXTRA_SKIP_LOAD, true)
-                    context.startActivity(intent)
+                    context.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

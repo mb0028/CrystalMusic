@@ -5,7 +5,13 @@ import android.content.Intent
 import android.os.Environment
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
+import mb28.crysongs.player
 import java.io.File
 
 object Settings {
@@ -14,7 +20,9 @@ object Settings {
     const val appCacheThumbsFolder = "$appFolder/Covers"
     const val settingsFile = "$appFolder/Songs Settings.txt"
 
-    val favorites = mutableListOf<String>()
+    val favorites = mutableStateListOf<String>()
+    var loopTrack by mutableStateOf(false)
+    var appVolume by mutableFloatStateOf(1f)
     var sortBy = 0
     var sortOrderDesc = true
     var tagsSpacer = " • "
@@ -41,7 +49,9 @@ object Settings {
                     }
                     s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
                     s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
+                    s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
                     s.startsWith("[TagsSpacer]") -> tagsSpacer = s.removePrefix("[TagsSpacer]")
+                    s.startsWith("[Volume]") -> appVolume = s.removePrefix("[Volume]").toFloat()
                 }
             }
         } else {
@@ -49,13 +59,16 @@ object Settings {
             file.createNewFile()
             save()
         }
+        player.isLooping = loopTrack
     }
 
     fun save() {
         var data = "[Settings]\n"
         data += "[SortBy]$sortBy\n"
         data += "[SortOrderDesc]$sortOrderDesc\n"
+        data += "[Loop]$loopTrack\n"
         data += "[TagsSpacer]$tagsSpacer\n"
+        data += "[Volume]$appVolume\n"
 
         data += "\n[Favorites]\n"
         favorites.forEach {
