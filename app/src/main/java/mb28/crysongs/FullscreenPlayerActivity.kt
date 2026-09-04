@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.transition.Explode
 import android.transition.Slide
 import android.transition.Transition
+import android.view.RoundedCorner
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -114,8 +118,8 @@ class FullscreenPlayerActivity : ComponentActivity() {
         }
 
         val skipLoad = intent.getBooleanExtra(EXTRA_SKIP_LOAD, false)
-
         super.onCreate(savedInstanceState)
+
         setContent {
             var activityOffset by remember { mutableIntStateOf(0) }
             CrySongsTheme {
@@ -149,6 +153,8 @@ class FullscreenPlayerActivity : ComponentActivity() {
 
 @Composable
 private fun Pager(innerPadding: PaddingValues, activity: Activity) {
+    val roundness = activity.window.decorView.rootWindowInsets?.getRoundedCorner(
+        RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
     val selectedTab = rememberPagerState(1) { 3 }
     val fsPlayerCover = try {
             BitmapFactory.decodeFile(Track.createOrGetThumbnail(nowPlaying!!.path)).asImageBitmap()
@@ -156,7 +162,9 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity) {
             activity.resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
         }
 
-    Box {
+    Box(
+        Modifier.clip(RoundedCornerShape((roundness / 3.25f).dp))
+    ) {
         Image(
             fsPlayerCover, null,
             contentScale = ContentScale.FillHeight,

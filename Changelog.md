@@ -1,3 +1,6 @@
+## v0.0.4-pre-release
+- Fullscreen player corners are now rounded
+
 ## v0.0.3-pre-release
 - Swipe down to exit fullscreen player
 - Add animations for opening/closing fullscreen player
