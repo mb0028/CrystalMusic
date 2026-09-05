@@ -1,4 +1,5 @@
 ## v0.0.4-pre-release
+- Add support for multi-language LRC files (max 3 lang)
 - Fullscreen player corners are now rounded
 - Wavy slider for fullscreen player
 - Lot of bug fixes & improvements

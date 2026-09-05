@@ -455,13 +455,14 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
                         }
                         .background(
                             MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = lineAnim.value),
-                            RoundedCornerShape(30.dp)
+                            RoundedCornerShape(20.dp)
                         )
-                        .clip(RoundedCornerShape(30.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .clickable {
                             scope.launch {
                                 player.seekTo(
-                                    lerp(0, duration,
+                                    lerp(
+                                        0, duration,
                                         inverseLerp(0f, duration / 1000f, line.TimeStomp),
                                     )
                                 )
@@ -470,7 +471,11 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
                         },
                 ) {
                     Text(
-                        line.Lyric,
+                        when {
+                            line.Lyric3 != null -> "${line.Lyric}\n${line.Lyric2!!}\n${line.Lyric3}"
+                            line.Lyric2 != null -> "${line.Lyric}\n${line.Lyric2}"
+                            else -> line.Lyric
+                        },
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                         textAlign = TextAlign.Center
                     )

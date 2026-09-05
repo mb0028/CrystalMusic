@@ -1,4 +1,4 @@
-@file:Suppress("PropertyName", "FunctionName", "ControlFlowWithEmptyBody")
+@file:Suppress("PropertyName", "FunctionName", "ControlFlowWithEmptyBody", "unused")
 
 package mb28.music
 
@@ -20,17 +20,41 @@ class LrcParser {
         return noTimedLines == Count
     }
 
-
+    // This is a bit funky but it works
     constructor(path: String) {
+        val linesWithTime = mutableMapOf<Float, MutableList<String>>()
         val lines = File(path).readLines()
         lines.forEach { line ->
             if (line.isNotBlank()) {
                 if (line.IsTimedSection()) {
-                    LyricLines.add(LyricLine.FromString(line))
+                    val lyric = LyricLine.FromString(line)
+                    val i = linesWithTime[lyric.TimeStomp]
+                    when {
+                        i == null -> linesWithTime[lyric.TimeStomp] = mutableListOf(lyric.Lyric)
+                        i.count() == 1 -> linesWithTime[lyric.TimeStomp]!!.add(lyric.Lyric)
+                        i.count() == 2 -> linesWithTime[lyric.TimeStomp]!!.add(lyric.Lyric)
+                    }
                 } else if (line.IsTagsSection()) {
 
                 } else {
                     LyricLines.add(LyricLine(-1f, line))
+                }
+            }
+        }
+
+        linesWithTime.forEach { (ts, lines) ->
+            when(lines.count()) {
+                1 -> LyricLines.add(LyricLine(ts, lines.first()))
+                2 -> {
+                    val l = LyricLine(ts, lines.first())
+                    l.Lyric2 = lines[1]
+                    LyricLines.add(l)
+                }
+                3 -> {
+                    val l = LyricLine(ts, lines.first())
+                    l.Lyric2 = lines[1]
+                    l.Lyric3 = lines.last()
+                    LyricLines.add(l)
                 }
             }
         }
@@ -72,6 +96,8 @@ class LrcParser {
 }
 
 data class LyricLine(val TimeStomp: Float, val Lyric: String) {
+    var Lyric2: String? = null
+    var Lyric3: String? = null
     companion object {
         fun FromString(text: String) : LyricLine {
             val time = text.substring(0, text.lastIndexOf(']')).removePrefix("[") // xx:xx.xx?
@@ -86,5 +112,9 @@ data class LyricLine(val TimeStomp: Float, val Lyric: String) {
                 LyricLine(sec, "")
             }
         }
+    }
+
+    override fun toString(): String {
+        return "$TimeStomp | $Lyric | $Lyric2 | $Lyric3"
     }
 }
