@@ -4,9 +4,7 @@ import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.transition.Explode
 import android.transition.Slide
-import android.transition.Transition
 import android.view.RoundedCorner
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -17,7 +15,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,16 +23,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -69,6 +63,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -414,14 +409,15 @@ private fun ProgressBarRow(modifier: Modifier = Modifier) {
             Alignment.Center
         ) {
             val pos = position.toFloat()
+            LinearWavyProgressIndicator(
+                {(pos / duration).takeIf { pos != 0f } ?: 0f},
+                wavelength = 24.dp,
+                amplitude = { if (isPlaying) 1f else 0f }
+            )
             Slider(
                 0f,
                 { player.seekTo((it * duration).roundToInt()) },
                 Modifier.alpha(0f)
-            )
-            LinearWavyProgressIndicator(
-                {(pos / duration).takeIf { pos != 0f } ?: 0f},
-                wavelength = 24.dp
             )
         }
         TextButton(
@@ -444,37 +440,39 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
             state = state
         ) {
             items(lrcParser!!.Count) { //TODO: Fix null pointer exc. on this line (i think its because of the animation)
-                val textSize = animateIntAsState(
-                    if (it == lastLrcLineI) 20 else 16,
-                    TweenSpec(500)
-                )
-                val color = animateFloatAsState(
+                val lineAnim = animateFloatAsState(
                     if (it == lastLrcLineI) 0.5f else 0f,
-                    TweenSpec(500)
+                    TweenSpec(400)
                 )
                 val line = lrcParser!!.LyricLines[it]
-                Surface(
-                    onClick = {
-                        scope.launch {
-                            player.seekTo(
-                                lerp(0, duration,
-                                    inverseLerp(0f, duration / 1000f, line.TimeStomp),
-                                )
-                            )
-                            state.scrollToItem(it, -500)
+                Box(
+                    Modifier
+                        .padding(6.dp)
+                        .graphicsLayer {
+                            val s = 1.05f + (lineAnim.value * 0.18f)
+                            scaleX = s
+                            scaleY = s
                         }
-                    },
-                    modifier = Modifier.padding(vertical = 1.dp),
-                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(color.value),
-                    shape = RoundedCornerShape(35.dp)
+                        .background(
+                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = lineAnim.value),
+                            RoundedCornerShape(30.dp)
+                        )
+                        .clip(RoundedCornerShape(30.dp))
+                        .clickable {
+                            scope.launch {
+                                player.seekTo(
+                                    lerp(0, duration,
+                                        inverseLerp(0f, duration / 1000f, line.TimeStomp),
+                                    )
+                                )
+                                state.scrollToItem(it, -500)
+                            }
+                        },
                 ) {
                     Text(
                         line.Lyric,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp, 8.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = textSize.value.sp
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
