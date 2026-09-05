@@ -455,7 +455,7 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(vertical = 200.dp),
             state = state
         ) {
-            items(lrcParser!!.Count) { //TODO: Fix null pointer exc. on this line (i think its because of the animation)
+            items(lrcParser!!.Count) { //TODO: Fix null pointer exc on this line (i think its because of the animation)
                 val lineAnim = animateFloatAsState(
                     if (it == lastLrcLineI) 0.5f else 0f,
                     TweenSpec(400)
@@ -476,13 +476,15 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
                         .clip(RoundedCornerShape(20.dp))
                         .clickable {
                             scope.launch {
-                                player.seekTo(
-                                    lerp(
-                                        0, duration,
-                                        inverseLerp(0f, duration / 1000f, line.TimeStomp),
+                                if (lrcParser!!.IsGettingLineInRealtimePossible) {
+                                    player.seekTo(
+                                        lerp(
+                                            0, duration,
+                                            inverseLerp(0f, duration / 1000f, line.TimeStomp),
+                                        )
                                     )
-                                )
-                                state.scrollToItem(it, -500)
+                                    state.scrollToItem(it, -500)
+                                }
                             }
                         },
                 ) {
