@@ -6,6 +6,8 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateBounds
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +37,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
@@ -56,6 +59,7 @@ import mb28.crysongs.icons.search
 import mb28.crysongs.icons.stylus_brush
 import mb28.crysongs.icons.theater_comedy
 import mb28.crysongs.ui.MiniPlayer
+import mb28.crysongs.ui.PlaylistsPage
 import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.theme.CrySongsTheme
@@ -110,6 +114,7 @@ class MainActivity : ComponentActivity() {
                     when (selectedIndex.intValue) {
                         0 -> TracksList(Modifier.padding(innerPadding))
                         1 -> QueryPage()
+                        2 -> PlaylistsPage(selectedIndex)
                         4 -> SearchPage()
                         else -> {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -117,11 +122,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-
                 }
             }
         }
-
     }
 
     override fun onDestroy() {
@@ -191,14 +194,3 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

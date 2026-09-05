@@ -1,4 +1,5 @@
 ## v0.0.4-pre-release
+- New: Add tracks to favorites and access them in playlists tab
 - Add support for multi-language LRC files (max 3 lang)
 - Fullscreen player corners are now rounded
 - Wavy slider for fullscreen player

@@ -79,6 +79,8 @@ import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.core.inverseLerp
 import mb28.crysongs.icons.arrow_cool_down
+import mb28.crysongs.icons.favorite
+import mb28.crysongs.icons.heart_plus
 import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.pause_circle
 import mb28.crysongs.icons.play_circle
@@ -125,7 +127,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
                         .offset { IntOffset(0, activityOffset) }
                         .pointerInput(Unit) {
                             fun onRelease() {
-                                if (activityOffset > 500) {
+                                if (activityOffset > 300) {
                                     finish()
                                 } else {
                                     activityOffset = 0
@@ -235,8 +237,10 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, activity: Activity) {
+    var showVolSheet by rememberSaveable { mutableStateOf(false) }
     val tabs = listOf("Details", "Player", "Lyrics")
     Row(
         modifier
@@ -281,9 +285,30 @@ private fun ChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState
         }
 
         IconButton(
-            { }
+            { showVolSheet = true }
         ) {
-            Icon(list_2, null)
+            Icon(sound_detection_loud_sound, null)
+        }
+    }
+
+    if (showVolSheet) {
+        ModalBottomSheet(
+            {
+                showVolSheet = false
+            }
+        ) {
+            Text("Volume: ${(Settings.appVolume * 100f).roundToInt() / 100f}", modifier = Modifier.padding(horizontal = 25.dp))
+            Slider(
+                Settings.appVolume,
+                {
+                    Settings.appVolume = it
+                    player.setVolume(Settings.appVolume, Settings.appVolume)
+                    Settings.save()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 15.dp)
+            )
         }
     }
 }
@@ -307,11 +332,8 @@ private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlayerButtonsRow() {
-    var showVolSheet by rememberSaveable { mutableStateOf(false) }
-
     Row(
         Modifier
             .scale(1.4f)
@@ -319,11 +341,26 @@ private fun PlayerButtonsRow() {
     ) {
         IconButton(
             {
-                showVolSheet = true
+                if (nowPlaying != null) {
+                    if (Settings.favorites.contains(nowPlaying!!.path)) {
+                        Settings.favorites.remove(nowPlaying!!.path)
+                    } else {
+                        Settings.favorites.add(nowPlaying!!.path)
+                    }
+                    Settings.save()
+                }
             },
             modifier = Modifier.scale(0.8f)
         ) {
-            Icon(sound_detection_loud_sound, null)
+            if (nowPlaying != null) {
+                Icon(
+                    if (Settings.favorites.contains(nowPlaying!!.path)) favorite else heart_plus,
+                    null
+                )
+            } else {
+                Icon(heart_plus, null, modifier = Modifier.alpha(0.5f))
+            }
+
         }
         IconButton(
             {
@@ -369,27 +406,6 @@ private fun PlayerButtonsRow() {
             modifier = Modifier.scale(0.8f)
         ) {
             Icon(if (Settings.loopTrack) repeat_on else repeat, null)
-        }
-    }
-
-    if (showVolSheet) {
-        ModalBottomSheet(
-            {
-                showVolSheet = false
-            }
-        ) {
-            Text("Volume: ${(Settings.appVolume * 100f).roundToInt() / 100f}", modifier = Modifier.padding(horizontal = 25.dp))
-            Slider(
-                Settings.appVolume,
-                {
-                    Settings.appVolume = it
-                    player.setVolume(Settings.appVolume, Settings.appVolume)
-                    Settings.save()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 15.dp)
-            )
         }
     }
 }
