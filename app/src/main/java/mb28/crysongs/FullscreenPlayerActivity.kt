@@ -44,6 +44,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -117,14 +118,15 @@ class FullscreenPlayerActivity : ComponentActivity() {
             isNavigationBarContrastEnforced = false
         }
 
-        val skipLoad = intent.getBooleanExtra(EXTRA_SKIP_LOAD, false)
+//        val skipLoad = intent.getBooleanExtra(EXTRA_SKIP_LOAD, false)
         super.onCreate(savedInstanceState)
 
         setContent {
             var activityOffset by remember { mutableIntStateOf(0) }
             CrySongsTheme {
                 Scaffold(
-                    Modifier.fillMaxSize()
+                    Modifier
+                        .fillMaxSize()
                         .offset { IntOffset(0, activityOffset) }
                         .pointerInput(Unit) {
                             fun onRelease() {
@@ -138,13 +140,14 @@ class FullscreenPlayerActivity : ComponentActivity() {
                                 onDragEnd = { onRelease() },
                                 onDragCancel = { onRelease() }
                             ) { _, dragAmount ->
-                                activityOffset = (activityOffset + dragAmount.toInt()).coerceAtLeast(0)
+                                activityOffset =
+                                    (activityOffset + dragAmount.toInt()).coerceAtLeast(0)
                             }
 
                         },
-                    containerColor = MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f))
+                    containerColor = Color.Transparent
                 ) { innerPadding ->
-                    Pager(innerPadding, this)
+                    Pager(innerPadding, this, activityOffset)
                 }
             }
         }
@@ -152,7 +155,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Pager(innerPadding: PaddingValues, activity: Activity) {
+private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffset: Int) {
     val roundness = activity.window.decorView.rootWindowInsets?.getRoundedCorner(
         RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
     val selectedTab = rememberPagerState(1) { 3 }
@@ -161,9 +164,12 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity) {
         } catch (_: Exception) {
             activity.resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
         }
+    val shape = RoundedCornerShape((roundness / 3.25f).dp)
 
     Box(
-        Modifier.clip(RoundedCornerShape((roundness / 3.25f).dp))
+        Modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f)))
     ) {
         Image(
             fsPlayerCover, null,
@@ -201,26 +207,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity) {
                            Modifier.fillMaxWidth(),
                            horizontalAlignment = Alignment.CenterHorizontally
                        ) {
-                           Row {
-                               TextButton(
-                                   { player.seekTo(position - 5000) }
-                               ) {
-                                   Text(formatDurationMs(position.milliseconds))
-                               }
-                               val pos = position.toFloat()
-                               Slider(
-                                   (pos / duration).takeIf { pos != 0f } ?: 0f,
-                                   { player.seekTo((it * duration).roundToInt()) },
-                                   modifier = Modifier
-                                       .fillMaxWidth(0.75f)
-                                       .padding(horizontal = 10.dp)
-                               )
-                               TextButton(
-                                   { player.seekTo(position + 5000) }
-                               ) {
-                                   Text(formatDurationMs(duration.milliseconds))
-                               }
-                           }
+                           ProgressBarRow(Modifier.fillMaxWidth())
                            Spacer(Modifier.height(15.dp))
                            PlayerButtonsRow()
                            Spacer(Modifier.height(15.dp))
@@ -257,7 +244,9 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity) {
 private fun ChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, activity: Activity) {
     val tabs = listOf("Details", "Player", "Lyrics")
     Row(
-        modifier.fillMaxWidth().padding(horizontal = 10.dp),
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp),
         Arrangement.SpaceBetween,
         Alignment.CenterVertically
     ) {
@@ -406,6 +395,39 @@ private fun PlayerButtonsRow() {
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun ProgressBarRow(modifier: Modifier = Modifier) {
+    Row(modifier) {
+        TextButton(
+            { player.seekTo(position - 5000) }
+        ) {
+            Text(formatDurationMs(position.milliseconds))
+        }
+        Box(
+            Modifier
+                .fillMaxWidth(0.75f)
+                .padding(horizontal = 10.dp),
+            Alignment.Center
+        ) {
+            val pos = position.toFloat()
+            Slider(
+                0f,
+                { player.seekTo((it * duration).roundToInt()) },
+                Modifier.alpha(0f)
+            )
+            LinearWavyProgressIndicator(
+                {(pos / duration).takeIf { pos != 0f } ?: 0f},
+                wavelength = 24.dp
+            )
+        }
+        TextButton(
+            { player.seekTo(position + 5000) }
+        ) {
+            Text(formatDurationMs(duration.milliseconds))
         }
     }
 }
