@@ -78,15 +78,4 @@ object Settings {
         val file = File(settingsFile)
         file.writeText(data)
     }
-
-    fun Activity.requestAllFilesAccessOrFinish() {
-        if (!Environment.isExternalStorageManager()) {
-            Toast.makeText(this, "App needs all file access to run", Toast.LENGTH_LONG).show()
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                .setData("package:$packageName".toUri())
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            finish()
-        }
-    }
 }

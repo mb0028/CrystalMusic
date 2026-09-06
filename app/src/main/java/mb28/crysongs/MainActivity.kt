@@ -2,12 +2,11 @@ package mb28.crysongs
 
 import android.app.NotificationManager
 import android.os.Bundle
+import android.os.Environment
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.animateBounds
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,10 +14,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -37,16 +36,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
-import androidx.core.view.WindowCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Settings.requestAllFilesAccessOrFinish
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.album
 import mb28.crysongs.icons.artist
@@ -59,6 +54,7 @@ import mb28.crysongs.icons.search
 import mb28.crysongs.icons.stylus_brush
 import mb28.crysongs.icons.theater_comedy
 import mb28.crysongs.ui.MiniPlayer
+import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.PlaylistsPage
 import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.TracksList
@@ -71,7 +67,12 @@ class MainActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
 
-        requestAllFilesAccessOrFinish()
+        if (!Environment.isExternalStorageManager()) {
+            super.onCreate(savedInstanceState)
+            setContent { CrySongsTheme { PermissionsPage(Modifier.fillMaxSize(), this) } }
+            return
+        }
+
         setupPermissions()
         Settings.load()
         super.onCreate(savedInstanceState)
