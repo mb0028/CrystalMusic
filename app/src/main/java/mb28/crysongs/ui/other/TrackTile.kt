@@ -17,8 +17,13 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -33,11 +38,13 @@ import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.setAndPlay
+import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true, onBeforeClick: () -> Unit = {}) {
+    var showMoreOptions by remember { mutableStateOf(false) }
     val coverPath = Track.createOrGetThumbnail(t.path)
     val defaultShape = RoundedCornerShape(15.dp)
     val shape = when {
@@ -74,17 +81,23 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
         ),
         contentPadding = PaddingValues(5.dp),
         leadingContent = {
-            if (coverPath != null) {
-                Image(
-                    BitmapFactory.decodeFile(coverPath).asImageBitmap(),
-                    "Track cover",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier
-                        .height(73.dp).width(73.dp)
-                        .clip(RoundedCornerShape(25.dp))
-                )
-            } else {
-                NoCoverImage(73.dp)
+            Surface(
+                { showMoreOptions = true },
+                color = Color.Transparent,
+                shape = RoundedCornerShape(25.dp)
+            ) {
+                if (coverPath != null) {
+                    Image(
+                        BitmapFactory.decodeFile(coverPath).asImageBitmap(),
+                        "Track cover",
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier
+                            .height(73.dp).width(73.dp)
+                            .clip(RoundedCornerShape(25.dp))
+                    )
+                } else {
+                    NoCoverImage(73.dp)
+                }
             }
         },
         onClick = {
@@ -131,6 +144,12 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
                 maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+    }
+
+    if (showMoreOptions) {
+        TrackMoreOptionsPopup(t) {
+            showMoreOptions = false
         }
     }
 }

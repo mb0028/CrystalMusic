@@ -21,10 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
 import mb28.crysongs.ui.other.TrackTile
+import java.io.File
 
 private var searchPageSearchText by mutableStateOf("")
 private var searchResult = mutableStateListOf<Track>()
@@ -32,15 +34,15 @@ private var searchResult = mutableStateListOf<Track>()
 fun searchPageResearch(input: String) {
     searchPageSearchText = input
     searchResult.clear()
-    if (input == "#pl:fav") {
-        tracks.fastForEachIndexed { i, track ->
+    if (input == "#fav") {
+        tracks.fastForEach { track ->
             if (Settings.favorites.contains(track.path)) {
                 searchResult.add(track)
             }
         }
     }
     else if (input.isNotBlank()) {
-        tracks.fastForEachIndexed { i, track ->
+        tracks.fastForEach { track ->
             if (track.title.lowercase().contains(input.lowercase())
                 || track.artist.lowercase().contains(input.lowercase())) {
                 searchResult.add(track)
@@ -76,7 +78,9 @@ fun SearchPage() {
                     showKeyboardOnFocus = true
                 ),
                 shape = RoundedCornerShape(35.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 5.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 5.dp)
             )
         }
 

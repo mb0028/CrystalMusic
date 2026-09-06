@@ -1,34 +1,43 @@
+@file:Suppress("ConstPropertyName")
+
 package mb28.crysongs.core
 
-import android.app.Activity
-import android.content.Intent
-import android.os.Environment
-import android.provider.Settings
-import android.widget.Toast
+import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.net.toUri
 import mb28.crysongs.player
 import java.io.File
 
 object Settings {
+    @SuppressLint("SdCardPath")
     const val appFolder = "/sdcard/Documents/.Crystal"
     const val appCacheFolder = "$appFolder/.SongsTemp"
     const val appCacheThumbsFolder = "$appFolder/Covers"
     const val settingsFile = "$appFolder/Songs Settings.txt"
 
     val favorites = mutableStateListOf<String>()
+    val playlists = mutableStateListOf<String>()
     var loopTrack by mutableStateOf(false)
     var appVolume by mutableFloatStateOf(1f)
     var sortBy = 0
     var sortOrderDesc = true
     var tagsSpacer = " • "
 
+    fun addOrRemoveFavorite(path: String) {
+        if (favorites.contains(path)) {
+            favorites.remove(path)
+        } else {
+            favorites.add(path)
+        }
+        save()
+    }
+
     fun load() {
         favorites.clear()
+        playlists.clear()
         val a = File(appFolder)
         val ac = File(appCacheFolder)
         val atc = File(appCacheThumbsFolder)
@@ -47,6 +56,12 @@ object Settings {
                             favorites.add(path)
                         }
                     }
+                    s.startsWith("[crym3u]") -> {
+                        val path = s.removePrefix("[crym3u]")
+                        if (File(path).exists()) {
+                            playlists.add(path)
+                        }
+                    }
                     s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
                     s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
                     s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
@@ -55,7 +70,6 @@ object Settings {
                 }
             }
         } else {
-            File("$appFolder/Settings").mkdirs()
             file.createNewFile()
             save()
         }
@@ -69,6 +83,11 @@ object Settings {
         data += "[Loop]$loopTrack\n"
         data += "[TagsSpacer]$tagsSpacer\n"
         data += "[Volume]$appVolume\n"
+
+        data += "\n[Playlists]\n"
+        playlists.forEach {
+            data += "[crym3u]$it\n"
+        }
 
         data += "\n[Favorites]\n"
         favorites.forEach {

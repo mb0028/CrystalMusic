@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
                     when (selectedIndex.intValue) {
                         0 -> TracksList(Modifier.padding(innerPadding))
                         1 -> QueryPage()
-                        2 -> PlaylistsPage(selectedIndex)
+                        2 -> PlaylistsPage()
                         4 -> SearchPage()
                         else -> {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

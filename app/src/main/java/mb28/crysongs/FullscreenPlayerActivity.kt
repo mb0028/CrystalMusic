@@ -12,7 +12,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +35,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
@@ -81,14 +81,15 @@ import mb28.crysongs.core.inverseLerp
 import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
-import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.pause_circle
 import mb28.crysongs.icons.play_circle
+import mb28.crysongs.icons.playlist_add
 import mb28.crysongs.icons.repeat
 import mb28.crysongs.icons.repeat_on
 import mb28.crysongs.icons.skip_next
 import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.icons.sound_detection_loud_sound
+import mb28.crysongs.ui.popups.AddToPlaylistPopup
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
@@ -142,7 +143,8 @@ class FullscreenPlayerActivity : ComponentActivity() {
                             }
 
                         },
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 ) { innerPadding ->
                     Pager(innerPadding, this, activityOffset)
                 }
@@ -342,12 +344,7 @@ private fun PlayerButtonsRow() {
         IconButton(
             {
                 if (nowPlaying != null) {
-                    if (Settings.favorites.contains(nowPlaying!!.path)) {
-                        Settings.favorites.remove(nowPlaying!!.path)
-                    } else {
-                        Settings.favorites.add(nowPlaying!!.path)
-                    }
-                    Settings.save()
+                    Settings.addOrRemoveFavorite(nowPlaying!!.path)
                 }
             },
             modifier = Modifier.scale(0.8f)
@@ -523,6 +520,8 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
 
 @Composable
 private fun TagsTab(modifier: Modifier = Modifier) {
+    var showAddToPlaylist by rememberSaveable { mutableStateOf(false) }
+
     if (nowPlaying != null) {
         val tags = listOf(
             "Title: ${nowPlaying!!.title}",
@@ -544,6 +543,19 @@ private fun TagsTab(modifier: Modifier = Modifier) {
             modifier,
             contentPadding = PaddingValues(vertical = 200.dp)
         ) {
+            item {
+                Row(
+                    Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledTonalIconButton(
+                        { showAddToPlaylist = true }
+                    ) {
+                        Icon(playlist_add, null)
+                    }
+                }
+            }
             items(tags.count()) { i ->
                 Text(
                     tags[i],
@@ -551,6 +563,10 @@ private fun TagsTab(modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
+        }
+
+        if (showAddToPlaylist) {
+            AddToPlaylistPopup(nowPlaying!!) { showAddToPlaylist = false }
         }
     }
 }

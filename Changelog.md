@@ -1,8 +1,12 @@
 ## v0.0.4-pre-release
+- New: Create playlists
 - New: Add tracks to favorites and access them in playlists tab
+- Open more actions panel by clicking track cover
 - Add support for multi-language LRC files (max 3 lang)
 - Fullscreen player corners are now rounded
 - Wavy slider for fullscreen player
+- App now shows a permissions page instead of closing app if permissions are now granted
+- Fix query randomize button bug
 - Lot of bug fixes & improvements
 
 ## v0.0.3-pre-release

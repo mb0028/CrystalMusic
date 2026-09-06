@@ -24,6 +24,7 @@ import mb28.crysongs.displayQueryMA
 import mb28.crysongs.displayQueryMB
 import mb28.crysongs.isReloading
 import mb28.crysongs.ui.other.ShuffleButton
+import mb28.crysongs.ui.other.ShuffleButtonQuery
 import mb28.crysongs.ui.other.TrackTile
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -51,7 +52,7 @@ fun QueryPage() {
                 Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
-                ShuffleButton()
+                ShuffleButtonQuery()
             }
         }
 
