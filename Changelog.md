@@ -1,4 +1,6 @@
 ## v0.0.4-pre-release
+- Fix app crashes after song ends
+- Add ignore battery optimization so app stay open a bit longer. Next update foreground service will be added too
 - New: Create playlists
 - New: Add tracks to favorites and access them in playlists tab
 - Open more actions panel by clicking track cover
@@ -6,7 +8,7 @@
 - Fullscreen player corners are now rounded
 - Wavy slider for fullscreen player
 - App now shows a permissions page instead of closing app if permissions are now granted
-- Fix query randomize button bug
+- Query randomize button will now correctly randomize query
 - Lot of bug fixes & improvements
 
 ## v0.0.3-pre-release

@@ -88,7 +88,8 @@ fun PlaylistsPage() {
             ) }
             EasySegmentedListItem(
                 playlist_play,
-                if (pl[0].startsWith("Name -> ")) pl[0].removePrefix("Name -> ")
+                if (pl[0].startsWith("Name -> "))
+                    pl[0].removePrefix("Name -> ") + " (${pl.count() - 1})"
                     else "??? (Corrupted name)",
                 i + 1, count,
                 Modifier.padding(horizontal = 15.dp)

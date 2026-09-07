@@ -452,7 +452,7 @@ private fun LyricsTab(modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(vertical = 200.dp),
             state = state
         ) {
-            items(lrcParser!!.Count) { //TODO: Fix null pointer exc on this line (i think its because of the animation)
+            items(lrcParser?.Count ?: 0) {
                 val lineAnim = animateFloatAsState(
                     if (it == lastLrcLineI) 0.5f else 0f,
                     TweenSpec(400)

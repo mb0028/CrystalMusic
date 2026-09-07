@@ -3,6 +3,7 @@ package mb28.crysongs
 import android.app.NotificationManager
 import android.os.Bundle
 import android.os.Environment
+import android.os.PowerManager
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -68,7 +69,8 @@ class MainActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
 
-        if (!Environment.isExternalStorageManager()) {
+        if (!Environment.isExternalStorageManager() ||
+            !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
             super.onCreate(savedInstanceState)
             setContent { CrySongsTheme { PermissionsPage(Modifier.fillMaxSize(), this) } }
             return
