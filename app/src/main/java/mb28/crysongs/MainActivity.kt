@@ -61,6 +61,7 @@ import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.PlaylistsPage
 import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.TracksList
+import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.theme.CrySongsTheme
 
 var noCoverBitmap: ImageBitmap? = null
@@ -128,6 +129,7 @@ class MainActivity : ComponentActivity() {
                         0 -> TracksList(Modifier.padding(innerPadding))
                         1 -> QueryPage()
                         2 -> PlaylistsPage()
+                        3 -> FoldersPage()
                         4 -> SearchPage()
                         else -> {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -3,6 +3,8 @@
 - Rename playlists with the new button
 - Better app icon & notification icons
 - Better notification progress bar
+- Folders tab is now works
+- UI improvements
 - Lot of bug fixes & improvements
   - Fix duplicate query causes infinity loop
 

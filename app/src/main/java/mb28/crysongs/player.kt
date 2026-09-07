@@ -22,6 +22,7 @@ import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.updateNotification
 import mb28.music.LrcParser
+import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
 var player by mutableStateOf(MediaPlayer())
@@ -39,6 +40,8 @@ private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
 
+
+var folders = mutableStateListOf<String>()
 var tracks = mutableStateListOf<Track>()
 var playerQuery = mutableStateListOf<Track>()
 var displayQuery = mutableStateListOf<Track>()
@@ -183,6 +186,11 @@ fun refreshTracksList(context: Context) {
                 cursor.getString(aaC) ?: "???",
             )
             tracks += track
+
+            val folder = File(path).parent
+            if (folder != null && !folders.contains(folder)) {
+                folders.add(folder)
+            }
         }
     }
 }
