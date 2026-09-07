@@ -1,3 +1,6 @@
+## v1.0.0-2026.09.xx (Upcoming)
+- Better app icon & notification icons
+
 ## v0.0.4-pre-release
 - Fix app crashes after song ends
 - Add ignore battery optimization so app stay open a bit longer. Next update foreground service will be added too
