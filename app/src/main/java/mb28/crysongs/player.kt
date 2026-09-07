@@ -34,7 +34,7 @@ var lastLrcLineI by mutableIntStateOf(-1)
 
 
 private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 300.milliseconds
+private val playerLoopDelay = 350.milliseconds
 private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)

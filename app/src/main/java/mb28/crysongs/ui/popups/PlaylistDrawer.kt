@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.icons.delete_sweep
 import mb28.crysongs.icons.edit_note
 import mb28.crysongs.icons.reorder
 import mb28.crysongs.icons.swipe_down_alt
@@ -40,14 +41,16 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
+    var showRenamePopup by remember { mutableStateOf(false) }
     var reorderMode by remember { mutableStateOf(false) }
     var plPath by remember { mutableStateOf("") }
+    var plName by remember { mutableStateOf("") }
     val songs = remember { mutableStateListOf<Track>() }
 
-    fun save() {
-        val pl = File(plPath).readLines()
+    fun save(newName: String = plName) {
+        plName = newName
         val newPl = mutableListOf<String>()
-        newPl.add(pl.first())
+        newPl.add("Name -> $newName")
         songs.forEach {
             newPl.add("Music -> " + it.path)
         }
@@ -73,6 +76,7 @@ fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
             }
             if (exists) {
                 val pl = File(plPath).readLines()
+                plName = pl.first().removePrefix("Name -> ")
                 pl.forEach { plItem ->
                     if (plItem.startsWith("Music -> ")) {
                         val path = plItem.substring(9)
@@ -94,14 +98,14 @@ fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
             Alignment.CenterVertically
         ) {
             Text(
-                if (playlist == "#fav") "Favorites" else playlist,
+                if (playlist == "#fav") "Favorites" else plName,
                 Modifier.fillMaxWidth(if (playlist == "#fav") 1f else 0.7f).padding(horizontal = 10.dp),
                 maxLines = 1
             )
 
             if (playlist != "#fav") {
                 FilledTonalIconButton(
-                    { }
+                    { showRenamePopup = true }
                 ) {
                     Icon(edit_note, null)
                 }
@@ -113,13 +117,24 @@ fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
                 }
             }
         }
-        LazyColumn() {
+        LazyColumn {
             val count = songs.count()
             items(count) { i ->
                 Row(
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (reorderMode) {
+                        IconButton(
+                            {
+                                songs.removeAt(i)
+                                save()
+                            }
+                        ) {
+                            Icon(delete_sweep, null)
+                        }
+                    }
+
                     TrackTile(
                         songs[i],
                         i, count,
@@ -129,6 +144,7 @@ fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
                         playerQuery = songs.toMutableStateList()
                         updateDisplayQuery()
                     }
+
                     if (reorderMode) {
                         Column {
                             IconButton(
@@ -155,6 +171,15 @@ fun PlaylistDrawer(playlist: String, onDismiss: () -> Unit) {
             }
             item {
                 Spacer(Modifier.height(200.dp))
+            }
+        }
+    }
+
+    if (showRenamePopup) {
+        RenamePlaylistPopup(plName) { newName, saved ->
+            showRenamePopup = false
+            if (saved) {
+                save(newName)
             }
         }
     }

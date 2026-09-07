@@ -46,6 +46,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.WavyProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -369,7 +370,8 @@ private fun PlayerButtonsRow() {
                     playerQuery[(nowPlayingI - 1).coerceIn(0, playerQuery.count() - 1)],
                     false
                 )
-            }
+            },
+            enabled = playerQuery.isNotEmpty()
         ) {
             Icon(skip_previous, null)
         }
@@ -394,7 +396,8 @@ private fun PlayerButtonsRow() {
                     playerQuery[(nowPlayingI + 1).coerceIn(0, playerQuery.count() - 1)],
                     false
                 )
-            }
+            },
+            enabled = playerQuery.isNotEmpty()
         ) {
             Icon(skip_next, null)
         }
@@ -413,6 +416,11 @@ private fun PlayerButtonsRow() {
 
 @Composable
 private fun ProgressBarRow(modifier: Modifier = Modifier) {
+    val pos = position.toFloat()
+    val animatedPos = animateFloatAsState(
+        (pos / duration).takeIf { pos != 0f } ?: 0f,
+        WavyProgressIndicatorDefaults.ProgressAnimationSpec
+    )
     Row(modifier) {
         TextButton(
             { player.seekTo(position - 5000) }
@@ -425,9 +433,8 @@ private fun ProgressBarRow(modifier: Modifier = Modifier) {
                 .padding(horizontal = 10.dp),
             Alignment.Center
         ) {
-            val pos = position.toFloat()
             LinearWavyProgressIndicator(
-                {(pos / duration).takeIf { pos != 0f } ?: 0f},
+                { animatedPos.value },
                 wavelength = 24.dp,
                 amplitude = { if (isPlaying) 1f else 0f }
             )
