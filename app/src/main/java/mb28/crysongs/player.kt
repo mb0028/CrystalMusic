@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -35,6 +34,7 @@ var lastLrcLineI by mutableIntStateOf(-1)
 
 
 private const val NO_LYRIC = "No lyrics..."
+private val playerLoopDelay = 300.milliseconds
 private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
@@ -74,7 +74,7 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
     isReloading = false
 }
 
-fun playerLoop(nm: NotificationManager, context: Activity, color: Color) = scope.launch {
+fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
     while (true) {
         isPlaying = player.isPlaying
         // Pos needs to update even when player is paused for seekbar
@@ -88,13 +88,14 @@ fun playerLoop(nm: NotificationManager, context: Activity, color: Color) = scope
                 // On lyric line changes
                 if (line != lastLrcLine) {
                     updateNotification(nm, context, nowPlaying!!.title + "$tagsSpacer${nowPlaying!!.artist}", line,
-                        line, color, position.milliseconds, player.duration.milliseconds)
+                        line,
+                        position.milliseconds, player.duration.milliseconds)
                     lastLrcLine = line
                 }
             } else {
                 lastLrcLine = NO_LYRIC
                 updateNotification(nm, context, nowPlaying!!.title, nowPlaying!!.artist,
-                    nowPlaying!!.title, color, position.milliseconds, player.duration.milliseconds)
+                    nowPlaying!!.title, position.milliseconds, player.duration.milliseconds)
             }
 
             // On track changed
@@ -107,7 +108,7 @@ fun playerLoop(nm: NotificationManager, context: Activity, color: Color) = scope
             }
         }
 
-        delay(if (hasLrc) 100.milliseconds else 300.milliseconds)
+        delay(playerLoopDelay)
     }
 }
 

@@ -1,5 +1,8 @@
 ## v1.0.0-2026.09.xx (Upcoming)
 - Better app icon & notification icons
+- Better notification progress bar
+- Lot of bug fixes & improvements
+  - Fix duplicate query causes infinity loop
 
 ## v0.0.4-pre-release
 - Fix app crashes after song ends

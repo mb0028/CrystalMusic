@@ -4,12 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.pm.PackageManager
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import mb28.crysongs.R
+import mb28.crysongs.notificationColor
 import kotlin.time.Duration
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
@@ -21,38 +22,34 @@ fun formatDurationMs(d: Duration) : String {
             ":${d.inWholeSeconds.rem(60).toString().padStart(2, '0')}"
 }
 
-private var progressIcon: IconCompat? = null
 private var nIcon: IconCompat? = null
+private const val colWhite = 0xffaaaaaa.toInt()
 
 fun updateNotification(nm: NotificationManager, context: Activity, title: String, subtitle: String,
-                          shortCriticalText: String, color: androidx.compose.ui.graphics.Color, progress: Duration,
-                          duration: Duration, id: Int = 0) {
-    if (progressIcon == null) {
-        progressIcon = IconCompat.createWithResource(context, R.drawable.current_pos)
-    }
+                       shortCriticalText: String, progress: Duration,
+                       duration: Duration, id: Int = 0) {
     if (nIcon == null) {
         nIcon = IconCompat.createWithResource(context, R.drawable.now_playing_icon)
     }
     val d = duration.inWholeSeconds.toInt()
+    val s = progress.inWholeSeconds.toInt().fastCoerceAtLeast(1)
     val style: NotificationCompat.ProgressStyle = NotificationCompat.ProgressStyle()
-        .setStyledByProgress(false)
-        .setProgress(progress.inWholeSeconds.toInt())
-        .setProgressTrackerIcon(progressIcon!!)
+        .setProgress(s)
         .setProgressSegments(
             listOf(
-                NotificationCompat.ProgressStyle.Segment(d).setColor(color.toArgb())
+                NotificationCompat.ProgressStyle.Segment(d).setColor(notificationColor ?: colWhite)
             )
         )
 
     val n = NotificationCompat.Builder(context, CHANNEL_NOW_PLAYING)
-        .setColor(color.toArgb())
+        .setSmallIcon(nIcon!!)
+        .setColor(notificationColor ?: colWhite)
         .setContentTitle(title)
         .setContentText(subtitle)
         .setShortCriticalText(shortCriticalText)
+        .setStyle(style)
         .setOngoing(true)
         .setRequestPromotedOngoing(true)
-        .setSmallIcon(nIcon!!)
-        .setStyle(style)
         .build()
 
 

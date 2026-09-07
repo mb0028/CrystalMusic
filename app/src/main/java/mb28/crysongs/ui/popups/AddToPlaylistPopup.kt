@@ -26,11 +26,7 @@ import java.io.File
 fun AddToPlaylistPopup(track: Track, onDismissRequired: () -> Unit) {
     AlertDialog(
         { onDismissRequired() },
-        {
-            OutlinedButton({ onDismissRequired() }) {
-                Text("Ok")
-            }
-        },
+        { },
         title = {
             Text("Add to playlist")
         },

@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.R
+import mb28.crysongs.noCoverBitmap
 
 @Composable
 fun NoCoverImage(sizeXY: Dp = 80.dp, roundness: Dp = 25.dp) {
@@ -28,7 +29,7 @@ fun NoCoverImage(sizeXY: Dp = 80.dp, roundness: Dp = 25.dp) {
             )
     ) {
         Image(
-            painterResource(R.drawable.null_track_cover),
+            noCoverBitmap!!,
             "Track cover",
             contentScale = ContentScale.FillHeight,
             modifier = Modifier.fillMaxSize()

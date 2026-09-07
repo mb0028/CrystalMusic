@@ -8,7 +8,6 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -37,10 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
@@ -62,6 +63,9 @@ import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.theme.CrySongsTheme
 
+var noCoverBitmap: ImageBitmap? = null
+var notificationColor: Int? = null
+
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +84,10 @@ class MainActivity : ComponentActivity() {
         Settings.load()
         super.onCreate(savedInstanceState)
 
+        if (noCoverBitmap == null) {
+            noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
+        }
+
         val nm = getSystemService<NotificationManager>()!!
 
         player.setOnCompletionListener {
@@ -94,13 +102,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        playerLoop(nm, this, Color(0xffcdb5de))
+        playerLoop(nm, this)
 
         lifecycleScope.launch {
             refreshTracksList(this@MainActivity)
         }
 
         setContent {
+            if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
             CrySongsTheme {
                 val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
                 val selectedSet = remember { mutableStateOf(false) }

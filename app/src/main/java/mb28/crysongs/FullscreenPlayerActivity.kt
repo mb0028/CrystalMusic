@@ -119,6 +119,10 @@ class FullscreenPlayerActivity : ComponentActivity() {
 //        val skipLoad = intent.getBooleanExtra(EXTRA_SKIP_LOAD, false)
         super.onCreate(savedInstanceState)
 
+        if (noCoverBitmap == null) {
+            noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
+        }
+
         setContent {
             var activityOffset by remember { mutableIntStateOf(0) }
             CrySongsTheme {
@@ -161,7 +165,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
     val fsPlayerCover = try {
             BitmapFactory.decodeFile(Track.createOrGetThumbnail(nowPlaying!!.path)).asImageBitmap()
         } catch (_: Exception) {
-            activity.resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
+            noCoverBitmap!!
         }
     val shape = RoundedCornerShape((roundness / 3.25f).dp)
 
@@ -362,7 +366,7 @@ private fun PlayerButtonsRow() {
         IconButton(
             {
                 setAndPlay(
-                    playerQuery[(playerQuery.indexOf(nowPlaying) - 1).coerceIn(0, playerQuery.count() - 1)],
+                    playerQuery[(nowPlayingI - 1).coerceIn(0, playerQuery.count() - 1)],
                     false
                 )
             }
@@ -387,7 +391,7 @@ private fun PlayerButtonsRow() {
         IconButton(
             {
                 setAndPlay(
-                    playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
+                    playerQuery[(nowPlayingI + 1).coerceIn(0, playerQuery.count() - 1)],
                     false
                 )
             }
@@ -417,7 +421,7 @@ private fun ProgressBarRow(modifier: Modifier = Modifier) {
         }
         Box(
             Modifier
-                .fillMaxWidth(0.75f)
+                .fillMaxWidth(0.77f)
                 .padding(horizontal = 10.dp),
             Alignment.Center
         ) {
@@ -537,7 +541,7 @@ private fun TagsTab(modifier: Modifier = Modifier) {
             "Album artist: ${nowPlaying!!.albumArtist}",
             " ",
             "Path:\n${nowPlaying!!.path.removePrefix("/storage/emulated/")}",
-            "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath}" else "No lrc file found"}",
+            "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath.removePrefix("/storage/emulated/")}" else "No lrc file found"}",
         )
         LazyColumn(
             modifier,
