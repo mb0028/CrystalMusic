@@ -60,6 +60,7 @@ import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.PlaylistsPage
 import mb28.crysongs.ui.QueryPage
+import mb28.crysongs.ui.SearchPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.theme.CrySongsTheme

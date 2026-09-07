@@ -1,5 +1,6 @@
 package mb28.crysongs.ui.other
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,8 +44,14 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true,
-              modifier: Modifier = Modifier, onBeforeClick: () -> Unit = {}) {
+fun TrackTile(
+    t: Track,
+    index: Int,
+    count: Int,
+    resetQueryOnClick: Boolean = true,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    onBeforeClick: () -> Unit = {}
+) {
     var showMoreOptions by remember { mutableStateOf(false) }
     val coverPath = Track.createOrGetThumbnail(t.path)
     val defaultShape = RoundedCornerShape(15.dp)

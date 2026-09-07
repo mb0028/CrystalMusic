@@ -23,7 +23,6 @@ import mb28.crysongs.displayQuery
 import mb28.crysongs.displayQueryMA
 import mb28.crysongs.displayQueryMB
 import mb28.crysongs.isReloading
-import mb28.crysongs.ui.other.ShuffleButton
 import mb28.crysongs.ui.other.ShuffleButtonQuery
 import mb28.crysongs.ui.other.TrackTile
 

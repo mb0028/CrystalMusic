@@ -1,4 +1,4 @@
-package mb28.crysongs
+package mb28.crysongs.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -22,11 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastForEachIndexed
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.playerQuery
+import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.TrackTile
-import java.io.File
+import mb28.crysongs.updateDisplayQuery
 
 private var searchPageSearchText by mutableStateOf("")
 private var searchResult = mutableStateListOf<Track>()
