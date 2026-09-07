@@ -7,6 +7,7 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -167,7 +168,7 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
                             null
                         )
                     },
-                    label = { Text(label) },
+                    label = { Text(label) }
                 )
             }
         }

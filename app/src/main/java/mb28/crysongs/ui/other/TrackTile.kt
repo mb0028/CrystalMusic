@@ -43,7 +43,8 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true, onBeforeClick: () -> Unit = {}) {
+fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = true,
+              modifier: Modifier = Modifier, onBeforeClick: () -> Unit = {}) {
     var showMoreOptions by remember { mutableStateOf(false) }
     val coverPath = Track.createOrGetThumbnail(t.path)
     val defaultShape = RoundedCornerShape(15.dp)
@@ -62,7 +63,7 @@ fun TrackTile(t: Track, index: Int, count: Int, resetQueryOnClick: Boolean = tru
             defaultShape,
             defaultShape
         ),
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 5.dp)
             .padding(horizontal = 10.dp)
             .height(82.dp)
