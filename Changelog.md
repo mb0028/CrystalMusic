@@ -1,4 +1,6 @@
 ## v1.0.0-2026.09.xx (Upcoming)
+- Add delete button for playlist items
+- Rename playlists with the new button
 - Better app icon & notification icons
 - Better notification progress bar
 - Lot of bug fixes & improvements
