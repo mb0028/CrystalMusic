@@ -10,17 +10,13 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,43 +24,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.WavyProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -72,28 +50,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
 import androidx.core.graphics.drawable.toBitmap
-import kotlinx.coroutines.launch
-import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
-import mb28.crysongs.core.formatDurationMs
-import mb28.crysongs.core.inverseLerp
-import mb28.crysongs.icons.arrow_cool_down
-import mb28.crysongs.icons.favorite
-import mb28.crysongs.icons.heart_plus
-import mb28.crysongs.icons.pause_circle
-import mb28.crysongs.icons.play_circle
-import mb28.crysongs.icons.playlist_add
-import mb28.crysongs.icons.repeat
-import mb28.crysongs.icons.repeat_on
-import mb28.crysongs.icons.skip_next
-import mb28.crysongs.icons.skip_previous
-import mb28.crysongs.icons.sound_detection_loud_sound
-import mb28.crysongs.ui.popups.AddToPlaylistPopup
+import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
+import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
+import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
+import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
+import mb28.crysongs.ui.fullscreen_player.FSTagsTab
 import mb28.crysongs.ui.theme.CrySongsTheme
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
 
 const val EXTRA_SKIP_LOAD = "EXTRA_SKIP_LOAD"
 
@@ -211,9 +175,9 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                            Modifier.fillMaxWidth(),
                            horizontalAlignment = Alignment.CenterHorizontally
                        ) {
-                           ProgressBarRow(Modifier.fillMaxWidth())
+                           FSProgressBarRow(Modifier.fillMaxWidth())
                            Spacer(Modifier.height(15.dp))
-                           PlayerButtonsRow()
+                           FSPlayerButtonsRow()
                            Spacer(Modifier.height(15.dp))
                            Text(
                                lastLrcLine,
@@ -224,99 +188,23 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                    }
                 }
                 2 -> {
-                    LyricsTab(Modifier
+                    FSLyricsTab(Modifier
                         .fillMaxSize()
                         .padding(horizontal = 20.dp))
                 }
                 0 -> {
-                    TagsTab(Modifier
+                    FSTagsTab(Modifier
                         .fillMaxSize()
                         .padding(horizontal = 20.dp))
                 }
             }
         }
-        ChangePageRow(
+        FSChangePageRow(
             Modifier
                 .padding(top = innerPadding.calculateTopPadding() + 10.dp)
                 .align(Alignment.TopCenter),
             selectedTab, activity
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, activity: Activity) {
-    var showVolSheet by rememberSaveable { mutableStateOf(false) }
-    val tabs = listOf("Details", "Player", "Lyrics")
-    Row(
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-        Arrangement.SpaceBetween,
-        Alignment.CenterVertically
-    ) {
-        IconButton(
-            { activity.finish() }
-        ) {
-            Icon(arrow_cool_down, null)
-        }
-
-        Row(
-            Modifier
-                .size(270.dp, 40.dp)
-                .background(
-                    MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
-                    RoundedCornerShape(35.dp)
-                ),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            tabs.forEachIndexed { i, tab ->
-                Surface(
-                    onClick = {selectedTab.requestScrollToPage(i)},
-                    modifier = Modifier.size(80.dp, 30.dp),
-                    color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondaryContainer
-                    else MaterialTheme.colorScheme.surface.copy(0.5f),
-                    shape = RoundedCornerShape(35.dp)
-                ) {
-                    Text(
-                        tab,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 2.dp)
-                    )
-                }
-            }
-        }
-
-        IconButton(
-            { showVolSheet = true }
-        ) {
-            Icon(sound_detection_loud_sound, null)
-        }
-    }
-
-    if (showVolSheet) {
-        ModalBottomSheet(
-            {
-                showVolSheet = false
-            }
-        ) {
-            Text("Volume: ${(Settings.appVolume * 100f).roundToInt() / 100f}", modifier = Modifier.padding(horizontal = 25.dp))
-            Slider(
-                Settings.appVolume,
-                {
-                    Settings.appVolume = it
-                    player.setVolume(Settings.appVolume, Settings.appVolume)
-                    Settings.save()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 15.dp)
-            )
-        }
     }
 }
 
@@ -336,248 +224,5 @@ private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
                 .size(340.dp, 340.dp)
                 .clip(RoundedCornerShape(30.dp))
         )
-    }
-}
-
-@Composable
-private fun PlayerButtonsRow() {
-    Row(
-        Modifier
-            .scale(1.4f)
-            .padding(vertical = 10.dp)
-    ) {
-        IconButton(
-            {
-                if (nowPlaying != null) {
-                    Settings.addOrRemoveFavorite(nowPlaying!!.path)
-                }
-            },
-            modifier = Modifier.scale(0.8f)
-        ) {
-            if (nowPlaying != null) {
-                Icon(
-                    if (Settings.favorites.contains(nowPlaying!!.path)) favorite else heart_plus,
-                    null
-                )
-            } else {
-                Icon(heart_plus, null, modifier = Modifier.alpha(0.5f))
-            }
-
-        }
-        IconButton(
-            {
-                setAndPlay(
-                    playerQuery[(nowPlayingI - 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
-            },
-            enabled = playerQuery.isNotEmpty()
-        ) {
-            Icon(skip_previous, null)
-        }
-        IconButton(
-            {
-                if (player.isPlaying) {
-                    player.pause()
-                } else {
-                    player.start()
-                }
-                isPlaying = player.isPlaying
-            },
-            modifier = Modifier
-                .scale(1.5f)
-                .padding(horizontal = 8.dp)
-        ) {
-            Icon(if (isPlaying) pause_circle else play_circle, null)
-        }
-        IconButton(
-            {
-                setAndPlay(
-                    playerQuery[(nowPlayingI + 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
-            },
-            enabled = playerQuery.isNotEmpty()
-        ) {
-            Icon(skip_next, null)
-        }
-        IconButton(
-            {
-                Settings.loopTrack = !Settings.loopTrack
-                player.isLooping = Settings.loopTrack
-                Settings.save()
-            },
-            modifier = Modifier.scale(0.8f)
-        ) {
-            Icon(if (Settings.loopTrack) repeat_on else repeat, null)
-        }
-    }
-}
-
-@Composable
-private fun ProgressBarRow(modifier: Modifier = Modifier) {
-    val pos = position.toFloat()
-    val animatedPos = animateFloatAsState(
-        (pos / duration).takeIf { pos != 0f } ?: 0f,
-        WavyProgressIndicatorDefaults.ProgressAnimationSpec
-    )
-    Row(modifier) {
-        TextButton(
-            { player.seekTo(position - 5000) }
-        ) {
-            Text(formatDurationMs(position.milliseconds))
-        }
-        Box(
-            Modifier
-                .fillMaxWidth(0.77f)
-                .padding(horizontal = 10.dp),
-            Alignment.Center
-        ) {
-            LinearWavyProgressIndicator(
-                { animatedPos.value },
-                wavelength = 24.dp,
-                amplitude = { if (isPlaying) 1f else 0f }
-            )
-            Slider(
-                0f,
-                { player.seekTo((it * duration).roundToInt()) },
-                Modifier.alpha(0f)
-            )
-        }
-        TextButton(
-            { player.seekTo(position + 5000) }
-        ) {
-            Text(formatDurationMs(duration.milliseconds))
-        }
-    }
-}
-
-@Composable
-private fun LyricsTab(modifier: Modifier = Modifier) {
-    val state = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    if (lrcParser != null) {
-        LazyColumn(
-            modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(vertical = 200.dp),
-            state = state
-        ) {
-            items(lrcParser?.Count ?: 0) {
-                val lineAnim = animateFloatAsState(
-                    if (it == lastLrcLineI) 0.5f else 0f,
-                    TweenSpec(400)
-                )
-                val line = lrcParser!!.LyricLines[it]
-                Box(
-                    Modifier
-                        .padding(6.dp)
-                        .graphicsLayer {
-                            val s = 1.05f + (lineAnim.value * 0.18f)
-                            scaleX = s
-                            scaleY = s
-                        }
-                        .background(
-                            MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = lineAnim.value),
-                            RoundedCornerShape(20.dp)
-                        )
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable {
-                            scope.launch {
-                                if (lrcParser!!.IsGettingLineInRealtimePossible) {
-                                    player.seekTo(
-                                        lerp(
-                                            0, duration,
-                                            inverseLerp(0f, duration / 1000f, line.TimeStomp),
-                                        )
-                                    )
-                                    state.scrollToItem(it, -500)
-                                }
-                            }
-                        },
-                ) {
-                    Text(
-                        when {
-                            line.Lyric3 != null -> "${line.Lyric}\n${line.Lyric2!!}\n${line.Lyric3}"
-                            line.Lyric2 != null -> "${line.Lyric}\n${line.Lyric2}"
-                            else -> line.Lyric
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-    else {
-        Column(
-            modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                "(。﹏。*)", fontSize = 40.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(15.dp))
-            Text(
-                "No Lyrics...",
-                fontSize = 16.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
-@Composable
-private fun TagsTab(modifier: Modifier = Modifier) {
-    var showAddToPlaylist by rememberSaveable { mutableStateOf(false) }
-
-    if (nowPlaying != null) {
-        val tags = listOf(
-            "Title: ${nowPlaying!!.title}",
-            "Artist: ${nowPlaying!!.artist}",
-            "Album: ${nowPlaying!!.album}",
-            "Composer: ${nowPlaying!!.composer}",
-            "Genre: ${nowPlaying!!.genre}",
-            " ",
-            "Duration: ${nowPlaying!!.duration.milliseconds}",
-            "Bitrate: ${(nowPlaying!!.bitrate / 1000f).roundToInt()} kbps",
-            "Year: ${nowPlaying!!.year}",
-            " ",
-            "Album artist: ${nowPlaying!!.albumArtist}",
-            " ",
-            "Path:\n${nowPlaying!!.path.removePrefix("/storage/emulated/")}",
-            "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath.removePrefix("/storage/emulated/")}" else "No lrc file found"}",
-        )
-        LazyColumn(
-            modifier,
-            contentPadding = PaddingValues(vertical = 200.dp)
-        ) {
-            item {
-                Row(
-                    Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    FilledTonalIconButton(
-                        { showAddToPlaylist = true }
-                    ) {
-                        Icon(playlist_add, null)
-                    }
-                }
-            }
-            items(tags.count()) { i ->
-                Text(
-                    tags[i],
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-        }
-
-        if (showAddToPlaylist) {
-            AddToPlaylistPopup(nowPlaying!!) { showAddToPlaylist = false }
-        }
     }
 }
