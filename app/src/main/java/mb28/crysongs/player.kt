@@ -212,6 +212,7 @@ fun refreshTracksList(context: Context) {
             }
         }
     }
+    folders.sort()
     artists.sort()
     albums.sort()
     genres.sort()

@@ -112,8 +112,8 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
             CrySongsTheme {
+                if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
                 val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
                 val selectedSet = remember { mutableStateOf(false) }
                 Scaffold(

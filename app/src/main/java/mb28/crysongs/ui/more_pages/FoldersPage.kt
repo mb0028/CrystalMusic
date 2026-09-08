@@ -44,7 +44,7 @@ fun FoldersPage() {
                     else "Folders (${folders.count()})",
                 fontSize = 36.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                lineHeight = 40.sp,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(33.dp))
@@ -66,8 +66,9 @@ fun FoldersPage() {
         }
 
         if (folderView) {
-            val folderTracks = tracks.takeWhile {
-                it.path.startsWith(clickedFolderPath)
+            val folderTracks = tracks.toMutableList()
+            folderTracks.removeIf {
+                !it.path.startsWith(clickedFolderPath)
             }
             val count = folderTracks.count()
             items(count) { i ->

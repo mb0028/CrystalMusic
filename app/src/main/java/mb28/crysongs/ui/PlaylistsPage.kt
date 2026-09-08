@@ -81,7 +81,7 @@ fun PlaylistsPage() {
                 if (playlistView) (if (lastClickedPlPath == "#fav") "Favorites" else plName)
                     else "Playlists",
                 fontSize = 36.sp,
-                maxLines = 1,
+                lineHeight = 40.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

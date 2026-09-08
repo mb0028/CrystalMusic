@@ -45,7 +45,7 @@ fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
                 if (listItemsView) clickedListItem else "${listType[0].uppercase() + listType.substring(1)} (${list.count()})",
                 fontSize = 36.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                lineHeight = 40.sp,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(33.dp))
