@@ -41,6 +41,10 @@ private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
 
 
+var albums = mutableStateListOf<String>()
+var artists = mutableStateListOf<String>()
+var genres = mutableStateListOf<String>()
+var composers = mutableStateListOf<String>()
 var folders = mutableStateListOf<String>()
 var tracks = mutableStateListOf<Track>()
 var playerQuery = mutableStateListOf<Track>()
@@ -125,7 +129,8 @@ fun updateDisplayQuery() {
 }
 
 fun refreshTracksList(context: Context) {
-    tracks.clear()
+    tracks.clear(); folders.clear(); albums.clear()
+    artists.clear(); genres.clear(); composers.clear()
 
     val projection = arrayOf(
         MediaStore.MediaColumns.DATA,
@@ -191,6 +196,24 @@ fun refreshTracksList(context: Context) {
             if (folder != null && !folders.contains(folder)) {
                 folders.add(folder)
             }
+            track.run {
+                if (album != "???" && !albums.contains(album)) {
+                    albums.add(album)
+                }
+                if (artist != "???" && !artists.contains(artist)) {
+                    artists.add(artist)
+                }
+                if (genre != "???" && !genres.contains(genre)) {
+                    genres.add(genre)
+                }
+                if (composer != "???" && !composers.contains(composer)) {
+                    composers.add(composer)
+                }
+            }
         }
     }
+    artists.sort()
+    albums.sort()
+    genres.sort()
+    composers.sort()
 }

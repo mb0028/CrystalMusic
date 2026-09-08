@@ -16,32 +16,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mb28.crysongs.folders
+import androidx.compose.ui.util.fastMap
 import mb28.crysongs.icons.arrow_back
-import mb28.crysongs.icons.folder
+import mb28.crysongs.icons.list_2
 import mb28.crysongs.playerQuery
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
+import kotlin.text.lastIndexOf
+import kotlin.text.substring
 
 @Composable
-fun FoldersPage() {
-    var folderView by remember { mutableStateOf(false) }
-    var clickedFolderPath by remember { mutableStateOf("") }
+fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
+    var listItemsView by remember { mutableStateOf(false) }
+    var clickedListItem by remember { mutableStateOf("") }
     LazyColumn(
         contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
     ) {
         item {
             Text(
-                if (folderView) clickedFolderPath.substring(
-                    clickedFolderPath.lastIndexOf('/') + 1)
-                    else "Folders (${folders.count()})",
+                if (listItemsView) clickedListItem else "${listType[0].uppercase() + listType.substring(1)} (${list.count()})",
                 fontSize = 36.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -52,12 +53,14 @@ fun FoldersPage() {
 
         item {
             Row(
-                Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
-                if (folderView) {
+                if (listItemsView) {
                     FilledTonalIconButton(
-                        { folderView = false }
+                        { listItemsView = false }
                     ) {
                         Icon(arrow_back, null)
                     }
@@ -65,34 +68,47 @@ fun FoldersPage() {
             }
         }
 
-        if (folderView) {
-            val folderTracks = tracks.takeWhile {
-                it.path.startsWith(clickedFolderPath)
+        if (listItemsView) {
+            val listTracks = tracks.toMutableList()
+            when(listType) {
+                "artists" -> listTracks.removeIf {
+                    it.artist != clickedListItem
+                }
+                "albums" -> listTracks.removeIf {
+                    it.album != clickedListItem
+                }
+                "genres" -> listTracks.removeIf {
+                    it.genre != clickedListItem
+                }
+                "composers" -> listTracks.removeIf {
+                    it.composer != clickedListItem
+                }
+                else -> { listTracks.clear() }
             }
-            val count = folderTracks.count()
+            val count = listTracks.count()
             items(count) { i ->
                 TrackTile(
-                    folderTracks[i],
+                    listTracks[i],
                     i, count,
                     resetQueryOnClick = false
                 ) {
-                    playerQuery = folderTracks.toMutableStateList()
+                    playerQuery = listTracks.toMutableStateList()
                     updateDisplayQuery()
                 }
             }
         }
         else {
-            val count = folders.count()
+            val count = list.count()
             items(count) { i ->
-                val f = folders[i]
+                val f = list[i]
                 EasySegmentedListItem(
-                    folder,
-                    f.substring(f.lastIndexOf('/') + 1),
+                    null,
+                    f,
                     i, count,
                     Modifier.padding(horizontal = 10.dp)
                 ) {
-                    clickedFolderPath = f
-                    folderView = true
+                    clickedListItem = list[i]
+                    listItemsView = true
                 }
             }
         }

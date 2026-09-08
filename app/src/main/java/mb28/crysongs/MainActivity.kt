@@ -62,6 +62,7 @@ import mb28.crysongs.ui.PlaylistsPage
 import mb28.crysongs.ui.QueryPage
 import mb28.crysongs.ui.SearchPage
 import mb28.crysongs.ui.TracksList
+import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.theme.CrySongsTheme
 
@@ -132,6 +133,10 @@ class MainActivity : ComponentActivity() {
                         2 -> PlaylistsPage()
                         3 -> FoldersPage()
                         4 -> SearchPage()
+                        5 -> CustomTagsPage(artists, "artists")
+                        6 -> CustomTagsPage(albums, "albums")
+                        7 -> CustomTagsPage(genres, "genres")
+                        8 -> CustomTagsPage(composers, "composers")
                         else -> {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text("Coming soon!")
