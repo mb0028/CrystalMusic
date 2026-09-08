@@ -144,7 +144,10 @@ fun PlaylistsPage() {
                         if (plItem.startsWith("Music -> ")) {
                             val path = plItem.substring(9)
                             if (plItem.contains(path)) {
-                                songs.add(tracks.find { it.path == path }!!)
+                                val t = tracks.find { it.path == path }
+                                if (t != null) {
+                                    songs.add(t)
+                                }
                             }
                         }
                     }

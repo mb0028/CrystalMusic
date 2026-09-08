@@ -97,7 +97,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
                         .offset { IntOffset(0, activityOffset) }
                         .pointerInput(Unit) {
                             fun onRelease() {
-                                if (activityOffset > 300) {
+                                if (activityOffset > 200) {
                                     finish()
                                 } else {
                                     activityOffset = 0
@@ -160,11 +160,11 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                        horizontalAlignment = Alignment.CenterHorizontally,
                        verticalArrangement = Arrangement.SpaceBetween
                    ) {
-                       Spacer(Modifier.height(15.dp))
-
                        Column(Modifier.fillMaxWidth()) {
-                           Cover(Modifier.align(Alignment.CenterHorizontally), fsPlayerCover)
+                           Spacer(Modifier.height(75.dp))
+                           Cover(cover = fsPlayerCover)
                            Spacer(Modifier.height(15.dp))
+
                            Text(nowPlaying?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                            Spacer(Modifier.height(10.dp))
                            Text(nowPlaying?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -211,7 +211,9 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
 @Composable
 private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
     Box(
-        modifier.background(
+        modifier
+            .fillMaxWidth()
+            .background(
             MaterialTheme.colorScheme.surfaceContainer,
             RoundedCornerShape(30.dp)
         )
@@ -219,9 +221,9 @@ private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
         Image(
             cover,
             "Track cover",
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.FillWidth,
             modifier = Modifier
-                .size(340.dp, 340.dp)
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(30.dp))
         )
     }
