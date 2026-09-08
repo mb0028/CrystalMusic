@@ -4,6 +4,7 @@
 - Better app icon & notification icons
 - Better notification progress bar
 - Folders, artists, albums, genres, composer tabs are now works
+- Play music from other apps using open with
 - UI improvements
 - Lot of bug fixes & improvements
   - Fix duplicate query causes infinity loop

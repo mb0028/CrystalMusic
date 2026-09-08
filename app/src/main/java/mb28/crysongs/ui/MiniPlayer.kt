@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mb28.crysongs.EXTRA_SKIP_LOAD
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
@@ -82,7 +81,6 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                 )
                 .clickable {
                     val intent = Intent(context, FullscreenPlayerActivity::class.java)
-                        .putExtra(EXTRA_SKIP_LOAD, true)
                     context.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
                 },
             horizontalArrangement = Arrangement.SpaceBetween,

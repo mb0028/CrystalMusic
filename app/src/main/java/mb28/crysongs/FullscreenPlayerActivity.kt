@@ -1,9 +1,12 @@
 package mb28.crysongs
 
 import android.app.Activity
+import android.app.NotificationManager
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.PowerManager
 import android.transition.Slide
 import android.view.RoundedCorner
 import android.view.Window
@@ -23,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,8 +52,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
@@ -59,7 +66,8 @@ import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
 import mb28.crysongs.ui.theme.CrySongsTheme
 
-const val EXTRA_SKIP_LOAD = "EXTRA_SKIP_LOAD"
+const val EXTRA_LOAD_FROM_OTHER_APPS = "EXTRA_LOAD_FROM_OTHER_APPS"
+const val EXTRA_PATH = "EXTRA_PATH"
 
 class FullscreenPlayerActivity : ComponentActivity() {
     override fun finish() {
@@ -80,9 +88,33 @@ class FullscreenPlayerActivity : ComponentActivity() {
             exitTransition = Slide()
             isNavigationBarContrastEnforced = false
         }
-
-//        val skipLoad = intent.getBooleanExtra(EXTRA_SKIP_LOAD, false)
         super.onCreate(savedInstanceState)
+
+        if (intent.getBooleanExtra(EXTRA_LOAD_FROM_OTHER_APPS, false)) {
+            val path = intent.getStringExtra(EXTRA_PATH)
+            if (!Environment.isExternalStorageManager() ||
+                !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
+                setContent { CrySongsTheme { PermissionsPage(Modifier.fillMaxSize(), this) } }
+                return
+            }
+            Settings.load()
+            lifecycleScope.launch {
+                refreshTracksList(this@FullscreenPlayerActivity)
+            }
+            var track: Track? = null
+            tracks.forEach {
+                if (it.path.startsWith(path!!)) {
+                    track = it
+                }
+            }
+            if (track == null) {
+                finish()
+            }
+            if (!isPlayerLoopStarted) {
+                playerLoop(getSystemService<NotificationManager>()!!, this)
+            }
+            setAndPlay(track!!, false)
+        }
 
         if (noCoverBitmap == null) {
             noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
@@ -214,9 +246,9 @@ private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
         modifier
             .fillMaxWidth()
             .background(
-            MaterialTheme.colorScheme.surfaceContainer,
-            RoundedCornerShape(30.dp)
-        )
+                MaterialTheme.colorScheme.surfaceContainer,
+                RoundedCornerShape(30.dp)
+            )
     ) {
         Image(
             cover,

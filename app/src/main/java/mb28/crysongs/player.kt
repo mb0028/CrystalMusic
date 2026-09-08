@@ -53,6 +53,8 @@ var displayQuery = mutableStateListOf<Track>()
 var displayQueryMB by mutableIntStateOf(0)
 var displayQueryMA by mutableIntStateOf(0)
 
+
+var isPlayerLoopStarted by mutableStateOf(false)
 var isReloading by mutableStateOf(false)
 var isPlaying by mutableStateOf(false)
 var position by mutableIntStateOf(0)
@@ -82,6 +84,7 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
 }
 
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
+    isPlayerLoopStarted = true
     while (true) {
         isPlaying = player.isPlaying
         // Pos needs to update even when player is paused for seekbar
