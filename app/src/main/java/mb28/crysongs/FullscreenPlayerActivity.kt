@@ -231,9 +231,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                 }
                 2 -> {
                     activity.window.decorView.keepScreenOn = true
-                    FSLyricsTab(Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 20.dp))
+                    FSLyricsTab(Modifier.fillMaxSize())
                 }
                 0 -> {
                     FSTagsTab(Modifier

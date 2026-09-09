@@ -28,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
+import mb28.crysongs.icons.align_justify_flex_end
 import mb28.crysongs.icons.arrow_cool_down
+import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.sound_detection_loud_sound
 import mb28.crysongs.player
 import kotlin.math.roundToInt
@@ -80,11 +82,26 @@ fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, acti
             }
         }
 
-        IconButton(
-            { showVolSheet = true }
-        ) {
-            Icon(sound_detection_loud_sound, null)
+        if (selectedTab.currentPage == 2) {
+            IconButton(
+                {
+                    Settings.verticalLyrics = !Settings.verticalLyrics
+                    Settings.save()
+                }
+            ) {
+                Icon(
+                    if (Settings.verticalLyrics) align_justify_flex_end else list_2,
+                    null
+                )
+            }
+        } else {
+            IconButton(
+                { showVolSheet = true }
+            ) {
+                Icon(sound_detection_loud_sound, null)
+            }
         }
+
     }
 
     if (showVolSheet) {

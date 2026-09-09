@@ -23,6 +23,7 @@ object Settings {
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()
     var loopTrack by mutableStateOf(false)
+    var verticalLyrics by mutableStateOf(false)
     var appVolume by mutableFloatStateOf(1f)
     var coverShapeMode by mutableIntStateOf(0)
     var sortBy = 0
@@ -68,6 +69,7 @@ object Settings {
                     s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
                     s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
                     s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
+                    s.startsWith("[VerticalLyrics]") -> verticalLyrics = s.removePrefix("[VerticalLyrics]").toBooleanStrict()
                     s.startsWith("[TagsSpacer]") -> tagsSpacer = s.removePrefix("[TagsSpacer]")
                     s.startsWith("[Volume]") -> appVolume = s.removePrefix("[Volume]").toFloat()
                     s.startsWith("[CoverShape]") -> coverShapeMode = s.removePrefix("[CoverShape]").toInt()
@@ -88,6 +90,7 @@ object Settings {
         data += "[Volume]$appVolume\n"
         data += "[TagsSpacer]$tagsSpacer\n"
         data += "[CoverShape]$coverShapeMode\n"
+        data += "[VerticalLyrics]$verticalLyrics\n"
 
         data += "\n[Playlists]\n"
         playlists.forEach {

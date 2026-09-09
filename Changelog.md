@@ -1,14 +1,15 @@
 ## v1.0.0-2026.09.xx (Upcoming)
 First stable release!
 
-- Add delete button for playlist items
 - Rename playlists with the new button
-- Better app icon & notification icons
-- Better notification progress bar
-- Folders, artists, albums, genres, composer tabs are now works
+- Added delete button for playlist items
 - Play music from other apps using open with
+- Folders, artists, albums, genres, composer tabs are now works
+- Added an option to show lyrics vertically
 - New: Click on cover in fullscreen player to change its shape (5 shapes available)
 - UI improvements
+- Better app icon & notification icons
+- Better notification progress bar
 - Lot of bug fixes & improvements
   - Fix duplicate query causes infinity loop
 
