@@ -8,6 +8,8 @@ import android.provider.MediaStore
 import android.util.Log
 import java.io.File
 
+var lastUriPath: String? = null
+
 class PlayerExportedActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         var uriPath = intent.data?.path
@@ -17,6 +19,13 @@ class PlayerExportedActivity : Activity() {
         if (uriPath == null) {
             finish()
         }
+
+        if (lastUriPath == uriPath) {
+            startActivity( Intent(this, FullscreenPlayerActivity::class.java))
+            finish()
+            return
+        }
+
         if (!uriPath!!.contains("storage/emulated")) {
             contentResolver.query(
                 intent.data!!,
@@ -42,6 +51,7 @@ class PlayerExportedActivity : Activity() {
             .putExtra(EXTRA_LOAD_FROM_OTHER_APPS, true)
             .putExtra(EXTRA_PATH, path)
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
+        lastUriPath = uriPath
         finish()
 
         super.onCreate(savedInstanceState)

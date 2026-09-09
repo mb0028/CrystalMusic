@@ -53,6 +53,7 @@
             android:exported="true"
             android:label="Play Song"
             android:theme="@style/Theme.CrySongs"
+            android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize" >
 
             <intent-filter>

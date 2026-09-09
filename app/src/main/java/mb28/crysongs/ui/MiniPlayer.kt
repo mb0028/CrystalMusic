@@ -65,13 +65,13 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun MiniPlayer(secondSet: MutableState<Boolean>) {
     val context = LocalActivity.current!!
-    val size = 0.55f
+    val size = 0.52f
     val shape = RoundedPolygon.star(
         12,
         radius = size,
-        innerRadius = 0.45f,
-        centerX = size / 2,
-        centerY = size / 2,
+        innerRadius = 0.42f,
+        centerX = size * 0.5f,
+        centerY = size * 0.5f,
         rounding = CornerRounding(80f)
     ).toShape()
 

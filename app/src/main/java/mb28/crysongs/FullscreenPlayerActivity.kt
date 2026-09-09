@@ -256,29 +256,29 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
 private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
     val coverShape =  when(Settings.coverShapeMode) {
         -1 -> RoundedCornerShape(5.dp)
-        1 -> CircleShape
-        2 -> {
-            val size = 0.55f
+        1 -> {
+            val size = 0.53f
             RoundedPolygon.star(
                 12,
                 radius = size,
-                innerRadius = 0.45f,
-                centerX = size / 2,
-                centerY = size / 2,
+                innerRadius = 0.43f,
+                centerX = size * 0.5f,
+                centerY = size * 0.5f,
                 rounding = CornerRounding(80f)
             ).toShape()
         }
-        3 -> {
+        2 -> {
             val size = 0.55f
             RoundedPolygon.star(
                 7,
                 radius = size,
                 innerRadius = 0.42f,
-                centerX = size / 2,
-                centerY = size / 2,
+                centerX = size * 0.5f,
+                centerY = size * 0.5f,
                 rounding = CornerRounding(80f)
             ).toShape()
         }
+        3 -> CircleShape
         else -> RoundedCornerShape(40.dp)
     }
     Box(
