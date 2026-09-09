@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.sp
 import mb28.crysongs.folders
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.folder
+import mb28.crysongs.icons.shuffle
 import mb28.crysongs.playerQuery
+import mb28.crysongs.setAndPlay
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
@@ -60,6 +62,19 @@ fun FoldersPage() {
                         { folderView = false }
                     ) {
                         Icon(arrow_back, null)
+                    }
+                    FilledTonalIconButton(
+                        {
+                            val folderTracks = tracks.toMutableList()
+                            folderTracks.removeIf {
+                                !it.path.startsWith(clickedFolderPath)
+                            }
+                            playerQuery = folderTracks.shuffled().toMutableStateList()
+                            updateDisplayQuery()
+                            setAndPlay(playerQuery.first(), false)
+                        }
+                    ) {
+                        Icon(shuffle, null)
                     }
                 }
             }

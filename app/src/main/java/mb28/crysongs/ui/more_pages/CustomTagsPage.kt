@@ -23,9 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastMap
+import mb28.crysongs.core.Track
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.list_2
+import mb28.crysongs.icons.shuffle
 import mb28.crysongs.playerQuery
+import mb28.crysongs.setAndPlay
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
@@ -37,6 +40,27 @@ import kotlin.text.substring
 fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
     var listItemsView by remember { mutableStateOf(false) }
     var clickedListItem by remember { mutableStateOf("") }
+
+    fun getListTracks() : MutableList<Track> {
+        val listTracks = tracks.toMutableList()
+        when(listType) {
+            "artists" -> listTracks.removeIf {
+                it.artist != clickedListItem
+            }
+            "albums" -> listTracks.removeIf {
+                it.album != clickedListItem
+            }
+            "genres" -> listTracks.removeIf {
+                it.genre != clickedListItem
+            }
+            "composers" -> listTracks.removeIf {
+                it.composer != clickedListItem
+            }
+            else -> { listTracks.clear() }
+        }
+        return listTracks
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
     ) {
@@ -64,27 +88,22 @@ fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
                     ) {
                         Icon(arrow_back, null)
                     }
+                    FilledTonalIconButton(
+                        {
+                            val folderTracks = getListTracks()
+                            playerQuery = folderTracks.shuffled().toMutableStateList()
+                            updateDisplayQuery()
+                            setAndPlay(playerQuery.first(), false)
+                        }
+                    ) {
+                        Icon(shuffle, null)
+                    }
                 }
             }
         }
 
         if (listItemsView) {
-            val listTracks = tracks.toMutableList()
-            when(listType) {
-                "artists" -> listTracks.removeIf {
-                    it.artist != clickedListItem
-                }
-                "albums" -> listTracks.removeIf {
-                    it.album != clickedListItem
-                }
-                "genres" -> listTracks.removeIf {
-                    it.genre != clickedListItem
-                }
-                "composers" -> listTracks.removeIf {
-                    it.composer != clickedListItem
-                }
-                else -> { listTracks.clear() }
-            }
+            val listTracks = getListTracks()
             val count = listTracks.count()
             items(count) { i ->
                 TrackTile(
