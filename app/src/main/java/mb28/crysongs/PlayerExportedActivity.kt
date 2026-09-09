@@ -4,17 +4,36 @@ import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import java.io.File
 
 class PlayerExportedActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val uriPath = intent.data?.path
+        var uriPath = intent.data?.path
+        Log.i("Crystal Songs",
+            "App started with external app. Intent data: $uriPath")
 
         if (uriPath == null) {
             finish()
         }
+        if (!uriPath!!.contains("storage/emulated")) {
+            contentResolver.query(
+                intent.data!!,
+                arrayOf(MediaStore.Audio.Media.DATA),
+                null, null, null
+            )?.use { cursor ->
+                val pathC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                if (cursor.moveToFirst()) {
+                    uriPath = cursor.getString(pathC)
+                }
+            }
+        }
+        if (uriPath == null) {
+            finish()
+        }
+
         val path = uriPath!!.substring(uriPath.indexOf("/storage/"))
-        println(path)
         if (!File(path).exists()) {
             finish()
         }
