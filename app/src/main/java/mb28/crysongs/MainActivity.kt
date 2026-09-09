@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                 val selectedSet = remember { mutableStateOf(false) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     bottomBar = {
                         Column {
                             MiniPlayer(selectedSet)
@@ -166,7 +166,7 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
         ).padding(horizontal = 15.dp)
             .height(65.dp),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
-            toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.95f)
+            toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.95f)
         ),
     ) {
         if (!secondSet.value) {

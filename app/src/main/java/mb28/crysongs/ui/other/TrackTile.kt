@@ -54,11 +54,11 @@ fun TrackTile(
 ) {
     var showMoreOptions by remember { mutableStateOf(false) }
     val coverPath = Track.createOrGetThumbnail(t.path)
-    val defaultShape = RoundedCornerShape(15.dp)
+    val defaultShape = RoundedCornerShape(12.dp)
     val shape = when {
         count == 1 -> defaultShape
-        index == 0 -> RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp, bottomStart = 15.dp, bottomEnd = 15.dp)
-        index == count - 1 -> RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomStart = 25.dp, bottomEnd = 25.dp)
+        index == 0 -> RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+        index == count - 1 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 25.dp, bottomEnd = 25.dp)
         else -> defaultShape
     }
     SegmentedListItem(
@@ -78,8 +78,8 @@ fun TrackTile(
                 Brush.horizontalGradient(
                     listOf(
                         if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-                        else MaterialTheme.colorScheme.secondaryContainer,
-                        MaterialTheme.colorScheme.surfaceContainer,
+                        else MaterialTheme.colorScheme.surfaceContainerLowest,
+                        MaterialTheme.colorScheme.surfaceBright,
                     )
                 ),
                 shape = shape
@@ -101,7 +101,6 @@ fun TrackTile(
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .height(73.dp).width(73.dp)
-                            .clip(RoundedCornerShape(25.dp))
                     )
                 } else {
                     NoCoverImage(73.dp)

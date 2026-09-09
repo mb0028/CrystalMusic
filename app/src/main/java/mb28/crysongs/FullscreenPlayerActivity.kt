@@ -15,6 +15,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,10 +29,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,6 +48,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +59,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import androidx.graphics.shapes.CornerRounding
+import androidx.graphics.shapes.RoundedPolygon
+import androidx.graphics.shapes.star
+import androidx.graphics.shapes.toPath
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
@@ -242,23 +251,60 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
+    val coverShape =  when(Settings.coverShapeMode) {
+        -1 -> RoundedCornerShape(5.dp)
+        1 -> CircleShape
+        2 -> {
+            val size = 0.55f
+            RoundedPolygon.star(
+                12,
+                radius = size,
+                innerRadius = 0.45f,
+                centerX = size / 2,
+                centerY = size / 2,
+                rounding = CornerRounding(80f)
+            ).toShape()
+        }
+        3 -> {
+            val size = 0.55f
+            RoundedPolygon.star(
+                7,
+                radius = size,
+                innerRadius = 0.42f,
+                centerX = size / 2,
+                centerY = size / 2,
+                rounding = CornerRounding(80f)
+            ).toShape()
+        }
+        else -> RoundedCornerShape(40.dp)
+    }
     Box(
         modifier
             .fillMaxWidth()
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
-                RoundedCornerShape(30.dp)
+                coverShape
             )
+            .clip(coverShape)
+            .clickable {
+                Settings.coverShapeMode = when(Settings.coverShapeMode) {
+                    -1 -> 0
+                    0 -> 1
+                    1 -> 2
+                    2 -> 3
+                    else -> -1
+                }
+                Settings.save()
+            }
     ) {
         Image(
             cover,
             "Track cover",
             contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(30.dp))
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

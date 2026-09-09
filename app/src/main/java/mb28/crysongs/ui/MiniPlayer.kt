@@ -19,11 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -36,6 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.graphics.shapes.CornerRounding
+import androidx.graphics.shapes.RoundedPolygon
+import androidx.graphics.shapes.star
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
@@ -46,6 +52,7 @@ import mb28.crysongs.icons.skip_next
 import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
+import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
@@ -54,15 +61,26 @@ import mb28.crysongs.setAndPlay
 import mb28.crysongs.ui.other.NoCoverImage
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MiniPlayer(secondSet: MutableState<Boolean>) {
     val context = LocalActivity.current!!
+    val size = 0.55f
+    val shape = RoundedPolygon.star(
+        12,
+        radius = size,
+        innerRadius = 0.45f,
+        centerX = size / 2,
+        centerY = size / 2,
+        rounding = CornerRounding(80f)
+    ).toShape()
+
     Row (
         Modifier.padding(horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ToggleButton(
+        FilledTonalToggleButton(
             secondSet.value,
             { secondSet.value = !secondSet.value }
         ) {
@@ -90,17 +108,14 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                 Spacer(Modifier.width(5.dp))
 
                 val coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
-                if (coverPath != null) {
-                    Image(
-                        BitmapFactory.decodeFile(coverPath).asImageBitmap(),
-                        "Track cover",
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier.width(70.dp).height(70.dp)
-                            .clip(RoundedCornerShape(30.dp))
-                    )
-                } else {
-                    NoCoverImage(70.dp, 30.dp)
-                }
+                val cover = if (coverPath == null) noCoverBitmap!!
+                    else BitmapFactory.decodeFile(coverPath).asImageBitmap()
+                Image(
+                    cover,
+                    "Track cover",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.width(70.dp).height(70.dp).clip(shape)
+                )
 
                 Column(
                     Modifier

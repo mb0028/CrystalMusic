@@ -31,7 +31,7 @@ fun EasySegmentedListItem(
         modifier = modifier.padding(bottom = if(index == count - 1) 0.dp else 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         colors = ListItemDefaults.segmentedColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         trailingContent = {
             if (icon != null) {
