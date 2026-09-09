@@ -38,9 +38,11 @@ import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.library_add
 import mb28.crysongs.icons.playlist_play
 import mb28.crysongs.icons.reorder
+import mb28.crysongs.icons.shuffle
 import mb28.crysongs.icons.swipe_down_alt
 import mb28.crysongs.icons.swipe_up_alt
 import mb28.crysongs.playerQuery
+import mb28.crysongs.setAndPlay
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
@@ -111,6 +113,15 @@ fun PlaylistsPage() {
                         ) {
                             Icon(reorder, null)
                         }
+                    }
+                    FilledTonalIconButton(
+                        {
+                            playerQuery = songs.shuffled().toMutableStateList()
+                            updateDisplayQuery()
+                            setAndPlay(playerQuery.first(), false)
+                        }
+                    ) {
+                        Icon(shuffle, null)
                     }
                 }
                 else {
