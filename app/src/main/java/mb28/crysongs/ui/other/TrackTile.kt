@@ -2,8 +2,10 @@ package mb28.crysongs.ui.other
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItemDefaults
@@ -37,11 +40,17 @@ import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
+import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.setAndPlay
 import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
+
+private val topShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+private val defaultShape = RoundedCornerShape(12.dp)
+private val defaultPressedShape = RoundedCornerShape(25.dp)
+private val endShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 25.dp, bottomEnd = 25.dp)
 
 @Composable
 fun TrackTile(
@@ -53,59 +62,52 @@ fun TrackTile(
     onBeforeClick: () -> Unit = {}
 ) {
     var showMoreOptions by remember { mutableStateOf(false) }
-    val coverPath = Track.createOrGetThumbnail(t.path)
-    val defaultShape = RoundedCornerShape(12.dp)
     val shape = when {
         count == 1 -> defaultShape
-        index == 0 -> RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
-        index == count - 1 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 25.dp, bottomEnd = 25.dp)
+        index == 0 -> topShape
+        index == count - 1 -> endShape
         else -> defaultShape
     }
     SegmentedListItem(
         shapes = ListItemShapes(
-            shape = shape,
+            shape,
             defaultShape,
-            defaultShape,
-            defaultShape,
-            defaultShape,
+            defaultPressedShape,
+            defaultPressedShape,
+            defaultPressedShape,
             defaultShape
+        ),
+        colors = ListItemDefaults.segmentedColors(
+            containerColor = if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+            else MaterialTheme.colorScheme.surfaceContainerLowest
         ),
         modifier = modifier
             .padding(bottom = 5.dp)
             .padding(horizontal = 10.dp)
-            .height(82.dp)
-            .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-                        else MaterialTheme.colorScheme.surfaceContainerLowest,
-                        MaterialTheme.colorScheme.surfaceBright,
-                    )
-                ),
-                shape = shape
-            ),
-        colors = ListItemDefaults.segmentedColors(
-            containerColor = Color.Transparent
-        ),
+            .height(82.dp),
+//            .background(
+//                Brush.horizontalGradient(
+//                    listOf(
+//                        if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+//                        else MaterialTheme.colorScheme.surfaceContainerLowest,
+//                        MaterialTheme.colorScheme.surfaceBright,
+//                    )
+//                )
+//            ),
         contentPadding = PaddingValues(5.dp),
         leadingContent = {
-            Surface(
-                { showMoreOptions = true },
-                color = Color.Transparent,
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                if (coverPath != null) {
-                    Image(
-                        BitmapFactory.decodeFile(coverPath).asImageBitmap(),
-                        "Track cover",
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier
-                            .height(73.dp).width(73.dp)
-                    )
-                } else {
-                    NoCoverImage(73.dp)
-                }
-            }
+            val coverPath = Track.createOrGetThumbnail(t.path)
+            val cover = if (coverPath == null) noCoverBitmap!!
+                else BitmapFactory.decodeFile(coverPath).asImageBitmap()
+            Image(
+                cover,
+                "Track cover",
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .size(73.dp, 73.dp)
+                    .clickable { showMoreOptions = true }
+                    .clip(defaultPressedShape)
+            )
         },
         onClick = {
             onBeforeClick()
