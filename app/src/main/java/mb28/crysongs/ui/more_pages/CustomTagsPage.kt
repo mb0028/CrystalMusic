@@ -1,5 +1,9 @@
 package mb28.crysongs.ui.more_pages
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastMap
 import mb28.crysongs.core.Track
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.shuffle
@@ -40,6 +45,11 @@ import kotlin.text.substring
 fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
     var listItemsView by remember { mutableStateOf(false) }
     var clickedListItem by remember { mutableStateOf("") }
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
 
     fun getListTracks() : MutableList<Track> {
         val listTracks = tracks.toMutableList()
@@ -61,73 +71,81 @@ fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
         return listTracks
     }
 
-    LazyColumn(
-        contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
     ) {
-        item {
-            Text(
-                if (listItemsView) clickedListItem else "${listType[0].uppercase() + listType.substring(1)} (${list.count()})",
-                fontSize = 36.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 40.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(33.dp))
-        }
+        LazyColumn(
+            contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+        ) {
+            item {
+                Text(
+                    if (listItemsView) clickedListItem else "${
+                        listType[0].uppercase() + listType.substring(
+                            1
+                        )
+                    } (${list.count()})",
+                    fontSize = 36.sp,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 40.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(33.dp))
+            }
 
-        item {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                if (listItemsView) {
-                    FilledTonalIconButton(
-                        { listItemsView = false }
-                    ) {
-                        Icon(arrow_back, null)
-                    }
-                    FilledTonalIconButton(
-                        {
-                            val folderTracks = getListTracks()
-                            playerQuery = folderTracks.shuffled().toMutableStateList()
-                            updateDisplayQuery()
-                            setAndPlay(playerQuery.first(), false)
+            item {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    if (listItemsView) {
+                        FilledTonalIconButton(
+                            { listItemsView = false }
+                        ) {
+                            Icon(arrow_back, null)
                         }
-                    ) {
-                        Icon(shuffle, null)
+                        FilledTonalIconButton(
+                            {
+                                val folderTracks = getListTracks()
+                                playerQuery = folderTracks.shuffled().toMutableStateList()
+                                updateDisplayQuery()
+                                setAndPlay(playerQuery.first(), false)
+                            }
+                        ) {
+                            Icon(shuffle, null)
+                        }
                     }
                 }
             }
-        }
 
-        if (listItemsView) {
-            val listTracks = getListTracks()
-            val count = listTracks.count()
-            items(count) { i ->
-                TrackTile(
-                    listTracks[i],
-                    i, count,
-                    resetQueryOnClick = false
-                ) {
-                    playerQuery = listTracks.toMutableStateList()
-                    updateDisplayQuery()
+            if (listItemsView) {
+                val listTracks = getListTracks()
+                val count = listTracks.count()
+                items(count) { i ->
+                    TrackTile(
+                        listTracks[i],
+                        i, count,
+                        resetQueryOnClick = false
+                    ) {
+                        playerQuery = listTracks.toMutableStateList()
+                        updateDisplayQuery()
+                    }
                 }
-            }
-        }
-        else {
-            val count = list.count()
-            items(count) { i ->
-                val f = list[i]
-                EasySegmentedListItem(
-                    null,
-                    f,
-                    i, count,
-                    Modifier.padding(horizontal = 10.dp)
-                ) {
-                    clickedListItem = list[i]
-                    listItemsView = true
+            } else {
+                val count = list.count()
+                items(count) { i ->
+                    val f = list[i]
+                    EasySegmentedListItem(
+                        null,
+                        f,
+                        i, count,
+                        Modifier.padding(horizontal = 10.dp)
+                    ) {
+                        clickedListItem = list[i]
+                        listItemsView = true
+                    }
                 }
             }
         }

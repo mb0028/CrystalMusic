@@ -1,5 +1,7 @@
 package mb28.crysongs.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
@@ -24,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.playerQuery
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.TrackTile
@@ -55,41 +59,53 @@ fun searchPageResearch(input: String) {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SearchPage() {
-    LazyColumn(
-        contentPadding = PaddingValues(top = 120.dp, bottom = 200.dp),
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
     ) {
-        item {
-            Text(
-                "Search (${searchResult.count()})", fontSize = 36.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(50.dp))
-        }
+        LazyColumn(
+            contentPadding = PaddingValues(top = 120.dp, bottom = 200.dp),
+        ) {
+            item {
+                Text(
+                    "Search (${searchResult.count()})",
+                    fontSize = 36.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(50.dp))
+            }
 
-        item {
-            OutlinedTextField(
-                searchPageSearchText,
-                {
-                    searchPageResearch(it)
-                },
-                label = {
-                    Text("Search title or artist (case insensitive)")
-                },
-                keyboardOptions = KeyboardOptions(
-                    showKeyboardOnFocus = true
-                ),
-                shape = RoundedCornerShape(35.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp, vertical = 5.dp)
-            )
-        }
+            item {
+                OutlinedTextField(
+                    searchPageSearchText,
+                    {
+                        searchPageResearch(it)
+                    },
+                    label = {
+                        Text("Search title or artist (case insensitive)")
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        showKeyboardOnFocus = true
+                    ),
+                    shape = RoundedCornerShape(35.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp, vertical = 5.dp)
+                )
+            }
 
-        val count = searchResult.count()
-        items(count) { i ->
-            TrackTile(searchResult[i], i, count, false) {
-                playerQuery = searchResult.toMutableStateList()
-                updateDisplayQuery()
+            val count = searchResult.count()
+            items(count) { i ->
+                TrackTile(searchResult[i], i, count, false) {
+                    playerQuery = searchResult.toMutableStateList()
+                    updateDisplayQuery()
+                }
             }
         }
     }

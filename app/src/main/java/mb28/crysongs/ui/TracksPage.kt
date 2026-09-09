@@ -31,7 +31,8 @@ fun TracksList(modifier: Modifier = Modifier) {
     val state = rememberLazyListState()
     LazyColumn(
         contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
-        state = state
+        horizontalAlignment = Alignment.CenterHorizontally,
+        state = state,
     ) {
         item {
             Text(

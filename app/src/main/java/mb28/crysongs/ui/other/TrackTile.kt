@@ -3,6 +3,11 @@ package mb28.crysongs.ui.other
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,29 +67,38 @@ fun TrackTile(
     onBeforeClick: () -> Unit = {}
 ) {
     var showMoreOptions by remember { mutableStateOf(false) }
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
     val shape = when {
         count == 1 -> defaultShape
         index == 0 -> topShape
         index == count - 1 -> endShape
         else -> defaultShape
     }
-    SegmentedListItem(
-        shapes = ListItemShapes(
-            shape,
-            defaultShape,
-            defaultPressedShape,
-            defaultPressedShape,
-            defaultPressedShape,
-            defaultShape
-        ),
-        colors = ListItemDefaults.segmentedColors(
-            containerColor = if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-            else MaterialTheme.colorScheme.surfaceContainerLowest
-        ),
-        modifier = modifier
-            .padding(bottom = 5.dp)
-            .padding(horizontal = 10.dp)
-            .height(82.dp),
+    AnimatedVisibility(
+        visibleState = state,
+        enter = scaleIn(initialScale = 0.65f) + fadeIn(initialAlpha = 0.1f),
+    ) {
+        SegmentedListItem(
+            shapes = ListItemShapes(
+                shape,
+                defaultShape,
+                defaultPressedShape,
+                defaultPressedShape,
+                defaultPressedShape,
+                defaultShape
+            ),
+            colors = ListItemDefaults.segmentedColors(
+                containerColor = if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+                else MaterialTheme.colorScheme.surfaceContainerLowest
+            ),
+            modifier = modifier
+                .padding(bottom = 5.dp)
+                .padding(horizontal = 10.dp)
+                .height(82.dp),
 //            .background(
 //                Brush.horizontalGradient(
 //                    listOf(
@@ -94,65 +108,66 @@ fun TrackTile(
 //                    )
 //                )
 //            ),
-        contentPadding = PaddingValues(5.dp),
-        leadingContent = {
-            val coverPath = Track.createOrGetThumbnail(t.path)
-            val cover = if (coverPath == null) noCoverBitmap!!
+            contentPadding = PaddingValues(5.dp),
+            leadingContent = {
+                val coverPath = Track.createOrGetThumbnail(t.path)
+                val cover = if (coverPath == null) noCoverBitmap!!
                 else BitmapFactory.decodeFile(coverPath).asImageBitmap()
-            Image(
-                cover,
-                "Track cover",
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .size(73.dp, 73.dp)
-                    .clickable { showMoreOptions = true }
-                    .clip(defaultPressedShape)
-            )
-        },
-        onClick = {
-            onBeforeClick()
-            setAndPlay(t, resetQueryOnClick)
-        }
-    ) {
-        Column(
-            Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Center
+                Image(
+                    cover,
+                    "Track cover",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .size(73.dp, 73.dp)
+                        .clickable { showMoreOptions = true }
+                        .clip(defaultPressedShape)
+                )
+            },
+            onClick = {
+                onBeforeClick()
+                setAndPlay(t, resetQueryOnClick)
+            }
         ) {
-            Text(
-                t.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp
-            )
-
-            Row(
-                Modifier.fillMaxWidth(),
+            Column(
+                Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    t.artist,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 13.sp,
-                    modifier = Modifier.fillMaxWidth(0.4f)
+                    t.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp
                 )
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        t.artist,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth(0.4f)
+                    )
+                    Text(
+                        tagsSpacer, fontSize = 18.sp,
+                        modifier = Modifier.fillMaxWidth(0.2f)
+                    )
+                    Text(
+                        t.album,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                val dura = formatDurationMs(t.duration.milliseconds)
+                val bitrate = (t.bitrate / 1000f).roundToInt()
                 Text(
-                    tagsSpacer, fontSize = 18.sp,
-                    modifier = Modifier.fillMaxWidth(0.2f)
-                )
-                Text(
-                    t.album,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 13.sp,
+                    "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t.year}${tagsSpacer}${t.genre}" +
+                            if (t.hasLRC) "${tagsSpacer}LRC" else "",
+                    maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
-            val dura = formatDurationMs(t.duration.milliseconds)
-            val bitrate = (t.bitrate / 1000f).roundToInt()
-            Text(
-                "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t.year}${tagsSpacer}${t.genre}" +
-                        if (t.hasLRC) "${tagsSpacer}LRC" else "",
-                maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 

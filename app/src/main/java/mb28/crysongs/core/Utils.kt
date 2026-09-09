@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.pm.PackageManager
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -12,6 +14,8 @@ import androidx.core.graphics.drawable.IconCompat
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
 import kotlin.time.Duration
+
+val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
 

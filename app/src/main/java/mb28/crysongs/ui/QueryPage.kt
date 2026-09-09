@@ -1,5 +1,7 @@
 package mb28.crysongs.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,11 +16,13 @@ import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.displayQuery
 import mb28.crysongs.displayQueryMA
 import mb28.crysongs.displayQueryMB
@@ -29,74 +33,83 @@ import mb28.crysongs.ui.other.TrackTile
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun QueryPage() {
-    LazyColumn(
-        contentPadding = PaddingValues(top = 100.dp, bottom = 200.dp),
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
+
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
     ) {
-        item {
-            Text(
-                "Query", fontSize = 36.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(15.dp))
-            Text(
-                "Query only shows last 4 & next 10 tracks.\nTo see more, play one of next/previous tracks",
-                fontSize = 16.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-        }
-
-        item {
-            Row(
-                Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                ShuffleButtonQuery()
-            }
-        }
-
-        if (isReloading) {
-            item {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    ContainedLoadingIndicator()
-                }
-            }
-        }
-        else if (displayQuery.isNotEmpty() && !isReloading) {
-            val count = displayQuery.count()
+        LazyColumn(
+            contentPadding = PaddingValues(top = 100.dp, bottom = 200.dp),
+        ) {
             item {
                 Text(
-                    "+ $displayQueryMB",
-                    fontSize = 16.sp, textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            items(count) { i ->
-                TrackTile(displayQuery[i], i, count, false)
-            }
-            item {
-                Text(
-                    "+ $displayQueryMA",
-                    fontSize = 16.sp, textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-        else {
-            item {
-                Spacer(Modifier.height(100.dp))
-                Text(
-                    "(┬┬﹏┬┬)", fontSize = 40.sp, textAlign = TextAlign.Center,
+                    "Query", fontSize = 36.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(15.dp))
                 Text(
-                    "Playing query is empty!\nPlay something or click randomize button",
+                    "Query only shows last 4 & next 10 tracks.\nTo see more, play one of next/previous tracks",
                     fontSize = 16.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+            }
+
+            item {
+                Row(
+                    Modifier.fillMaxWidth()
+                        .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    ShuffleButtonQuery()
+                }
+            }
+
+            if (isReloading) {
+                item {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        ContainedLoadingIndicator()
+                    }
+                }
+            } else if (displayQuery.isNotEmpty() && !isReloading) {
+                val count = displayQuery.count()
+                item {
+                    Text(
+                        "+ $displayQueryMB",
+                        fontSize = 16.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                items(count) { i ->
+                    TrackTile(displayQuery[i], i, count, false)
+                }
+                item {
+                    Text(
+                        "+ $displayQueryMA",
+                        fontSize = 16.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            } else {
+                item {
+                    Spacer(Modifier.height(100.dp))
+                    Text(
+                        "(┬┬﹏┬┬)", fontSize = 40.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(15.dp))
+                    Text(
+                        "Playing query is empty!\nPlay something or click randomize button",
+                        fontSize = 16.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
-
     }
 }

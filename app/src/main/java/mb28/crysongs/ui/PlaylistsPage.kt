@@ -1,5 +1,7 @@
 package mb28.crysongs.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.delete_sweep
 import mb28.crysongs.icons.download
@@ -54,7 +57,7 @@ import java.io.File
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlaylistsPage() {
-    val state = rememberLazyListState()
+    val stateList = rememberLazyListState()
     var playlistView by remember { mutableStateOf(false) }
     var showNewPlaylistPopup by remember { mutableStateOf(false) }
     var showRenamePopup by remember { mutableStateOf(false) }
@@ -63,6 +66,11 @@ fun PlaylistsPage() {
     val songs = remember { mutableStateListOf<Track>() }
     var lastClickedPlPath by remember { mutableStateOf("") }
     var plName by remember { mutableStateOf("") }
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
 
     fun save(newName: String = plName) {
         plName = newName
@@ -74,183 +82,188 @@ fun PlaylistsPage() {
         File(lastClickedPlPath).writeText(newPl.joinToString("\n"))
     }
 
-    LazyColumn(
-        contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
-        state = state
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
     ) {
-        item {
-            Text(
-                if (playlistView) (if (lastClickedPlPath == "#fav") "Favorites" else plName)
+        LazyColumn(
+            contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+            state = stateList
+        ) {
+            item {
+                Text(
+                    if (playlistView) (if (lastClickedPlPath == "#fav") "Favorites" else plName)
                     else "Playlists",
-                fontSize = 36.sp,
-                lineHeight = 40.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(33.dp))
-        }
-
-        item {
-            Row(
-                Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                if (playlistView) {
-                    FilledTonalIconButton(
-                        { playlistView = false }
-                    ) {
-                        Icon(arrow_back, null)
-                    }
-                    if (lastClickedPlPath != "#fav") {
-                        FilledTonalIconButton(
-                            { showRenamePopup = true }
-                        ) {
-                            Icon(edit_note, null)
-                        }
-                        FilledTonalToggleButton(
-                            reorderMode,
-                            { reorderMode = it }
-                        ) {
-                            Icon(reorder, null)
-                        }
-                    }
-                    FilledTonalIconButton(
-                        {
-                            playerQuery = songs.shuffled().toMutableStateList()
-                            updateDisplayQuery()
-                            setAndPlay(playerQuery.first(), false)
-                        }
-                    ) {
-                        Icon(shuffle, null)
-                    }
-                }
-                else {
-                    FilledTonalIconButton(
-                        { }
-                    ) {
-                        Icon(download, null)
-                    }
-                    FilledTonalIconButton(
-                        { showNewPlaylistPopup = true }
-                    ) {
-                        Icon(library_add, null)
-                    }
-                }
-
+                    fontSize = 36.sp,
+                    lineHeight = 40.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(33.dp))
             }
-        }
 
-        if (playlistView) {
-            if (songs.isEmpty()) {
-                if (lastClickedPlPath == "#fav") {
-                    tracks.forEach { track ->
-                        if (Settings.favorites.contains(track.path)) {
-                            songs.add(track)
+            item {
+                Row(
+                    Modifier.fillMaxWidth()
+                        .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    if (playlistView) {
+                        FilledTonalIconButton(
+                            { playlistView = false }
+                        ) {
+                            Icon(arrow_back, null)
+                        }
+                        if (lastClickedPlPath != "#fav") {
+                            FilledTonalIconButton(
+                                { showRenamePopup = true }
+                            ) {
+                                Icon(edit_note, null)
+                            }
+                            FilledTonalToggleButton(
+                                reorderMode,
+                                { reorderMode = it }
+                            ) {
+                                Icon(reorder, null)
+                            }
+                        }
+                        FilledTonalIconButton(
+                            {
+                                playerQuery = songs.shuffled().toMutableStateList()
+                                updateDisplayQuery()
+                                setAndPlay(playerQuery.first(), false)
+                            }
+                        ) {
+                            Icon(shuffle, null)
+                        }
+                    } else {
+                        FilledTonalIconButton(
+                            { }
+                        ) {
+                            Icon(download, null)
+                        }
+                        FilledTonalIconButton(
+                            { showNewPlaylistPopup = true }
+                        ) {
+                            Icon(library_add, null)
                         }
                     }
-                } else {
-                    val pl = File(lastClickedPlPath).readLines()
-                    plName = pl.first().removePrefix("Name -> ")
-                    pl.forEach { plItem ->
-                        if (plItem.startsWith("Music -> ")) {
-                            val path = plItem.substring(9)
-                            if (plItem.contains(path)) {
-                                val t = tracks.find { it.path == path }
-                                if (t != null) {
-                                    songs.add(t)
+
+                }
+            }
+
+            if (playlistView) {
+                if (songs.isEmpty()) {
+                    if (lastClickedPlPath == "#fav") {
+                        tracks.forEach { track ->
+                            if (Settings.favorites.contains(track.path)) {
+                                songs.add(track)
+                            }
+                        }
+                    } else {
+                        val pl = File(lastClickedPlPath).readLines()
+                        plName = pl.first().removePrefix("Name -> ")
+                        pl.forEach { plItem ->
+                            if (plItem.startsWith("Music -> ")) {
+                                val path = plItem.substring(9)
+                                if (plItem.contains(path)) {
+                                    val t = tracks.find { it.path == path }
+                                    if (t != null) {
+                                        songs.add(t)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            val count = songs.count()
-            items(count) { i ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (reorderMode) {
-                        IconButton(
-                            {
-                                songs.removeAt(i)
-                                save()
-                            }
-                        ) {
-                            Icon(delete_sweep, null)
-                        }
-                    }
-
-                    TrackTile(
-                        songs[i],
-                        i, count,
-                        false,
-                        Modifier.fillMaxWidth(if (reorderMode) 0.85f else 1f)
+                val count = songs.count()
+                items(count) { i ->
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        playerQuery = songs.toMutableStateList()
-                        updateDisplayQuery()
-                    }
-
-                    if (reorderMode) {
-                        Column {
+                        if (reorderMode) {
                             IconButton(
                                 {
-                                    songs.add(i - 1, songs.removeAt(i))
+                                    songs.removeAt(i)
                                     save()
-                                },
-                                enabled = i > 0
+                                }
                             ) {
-                                Icon(swipe_up_alt, null)
+                                Icon(delete_sweep, null)
                             }
-                            IconButton(
-                                {
-                                    songs.add(i + 1, songs.removeAt(i))
-                                    save()
-                                },
-                                enabled = i < songs.count() - 1
-                            ) {
-                                Icon(swipe_down_alt, null)
+                        }
+
+                        TrackTile(
+                            songs[i],
+                            i, count,
+                            false,
+                            Modifier.fillMaxWidth(if (reorderMode) 0.85f else 1f)
+                        ) {
+                            playerQuery = songs.toMutableStateList()
+                            updateDisplayQuery()
+                        }
+
+                        if (reorderMode) {
+                            Column {
+                                IconButton(
+                                    {
+                                        songs.add(i - 1, songs.removeAt(i))
+                                        save()
+                                    },
+                                    enabled = i > 0
+                                ) {
+                                    Icon(swipe_up_alt, null)
+                                }
+                                IconButton(
+                                    {
+                                        songs.add(i + 1, songs.removeAt(i))
+                                        save()
+                                    },
+                                    enabled = i < songs.count() - 1
+                                ) {
+                                    Icon(swipe_down_alt, null)
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-        else {
-            val count = Settings.playlists.count() + 1
-            item {
-                EasySegmentedListItem(
-                    favorite,
-                    "Favorites (${Settings.favorites.count()})",
-                    0, count,
-                    Modifier.padding(horizontal = 15.dp)
-                ) {
-                    songs.clear()
-                    lastClickedPlPath = "#fav"
-                    playlistView = true
+            } else {
+                val count = Settings.playlists.count() + 1
+                item {
+                    EasySegmentedListItem(
+                        favorite,
+                        "Favorites (${Settings.favorites.count()})",
+                        0, count,
+                        Modifier.padding(horizontal = 15.dp)
+                    ) {
+                        songs.clear()
+                        lastClickedPlPath = "#fav"
+                        playlistView = true
+                    }
+                }
+
+                items(count - 1) { i ->
+                    val pl by remember {
+                        mutableStateOf(
+                            File(Settings.playlists[i]).readLines()
+                        )
+                    }
+                    EasySegmentedListItem(
+                        playlist_play,
+                        if (pl[0].startsWith("Name -> "))
+                            pl[0].removePrefix("Name -> ") + " (${pl.count() - 1})"
+                        else "??? (Corrupted name)",
+                        i + 1, count,
+                        Modifier.padding(horizontal = 15.dp)
+                    ) {
+                        songs.clear()
+                        lastClickedPlPath = Settings.playlists[i]
+                        playlistView = true
+                    }
                 }
             }
-
-            items(count - 1) { i ->
-                val pl by remember { mutableStateOf(
-                    File(Settings.playlists[i]).readLines()
-                ) }
-                EasySegmentedListItem(
-                    playlist_play,
-                    if (pl[0].startsWith("Name -> "))
-                        pl[0].removePrefix("Name -> ") + " (${pl.count() - 1})"
-                    else "??? (Corrupted name)",
-                    i + 1, count,
-                    Modifier.padding(horizontal = 15.dp)
-                ) {
-                    songs.clear()
-                    lastClickedPlPath = Settings.playlists[i]
-                    playlistView = true
-                }
-            }
         }
-
     }
 
     if (showNewPlaylistPopup) {
