@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
+import android.view.Menu
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -148,9 +149,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        NotificationManagerCompat.from(this).cancel(0)
-        super.onDestroy()
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus && !isPlaying) {
+            NotificationManagerCompat.from(this).cancelAll()
+        }
     }
 }
 
