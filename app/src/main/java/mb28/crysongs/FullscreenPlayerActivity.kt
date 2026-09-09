@@ -182,6 +182,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
         HorizontalPager(
             selectedTab
         ) { page ->
+            activity.window.decorView.keepScreenOn = false
             when(page) {
                 1 -> {
                    Column(
@@ -220,6 +221,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                    }
                 }
                 2 -> {
+                    activity.window.decorView.keepScreenOn = true
                     FSLyricsTab(Modifier
                         .fillMaxSize()
                         .padding(horizontal = 20.dp))
