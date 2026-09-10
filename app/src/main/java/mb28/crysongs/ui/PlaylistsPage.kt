@@ -50,6 +50,7 @@ import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.ui.popups.CreatePlaylistPopup
+import mb28.crysongs.ui.popups.ImportPlaylistPopup
 import mb28.crysongs.ui.popups.RenamePlaylistPopup
 import mb28.crysongs.updateDisplayQuery
 import java.io.File
@@ -61,6 +62,7 @@ fun PlaylistsPage() {
     var playlistView by remember { mutableStateOf(false) }
     var showNewPlaylistPopup by remember { mutableStateOf(false) }
     var showRenamePopup by remember { mutableStateOf(false) }
+    var showImportPopup by remember { mutableStateOf(false) }
     var reorderMode by remember { mutableStateOf(false) }
 
     val songs = remember { mutableStateListOf<Track>() }
@@ -138,7 +140,7 @@ fun PlaylistsPage() {
                         }
                     } else {
                         FilledTonalIconButton(
-                            { }
+                            { showImportPopup = true }
                         ) {
                             Icon(download, null)
                         }
@@ -278,6 +280,12 @@ fun PlaylistsPage() {
             if (saved) {
                 save(newName)
             }
+        }
+    }
+
+    if (showImportPopup) {
+        ImportPlaylistPopup {
+            showImportPopup = false
         }
     }
 
