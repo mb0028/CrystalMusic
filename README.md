@@ -2,11 +2,6 @@
 
 Android music player app designed for local library, simplicity & performance, without any unnecessary futures.
 
-> [!Note]
-> Development is in progress.
-> </br>
-> Download pre-release versions from release page but remember these versions are only for testing and might have bugs or unfinished features.
-
 ## Futures
 
 - 🪶 Simple UI, easy to navigate
@@ -17,6 +12,12 @@ Android music player app designed for local library, simplicity & performance, w
 - 🟢 Android 13+
 
 ## Screenshots
+
+|                           | Light                    | Dark                     |
+|---------------------------|--------------------------|--------------------------|
+| Main                      | ![](/Images/S%20(1).png) | ![](/Images/S%20(2).png) |
+| Fullscreen<br/>miniplayer | ![](/Images/S%20(6).png) | ![](/Images/S%20(3).png) |
+| Lyrics                    | ![](/Images/S%20(4).png) | ![](/Images/S%20(5).png) |
 
 
 ## To-Do

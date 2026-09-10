@@ -1,5 +1,7 @@
 package mb28.crysongs.ui.more_pages
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.folders
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.folder
@@ -36,79 +39,91 @@ import mb28.crysongs.updateDisplayQuery
 fun FoldersPage() {
     var folderView by remember { mutableStateOf(false) }
     var clickedFolderPath by remember { mutableStateOf("") }
-    LazyColumn(
-        contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+    val state = remember {
+        MutableTransitionState(false).apply {
+            targetState = true
+        }
+    }
+
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
     ) {
-        item {
-            Text(
-                if (folderView) clickedFolderPath.substring(
-                    clickedFolderPath.lastIndexOf('/') + 1)
+        LazyColumn(
+            contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+        ) {
+            item {
+                Text(
+                    if (folderView) clickedFolderPath.substring(
+                        clickedFolderPath.lastIndexOf('/') + 1
+                    )
                     else "Folders (${folders.count()})",
-                fontSize = 36.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 40.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(33.dp))
-        }
+                    fontSize = 36.sp,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 40.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(33.dp))
+            }
 
-        item {
-            Row(
-                Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                if (folderView) {
-                    FilledTonalIconButton(
-                        { folderView = false }
-                    ) {
-                        Icon(arrow_back, null)
-                    }
-                    FilledTonalIconButton(
-                        {
-                            val folderTracks = tracks.toMutableList()
-                            folderTracks.removeIf {
-                                !it.path.startsWith(clickedFolderPath)
-                            }
-                            playerQuery = folderTracks.shuffled().toMutableStateList()
-                            updateDisplayQuery()
-                            setAndPlay(playerQuery.first(), false)
+            item {
+                Row(
+                    Modifier.fillMaxWidth()
+                        .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    if (folderView) {
+                        FilledTonalIconButton(
+                            { folderView = false }
+                        ) {
+                            Icon(arrow_back, null)
                         }
-                    ) {
-                        Icon(shuffle, null)
+                        FilledTonalIconButton(
+                            {
+                                val folderTracks = tracks.toMutableList()
+                                folderTracks.removeIf {
+                                    !it.path.startsWith(clickedFolderPath)
+                                }
+                                playerQuery = folderTracks.shuffled().toMutableStateList()
+                                updateDisplayQuery()
+                                setAndPlay(playerQuery.first(), false)
+                            }
+                        ) {
+                            Icon(shuffle, null)
+                        }
                     }
                 }
             }
-        }
 
-        if (folderView) {
-            val folderTracks = tracks.toMutableList()
-            folderTracks.removeIf {
-                !it.path.startsWith(clickedFolderPath)
-            }
-            val count = folderTracks.count()
-            items(count) { i ->
-                TrackTile(
-                    folderTracks[i],
-                    i, count,
-                    resetQueryOnClick = false
-                ) {
-                    playerQuery = folderTracks.toMutableStateList()
-                    updateDisplayQuery()
+            if (folderView) {
+                val folderTracks = tracks.toMutableList()
+                folderTracks.removeIf {
+                    !it.path.startsWith(clickedFolderPath)
                 }
-            }
-        }
-        else {
-            val count = folders.count()
-            items(count) { i ->
-                val f = folders[i]
-                EasySegmentedListItem(
-                    folder,
-                    f.substring(f.lastIndexOf('/') + 1),
-                    i, count,
-                    Modifier.padding(horizontal = 10.dp)
-                ) {
-                    clickedFolderPath = f
-                    folderView = true
+                val count = folderTracks.count()
+                items(count) { i ->
+                    TrackTile(
+                        folderTracks[i],
+                        i, count,
+                        resetQueryOnClick = false
+                    ) {
+                        playerQuery = folderTracks.toMutableStateList()
+                        updateDisplayQuery()
+                    }
+                }
+            } else {
+                val count = folders.count()
+                items(count) { i ->
+                    val f = folders[i]
+                    EasySegmentedListItem(
+                        folder,
+                        f.substring(f.lastIndexOf('/') + 1),
+                        i, count,
+                        Modifier.padding(horizontal = 10.dp)
+                    ) {
+                        clickedFolderPath = f
+                        folderView = true
+                    }
                 }
             }
         }

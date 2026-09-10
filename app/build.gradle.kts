@@ -15,8 +15,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 33
         targetSdk = 37
-        versionCode = 4
-        versionName = "v0.0.4-pre-release"
+        versionCode = 5
+        versionName = "v1.0.0-2026.09.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +40,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.glance.material)
+
     implementation(libs.androidx.graphics.shapes)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

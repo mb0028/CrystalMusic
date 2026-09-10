@@ -1,4 +1,4 @@
-## v1.0.0-2026.09.xx (Upcoming)
+## v1.0.0-2026.09.10
 First stable release!
 
 - Rename playlists with the new button

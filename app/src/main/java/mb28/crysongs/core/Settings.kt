@@ -25,7 +25,7 @@ object Settings {
     var loopTrack by mutableStateOf(false)
     var verticalLyrics by mutableStateOf(false)
     var appVolume by mutableFloatStateOf(1f)
-    var coverShapeMode by mutableIntStateOf(0)
+    var coverShapeMode by mutableIntStateOf(2)
     var sortBy = 0
     var sortOrderDesc = true
     var tagsSpacer = " • "

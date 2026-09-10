@@ -93,7 +93,9 @@ fun TrackTile(
             ),
             colors = ListItemDefaults.segmentedColors(
                 containerColor = if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-                else MaterialTheme.colorScheme.surfaceContainerLowest
+                    else MaterialTheme.colorScheme.surfaceContainerLowest,
+                contentColor = if (t == nowPlaying) MaterialTheme.colorScheme.onTertiaryContainer
+                    else MaterialTheme.colorScheme.onSurface,
             ),
             modifier = modifier
                 .padding(bottom = 5.dp)
