@@ -1,3 +1,6 @@
+# v1.1.0 (Upcoming)
+- UI improvements
+
 ## v1.0.0-2026.09.10
 First stable release!
 
