@@ -11,6 +11,10 @@ Android music player app designed for local library, simplicity & performance, w
 - 👟 Gapless playback
 - 🟢 Android 13+
 
+To-Do
+- [ ] Tag editor
+- [ ] Home widget
+
 ## Screenshots
 
 |                           | Light                    | Dark                     |
@@ -18,9 +22,3 @@ Android music player app designed for local library, simplicity & performance, w
 | Main                      | ![](/Images/S%20(1).png) | ![](/Images/S%20(2).png) |
 | Fullscreen<br/>miniplayer | ![](/Images/S%20(6).png) | ![](/Images/S%20(3).png) |
 | Lyrics                    | ![](/Images/S%20(4).png) | ![](/Images/S%20(5).png) |
-
-
-## To-Do
-
-- [ ] Tag editor
-- [x] ~~Custom Notification instead of android's default~~
