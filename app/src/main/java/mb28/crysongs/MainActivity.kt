@@ -1,18 +1,19 @@
 package mb28.crysongs
 
+import android.Manifest
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
-import android.view.Menu
 import android.view.Window
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
@@ -71,6 +73,8 @@ import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.theme.CrySongsTheme
 
+//const val ACTION_CONTROL_PLAYBACK = "mb28.CrystalMusic.ACTION_CONTROL_PLAYBACK"
+//const val EXTRA_CONTROL_PLAYBACK = "EXTRA_ACTION_CONTROL_PLAYBACK"
 var noCoverBitmap: ImageBitmap? = null
 var notificationColor: Int? = null
 

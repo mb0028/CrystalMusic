@@ -1,4 +1,5 @@
 # v1.1.0 (Upcoming)
+- New: Homescreen widget for controlling playback. also shows the lyrics
 - UI improvements
 
 ## v1.0.0-2026.09.10

@@ -56,6 +56,7 @@ import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
 import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
+import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
 import mb28.crysongs.position
@@ -161,10 +162,7 @@ private fun PlayPauseNextPrevious() {
     Row {
         IconButton(
             {
-                setAndPlay(
-                    playerQuery[(playerQuery.indexOf(nowPlaying) - 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
+                playNextOrPrevious(false)
             }
         ) {
             Icon(painterResource(R.drawable.skip_previous_24px), null)
@@ -185,10 +183,7 @@ private fun PlayPauseNextPrevious() {
         }
         IconButton(
             {
-                setAndPlay(
-                    playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
+                playNextOrPrevious()
             }
         ) {
             Icon(painterResource(R.drawable.skip_next_24px), null)

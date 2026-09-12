@@ -37,12 +37,17 @@ android {
     buildFeatures {
         compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
 }
 
 dependencies {
-//    implementation(libs.androidx.glance.appwidget)
-//    implementation(libs.androidx.glance.material3)
-//    implementation(libs.androidx.glance.material)
+    implementation(libs.androidx.startup.runtime)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.glance.material)
 
     implementation(libs.androidx.graphics.shapes)
     implementation(platform(libs.androidx.compose.bom))

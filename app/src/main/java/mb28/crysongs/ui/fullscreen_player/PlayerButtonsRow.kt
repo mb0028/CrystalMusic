@@ -31,6 +31,7 @@ import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.isPlaying
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.nowPlayingI
+import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
 import mb28.crysongs.setAndPlay
@@ -68,10 +69,7 @@ fun FSPlayerButtonsRow() {
         }
         FilledIconButton(
             {
-                setAndPlay(
-                    playerQuery[(nowPlayingI - 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
+                playNextOrPrevious(false)
             },
             enabled = playerQuery.isNotEmpty(),
             colors = IconButtonDefaults.filledIconButtonColors(
@@ -100,10 +98,7 @@ fun FSPlayerButtonsRow() {
         }
         FilledIconButton(
             {
-                setAndPlay(
-                    playerQuery[(nowPlayingI + 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
+                playNextOrPrevious()
             },
             enabled = playerQuery.isNotEmpty()
         ) {

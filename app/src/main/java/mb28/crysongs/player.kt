@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,6 +23,7 @@ import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.updateNotification
+import mb28.crysongs.glance.PlayerWidget
 import mb28.music.LrcParser
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -84,6 +86,14 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
     isReloading = false
 }
 
+fun playNextOrPrevious(next: Boolean = true) {
+    val add = if (next) 1 else -1
+    setAndPlay(
+        playerQuery[(nowPlayingI + add).coerceIn(0, playerQuery.count() - 1)],
+        false
+    )
+}
+
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
     isPlayerLoopStarted = true
     while (true) {
@@ -98,6 +108,7 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
                 // On lyric line changes
                 if (line != lastLrcLine) {
+                    PlayerWidget().updateAll(context)
                     updateNotification(nm, context, nowPlaying!!.title + "$tagsSpacer${nowPlaying!!.artist}", line,
                         line,
                         position.milliseconds, player.duration.milliseconds)
@@ -111,6 +122,7 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
+                PlayerWidget().updateAll(context)
                 hasLrc = nowPlaying!!.hasLRC
                 lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }
 
