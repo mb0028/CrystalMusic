@@ -14,7 +14,8 @@ Android music player app designed for local library, simplicity & performance, w
 
 To-Do
 - [ ] Tag editor
-- [ ] Home widget
+- [ ] App stays in background without being killed
+- [x] ~~Home widget~~
 
 ## Screenshots
 
