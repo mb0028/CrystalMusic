@@ -7,6 +7,7 @@
     android:maxResizeWidth="200dp"
     android:maxResizeHeight="120dp"
     android:updatePeriodMillis="86400000"
+    android:previewImage="@drawable/widget_turntable_preview"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"

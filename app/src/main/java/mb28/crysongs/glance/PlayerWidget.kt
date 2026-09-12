@@ -33,6 +33,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
 import mb28.crysongs.MainActivity
 import mb28.crysongs.R
 import mb28.crysongs.core.Track
@@ -94,7 +95,8 @@ private fun PlaybackControls() {
             Alignment.CenterHorizontally
         ) {
             if (nowPlaying != null) {
-                Text(nowPlaying!!.title, maxLines = 1)
+                Text(nowPlaying!!.title, maxLines = 1,
+                    style = TextStyle(color = GlanceTheme.colors.onSurface))
             }
 
             Row {
@@ -131,7 +133,8 @@ private fun PlaybackControls() {
             }
 
             if (lastLrcLine.isNotEmpty()) {
-                Text(lastLrcLine, maxLines = 1)
+                Text(lastLrcLine, maxLines = 1,
+                    style = TextStyle(color = GlanceTheme.colors.onSurface))
             }
 
 
