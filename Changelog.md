@@ -1,5 +1,5 @@
 # v1.1.0 (Upcoming)
-- New: Homescreen widget for controlling playback. also shows the lyrics
+- New: 2 Homescreen widgets that inspired by YT Music app
 - UI improvements
 
 ## v1.0.0-2026.09.10

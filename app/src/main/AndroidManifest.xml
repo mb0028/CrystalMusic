@@ -76,10 +76,17 @@
                 android:resource="@xml/player_widget_info" />
         </receiver>
 
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove" />
+        <receiver
+            android:name=".glance.TurntableReceiver"
+            android:exported="true"
+            android:label="Turntable">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/turntable_widget_info" />
+        </receiver>
 
     </application>
 </manifest>

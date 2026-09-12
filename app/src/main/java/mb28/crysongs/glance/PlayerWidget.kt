@@ -139,7 +139,7 @@ private fun PlaybackControls() {
     }
 }
 
-private fun controlPlayback(action: Int, context: Context) {
+fun controlPlayback(action: Int, context: Context) {
     try {
         when (action) {
             1 -> if (player.isPlaying) player.pause() else player.start()
