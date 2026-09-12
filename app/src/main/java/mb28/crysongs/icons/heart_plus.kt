@@ -12,12 +12,12 @@ import androidx.compose.ui.unit.dp
 @Suppress("CheckReturnValue")
 public val heart_plus: ImageVector
     get() {
-        if (_heart_plus != null) {
-            return _heart_plus!!
+        if (_favorite != null) {
+            return _favorite!!
         }
-        _heart_plus =
+        _favorite =
             ImageVector.Builder(
-                name = "heart_plus",
+                name = "favorite",
                 defaultWidth = 24.dp,
                 defaultHeight = 24.dp,
                 viewportWidth = 24f,
@@ -33,69 +33,56 @@ public val heart_plus: ImageVector
                         strokeLineCap = StrokeCap.Butt,
                         strokeLineJoin = StrokeJoin.Bevel,
                         strokeLineMiter = 1f,
-                        pathFillType = PathFillType.NonZero,
+                        pathFillType = PathFillType.Companion.NonZero,
                     ) {
-                        moveTo(11f, 11.48f)
+                        moveTo(11.29f, 20.2f)
+                        quadTo(10.93f, 20.08f, 10.65f, 19.8f)
+                        lineTo(8.93f, 18.23f)
+                        quadTo(6.28f, 15.8f, 4.14f, 13.41f)
+                        quadTo(2f, 11.02f, 2f, 8.15f)
+                        quadTo(2f, 5.8f, 3.58f, 4.22f)
+                        reflectiveQuadTo(7.5f, 2.65f)
+                        quadToRelative(1.33f, 0f, 2.5f, 0.56f)
+                        reflectiveQuadToRelative(2f, 1.54f)
+                        quadTo(12.83f, 3.77f, 14f, 3.21f)
+                        reflectiveQuadTo(16.5f, 2.65f)
+                        quadToRelative(2.35f, 0f, 3.93f, 1.57f)
+                        reflectiveQuadTo(22f, 8.15f)
+                        quadToRelative(0f, 2.88f, -2.13f, 5.28f)
+                        reflectiveQuadToRelative(-4.82f, 4.83f)
+                        lineToRelative(-1.7f, 1.55f)
+                        quadToRelative(-0.28f, 0.27f, -0.64f, 0.4f)
+                        reflectiveQuadTo(12f, 20.33f)
+                        reflectiveQuadTo(11.29f, 20.2f)
                         close()
-                        moveTo(11f, 21f)
-                        lineTo(7.83f, 18.15f)
-                        quadTo(6.03f, 16.52f, 4.74f, 15.25f)
-                        reflectiveQuadTo(2.61f, 12.85f)
-                        reflectiveQuadTo(1.39f, 10.68f)
-                        quadTo(1f, 9.63f, 1f, 8.48f)
-                        quadTo(1f, 6.13f, 2.58f, 4.56f)
-                        reflectiveQuadTo(6.5f, 3f)
-                        quadTo(7.8f, 3f, 8.98f, 3.55f)
-                        reflectiveQuadTo(11f, 5.1f)
-                        quadToRelative(0.85f, -1f, 2.03f, -1.55f)
-                        reflectiveQuadTo(15.5f, 3f)
-                        quadToRelative(2.03f, 0f, 3.4f, 1.14f)
-                        reflectiveQuadTo(20.78f, 7f)
-                        quadToRelative(0f, 0f, -0.34f, 0f)
-                        reflectiveQuadTo(19.71f, 7f)
-                        reflectiveQuadTo(18.99f, 7f)
-                        reflectiveQuadTo(18.65f, 7f)
-                        quadTo(18.2f, 6f, 17.33f, 5.5f)
-                        reflectiveQuadTo(15.5f, 5f)
-                        quadTo(14.23f, 5f, 13.3f, 5.69f)
-                        reflectiveQuadTo(11.58f, 7.5f)
-                        horizontalLineTo(10.43f)
-                        quadTo(9.65f, 6.38f, 8.66f, 5.69f)
-                        quadTo(7.68f, 5f, 6.5f, 5f)
-                        quadTo(5.08f, 5f, 4.04f, 5.99f)
-                        quadTo(3f, 6.97f, 3f, 8.48f)
-                        quadTo(3f, 9.3f, 3.35f, 10.15f)
-                        reflectiveQuadTo(4.6f, 12.11f)
-                        quadToRelative(0.9f, 1.11f, 2.45f, 2.6f)
-                        reflectiveQuadTo(11f, 18.3f)
-                        quadToRelative(0.65f, -0.57f, 1.53f, -1.32f)
-                        reflectiveQuadToRelative(1.4f, -1.25f)
-                        quadToRelative(0f, 0f, 0.22f, 0.22f)
-                        quadToRelative(0.22f, 0.23f, 0.49f, 0.49f)
-                        reflectiveQuadToRelative(0.49f, 0.49f)
-                        reflectiveQuadToRelative(0.23f, 0.22f)
-                        quadToRelative(-0.55f, 0.5f, -1.4f, 1.24f)
-                        reflectiveQuadToRelative(-1.5f, 1.31f)
-                        lineTo(11f, 21f)
+                        moveTo(11.05f, 6.75f)
+                        quadTo(10.33f, 5.72f, 9.5f, 5.19f)
+                        quadTo(8.68f, 4.65f, 7.5f, 4.65f)
+                        quadTo(6f, 4.65f, 5f, 5.65f)
+                        reflectiveQuadTo(4f, 8.15f)
+                        quadToRelative(0f, 1.3f, 0.93f, 2.76f)
+                        reflectiveQuadToRelative(2.21f, 2.84f)
+                        reflectiveQuadToRelative(2.65f, 2.57f)
+                        reflectiveQuadTo(12f, 18.3f)
+                        quadToRelative(0.85f, -0.78f, 2.21f, -1.98f)
+                        reflectiveQuadToRelative(2.65f, -2.57f)
+                        reflectiveQuadToRelative(2.21f, -2.84f)
+                        reflectiveQuadTo(20f, 8.15f)
+                        quadToRelative(0f, -1.5f, -1f, -2.5f)
+                        reflectiveQuadToRelative(-2.5f, -1f)
+                        quadToRelative(-1.17f, 0f, -2f, 0.54f)
+                        quadTo(13.68f, 5.72f, 12.95f, 6.75f)
+                        quadTo(12.78f, 7f, 12.53f, 7.13f)
+                        reflectiveQuadTo(12f, 7.25f)
+                        reflectiveQuadTo(11.48f, 7.13f)
+                        reflectiveQuadTo(11.05f, 6.75f)
                         close()
-                        moveToRelative(7f, -4f)
-                        verticalLineTo(14f)
-                        horizontalLineTo(15f)
-                        verticalLineTo(12f)
-                        horizontalLineToRelative(3f)
-                        verticalLineTo(9f)
-                        horizontalLineToRelative(2f)
-                        verticalLineToRelative(3f)
-                        horizontalLineToRelative(3f)
-                        verticalLineToRelative(2f)
-                        horizontalLineTo(20f)
-                        verticalLineToRelative(3f)
-                        horizontalLineTo(18f)
+                        moveTo(12f, 11.48f)
                         close()
                     }
                 }
                 .build()
-        return _heart_plus!!
+        return _favorite!!
     }
 
-private var _heart_plus: ImageVector? = null
+private var _favorite: ImageVector? = null

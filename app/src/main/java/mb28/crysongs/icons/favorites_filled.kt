@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
+
 @Suppress("CheckReturnValue")
 public val favorite: ImageVector
     get() {
@@ -33,27 +34,27 @@ public val favorite: ImageVector
                         strokeLineCap = StrokeCap.Butt,
                         strokeLineJoin = StrokeJoin.Bevel,
                         strokeLineMiter = 1f,
-                        pathFillType = PathFillType.NonZero,
+                        pathFillType = PathFillType.Companion.NonZero,
                     ) {
-                        moveTo(12f, 21f)
-                        lineTo(10.55f, 19.7f)
-                        quadTo(8.03f, 17.43f, 6.38f, 15.78f)
-                        quadTo(4.73f, 14.13f, 3.75f, 12.81f)
-                        quadTo(2.78f, 11.5f, 2.39f, 10.4f)
-                        reflectiveQuadTo(2f, 8.15f)
+                        moveTo(11.29f, 20.2f)
+                        quadTo(10.93f, 20.08f, 10.65f, 19.8f)
+                        lineTo(8.93f, 18.23f)
+                        quadTo(6.28f, 15.8f, 4.14f, 13.41f)
+                        quadTo(2f, 11.02f, 2f, 8.15f)
                         quadTo(2f, 5.8f, 3.58f, 4.22f)
                         reflectiveQuadTo(7.5f, 2.65f)
-                        quadToRelative(1.3f, 0f, 2.48f, 0.55f)
-                        reflectiveQuadTo(12f, 4.75f)
-                        quadToRelative(0.85f, -1f, 2.03f, -1.55f)
+                        quadToRelative(1.33f, 0f, 2.5f, 0.56f)
+                        reflectiveQuadToRelative(2f, 1.54f)
+                        quadTo(12.83f, 3.77f, 14f, 3.21f)
                         reflectiveQuadTo(16.5f, 2.65f)
                         quadToRelative(2.35f, 0f, 3.93f, 1.57f)
                         reflectiveQuadTo(22f, 8.15f)
-                        quadTo(22f, 9.3f, 21.61f, 10.4f)
-                        reflectiveQuadToRelative(-1.36f, 2.41f)
-                        quadToRelative(-0.97f, 1.31f, -2.63f, 2.96f)
-                        quadToRelative(-1.65f, 1.65f, -4.17f, 3.92f)
-                        lineTo(12f, 21f)
+                        quadToRelative(0f, 2.88f, -2.13f, 5.28f)
+                        reflectiveQuadToRelative(-4.82f, 4.83f)
+                        lineToRelative(-1.7f, 1.55f)
+                        quadToRelative(-0.28f, 0.27f, -0.64f, 0.4f)
+                        reflectiveQuadTo(12f, 20.33f)
+                        reflectiveQuadTo(11.29f, 20.2f)
                         close()
                     }
                 }

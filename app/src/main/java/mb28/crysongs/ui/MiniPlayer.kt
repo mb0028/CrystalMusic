@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import mb28.crysongs.FullscreenPlayerActivity
+import mb28.crysongs.R
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.duration
@@ -165,7 +167,7 @@ private fun PlayPauseNextPrevious() {
                 )
             }
         ) {
-            Icon(skip_previous, null)
+            Icon(painterResource(R.drawable.skip_previous_24px), null)
         }
         IconButton(
             {
@@ -178,7 +180,8 @@ private fun PlayPauseNextPrevious() {
             },
             modifier = Modifier.scale(1.5f)
         ) {
-            Icon(if (isPlaying) pause_circle else play_circle, null)
+            Icon(if (isPlaying) painterResource(R.drawable.pause_24px)
+                else painterResource(R.drawable.play_arrow_24px), null)
         }
         IconButton(
             {
@@ -188,7 +191,7 @@ private fun PlayPauseNextPrevious() {
                 )
             }
         ) {
-            Icon(skip_next, null)
+            Icon(painterResource(R.drawable.skip_next_24px), null)
         }
     }
 }
