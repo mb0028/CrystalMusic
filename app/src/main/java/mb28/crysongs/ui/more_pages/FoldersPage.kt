@@ -98,7 +98,8 @@ fun FoldersPage() {
             if (folderView) {
                 val folderTracks = tracks.toMutableList()
                 folderTracks.removeIf {
-                    !it.path.startsWith(clickedFolderPath)
+                    !it.path.substring(0, it.path.lastIndexOf('/'))
+                        .endsWith(clickedFolderPath)
                 }
                 val count = folderTracks.count()
                 items(count) { i ->
