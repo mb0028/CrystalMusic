@@ -2,7 +2,7 @@
 
 Android music player app designed for local library, simplicity & performance, without any unnecessary futures.
 
-## Futures
+## Features
 
 - 🪶 Simple UI, easy to navigate
 - ✨ Play any audio format, include mp3, m4a, flac, wav, ogg, ...
@@ -14,7 +14,9 @@ Android music player app designed for local library, simplicity & performance, w
 
 To-Do
 - [ ] Tag editor
-- [ ] Home widget
+- [ ] Add some settings for more customization
+- [ ] App stays in background without being killed
+- [x] ~~Home widget~~
 
 ## Screenshots
 
