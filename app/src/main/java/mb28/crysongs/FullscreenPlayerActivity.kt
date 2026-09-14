@@ -154,7 +154,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
 
                         },
                     containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    contentColor = if (Settings.whiteText) Color.White else MaterialTheme.colorScheme.onSurface
                 ) { innerPadding ->
                     Pager(innerPadding, this, activityOffset)
                 }
@@ -168,11 +168,6 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
     val roundness = activity.window.decorView.rootWindowInsets?.getRoundedCorner(
         RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
     val selectedTab = rememberPagerState(1) { 3 }
-    val fsPlayerCover = try {
-            BitmapFactory.decodeFile(Track.createOrGetThumbnail(nowPlaying!!.path)).asImageBitmap()
-        } catch (_: Exception) {
-            noCoverBitmap!!
-        }
     val shape = RoundedCornerShape((roundness / 3.25f).dp)
 
     Box(
@@ -181,7 +176,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
             .background(MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f)))
     ) {
         Image(
-            fsPlayerCover, null,
+            nowPlayingCover, null,
             contentScale = ContentScale.FillHeight,
             modifier = Modifier
                 .fillMaxSize()
@@ -204,7 +199,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                    ) {
                        Column(Modifier.fillMaxWidth()) {
                            Spacer(Modifier.height(75.dp))
-                           Cover(cover = fsPlayerCover)
+                           Cover()
                            Spacer(Modifier.height(15.dp))
 
                            Text(nowPlaying?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -251,7 +246,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
+private fun Cover(modifier: Modifier = Modifier) {
     val coverShape =  when(Settings.coverShapeMode) {
         -1 -> RoundedCornerShape(5.dp)
         1 -> {
@@ -299,7 +294,7 @@ private fun Cover(modifier: Modifier = Modifier, cover: ImageBitmap) {
             }
     ) {
         Image(
-            cover,
+            nowPlayingCover,
             "Track cover",
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxWidth()

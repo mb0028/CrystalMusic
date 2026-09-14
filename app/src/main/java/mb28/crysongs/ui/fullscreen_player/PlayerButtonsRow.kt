@@ -22,24 +22,18 @@ import mb28.crysongs.R
 import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
-import mb28.crysongs.icons.pause_circle
-import mb28.crysongs.icons.play_circle
 import mb28.crysongs.icons.repeat
 import mb28.crysongs.icons.repeat_on
-import mb28.crysongs.icons.skip_next
-import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.isPlaying
 import mb28.crysongs.nowPlaying
-import mb28.crysongs.nowPlayingI
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
-import mb28.crysongs.setAndPlay
 
 @Composable
 fun FSPlayerButtonsRow() {
     val roundingAnim = animateDpAsState(
-        if (isPlaying) 15.dp else 25.dp,
+        if (isPlaying) 12.dp else 20.dp,
         SpringSpec(
             stiffness = Spring.StiffnessMedium
         )
@@ -93,8 +87,12 @@ fun FSPlayerButtonsRow() {
                 .scale(1.5f)
                 .padding(horizontal = 8.dp)
         ) {
-            Icon(if (isPlaying) painterResource(R.drawable.pause_24px)
-                else painterResource(R.drawable.play_arrow_24px), null)
+            Icon(
+                if (isPlaying) painterResource(R.drawable.pause_40px)
+                    else painterResource(R.drawable.play_arrow_40px),
+                "Play / Pause",
+                Modifier.padding(7.dp)
+            )
         }
         FilledIconButton(
             {

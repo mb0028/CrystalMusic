@@ -16,7 +16,6 @@ import java.io.File
 object Settings {
     @SuppressLint("SdCardPath")
     const val appFolder = "/sdcard/Documents/.Crystal"
-    const val appCacheFolder = "$appFolder/.SongsTemp"
     const val appCacheThumbsFolder = "$appFolder/Covers"
     const val settingsFile = "$appFolder/Songs Settings.txt"
 
@@ -27,8 +26,12 @@ object Settings {
     var appVolume by mutableFloatStateOf(1f)
     var coverShapeMode by mutableIntStateOf(2)
     var sortBy = 0
-    var sortOrderDesc = true
-    var tagsSpacer = " • "
+    var sortOrderDesc by mutableStateOf(true)
+    var tagsSpacer by mutableStateOf(" • ")
+    var useCoverColor by mutableStateOf(false)
+    var experimental by mutableStateOf(false)
+    var whiteText by mutableStateOf(false)
+    var gradientColoring by mutableStateOf(false)
 
     fun addOrRemoveFavorite(path: String) {
         if (favorites.contains(path)) {
@@ -43,9 +46,8 @@ object Settings {
         favorites.clear()
         playlists.clear()
         val a = File(appFolder)
-        val ac = File(appCacheFolder)
         val atc = File(appCacheThumbsFolder)
-        if (!a.exists() || !ac.exists() || !atc.exists()) {
+        if (!a.exists() || !atc.exists()) {
             atc.mkdirs()
         }
 
@@ -73,6 +75,10 @@ object Settings {
                     s.startsWith("[TagsSpacer]") -> tagsSpacer = s.removePrefix("[TagsSpacer]")
                     s.startsWith("[Volume]") -> appVolume = s.removePrefix("[Volume]").toFloat()
                     s.startsWith("[CoverShape]") -> coverShapeMode = s.removePrefix("[CoverShape]").toInt()
+                    s.startsWith("[UseCoverColor]") -> useCoverColor = s.removePrefix("[UseCoverColor]").toBooleanStrict()
+                    s.startsWith("[FeatureFlags]") -> experimental = s.removePrefix("[FeatureFlags]").toBooleanStrict()
+                    s.startsWith("[WhiteTexts]") -> whiteText = s.removePrefix("[WhiteTexts]").toBooleanStrict()
+                    s.startsWith("[GradientColoring]") -> gradientColoring = s.removePrefix("[GradientColoring]").toBooleanStrict()
                 }
             }
         } else {
@@ -91,13 +97,17 @@ object Settings {
         data += "[TagsSpacer]$tagsSpacer\n"
         data += "[CoverShape]$coverShapeMode\n"
         data += "[VerticalLyrics]$verticalLyrics\n"
+        data += "[UseCoverColor]$useCoverColor\n"
+        data += "[FeatureFlags]$experimental\n"
+        data += "[WhiteTexts]$whiteText\n"
+        data += "[GradientColoring]$gradientColoring\n"
 
-        data += "\n[Playlists]\n"
+        data += "\n"
         playlists.forEach {
             data += "[crym3u]$it\n"
         }
 
-        data += "\n[Favorites]\n"
+        data += "\n"
         favorites.forEach {
             data += "[Favorite]$it\n"
         }

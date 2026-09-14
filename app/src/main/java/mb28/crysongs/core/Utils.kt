@@ -3,6 +3,8 @@ package mb28.crysongs.core
 import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
@@ -11,6 +13,7 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.net.toUri
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
 import kotlin.time.Duration
@@ -82,6 +85,10 @@ fun inverseLerp(a: Float, b: Float, value: Float): Float {
     return 0f
 }
 
-
+fun openLink(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
+}
 
 

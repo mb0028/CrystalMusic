@@ -4,7 +4,8 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentUris
 import android.content.Context
-import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.provider.MediaStore
@@ -14,7 +15,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.glance.appwidget.updateAll
+import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,6 +29,7 @@ import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.updateNotification
 import mb28.crysongs.glance.PlayerWidget
+import mb28.crysongs.ui.theme.trackCoverPrimary
 import mb28.music.LrcParser
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -31,6 +37,8 @@ import kotlin.time.Duration.Companion.milliseconds
 var player by mutableStateOf(MediaPlayer())
 var nowPlayingI by mutableIntStateOf(-1)
 var nowPlaying: Track? by mutableStateOf(null)
+private var pNowPlayingCover: Bitmap? by mutableStateOf(null)
+val nowPlayingCover get() = pNowPlayingCover?.asImageBitmap() ?: noCoverBitmap!!
 
 var lrcParser: LrcParser? by mutableStateOf(null)
 var lastLrcLine by mutableStateOf("")
@@ -38,7 +46,7 @@ var lastLrcLineI by mutableIntStateOf(-1)
 
 
 private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 350.milliseconds
+private val playerLoopDelay = 250.milliseconds
 private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
@@ -122,6 +130,17 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
+                val coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
+                pNowPlayingCover = if (coverPath == null) null
+                    else BitmapFactory.decodeFile(coverPath)
+
+                if (Settings.useCoverColor) {
+                    trackCoverPrimary = if (pNowPlayingCover != null) {
+                        pNowPlayingCover!!.asImageBitmap().themeColors(fallback = Color.Blue).first()
+                    } else null
+                    notificationColor = trackCoverPrimary!!.toArgb()
+                }
+
                 PlayerWidget().updateAll(context)
                 hasLrc = nowPlaying!!.hasLRC
                 lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }

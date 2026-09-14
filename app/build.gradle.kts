@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.material.kolor)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)

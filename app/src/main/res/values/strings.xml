@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Cry Songs</string>
     <string name="title_activity_fullscreen_player">Cry Songs Player</string>
+    <string name="title_activity_settings">Settings Activity</string>
 </resources>

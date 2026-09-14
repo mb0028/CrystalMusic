@@ -56,6 +56,7 @@ import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
 import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
+import mb28.crysongs.nowPlayingCover
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
@@ -109,12 +110,8 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
         ) {
             if (nowPlaying != null) {
                 Spacer(Modifier.width(5.dp))
-
-                val coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
-                val cover = if (coverPath == null) noCoverBitmap!!
-                    else BitmapFactory.decodeFile(coverPath).asImageBitmap()
                 Image(
-                    cover,
+                    nowPlayingCover,
                     "Track cover",
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier.width(70.dp).height(70.dp).clip(shape)

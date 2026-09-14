@@ -8,14 +8,17 @@ Android music player app designed for local library, simplicity & performance, w
 - ✨ Play any audio format, include mp3, m4a, flac, wav, ogg, ...
 - 📃 Live notification with lyrics
 - 🍃 Material 3 expressive
-- 🧱 Homescreen widgets (inspired by YT Music app)
-- 👟 Gapless playback
-- 🟢 Android 13+
+- 🧱 Homescreen widgets (that inspired by YT Music app)
+- 📦 Only 3 megabytes
+- 🟢 Android 13+ and TV support
 
 To-Do
 - [ ] Tag editor
 - [ ] Add some settings for more customization
 - [ ] App stays in background without being killed
+- [ ] Widget settings
+- [ ] Better landscape support
+- [ ] Support for android 12, 11 & 10
 - [x] ~~Home widget~~
 
 ## Screenshots

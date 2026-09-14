@@ -1,30 +1,30 @@
 package mb28.crysongs
 
-import android.Manifest
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.view.Window
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
@@ -61,6 +60,7 @@ import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.music_note_2
 import mb28.crysongs.icons.queue_music
 import mb28.crysongs.icons.search
+import mb28.crysongs.icons.settings
 import mb28.crysongs.icons.stylus_brush
 import mb28.crysongs.icons.theater_comedy
 import mb28.crysongs.ui.MiniPlayer
@@ -134,6 +134,22 @@ class MainActivity : ComponentActivity() {
                             Spacer(Modifier.height(3.dp))
                             NavBar(selectedIndex, selectedSet)
                         }
+                    },
+                    topBar = {
+                        Row(
+                            Modifier.fillMaxWidth()
+                                .statusBarsPadding()
+                                .padding(5.dp),
+                            Arrangement.End
+                        ) {
+                            FilledTonalIconButton(
+                                {
+                                    startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                                }
+                            ) {
+                                Icon(settings, null)
+                            }
+                        }
                     }
                 ) { innerPadding ->
                     when (selectedIndex.intValue) {
@@ -162,6 +178,11 @@ class MainActivity : ComponentActivity() {
         if (!hasFocus && !isPlaying) {
             NotificationManagerCompat.from(this).cancelAll()
         }
+    }
+
+    override fun onResume() {
+        refreshTracksList(this@MainActivity)
+        super.onResume()
     }
 }
 

@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,13 +19,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
@@ -92,38 +90,46 @@ fun TrackTile(
                 defaultShape
             ),
             colors = ListItemDefaults.segmentedColors(
-                containerColor = if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-                    else MaterialTheme.colorScheme.surfaceContainerLowest,
+                containerColor = when {
+                    Settings.gradientColoring -> Color.Transparent
+                    t == nowPlaying -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.surfaceContainerLowest
+                },
                 contentColor = if (t == nowPlaying) MaterialTheme.colorScheme.onTertiaryContainer
                     else MaterialTheme.colorScheme.onSurface,
             ),
-            modifier = modifier
-                .padding(bottom = 5.dp)
-                .padding(horizontal = 10.dp)
-                .height(82.dp),
-//            .background(
-//                Brush.horizontalGradient(
-//                    listOf(
-//                        if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-//                        else MaterialTheme.colorScheme.surfaceContainerLowest,
-//                        MaterialTheme.colorScheme.surfaceBright,
-//                    )
-//                )
-//            ),
+            modifier = if (Settings.gradientColoring) modifier
+                    .padding(bottom = 5.dp)
+                    .padding(horizontal = 10.dp)
+                    .height(82.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+                                else MaterialTheme.colorScheme.surfaceContainerLowest,
+                                MaterialTheme.colorScheme.surfaceBright,
+                            )
+                        ),
+                        shape
+                    )
+                else modifier.padding(bottom = 5.dp).padding(horizontal = 10.dp).height(82.dp),
             contentPadding = PaddingValues(5.dp),
             leadingContent = {
                 val coverPath = Track.createOrGetThumbnail(t.path)
                 val cover = if (coverPath == null) noCoverBitmap!!
-                else BitmapFactory.decodeFile(coverPath).asImageBitmap()
-                Image(
-                    cover,
-                    "Track cover",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier
-                        .size(73.dp, 73.dp)
-                        .clickable { showMoreOptions = true }
-                        .clip(defaultPressedShape)
+                    else BitmapFactory.decodeFile(coverPath).asImageBitmap()
+                Box(Modifier.clip(defaultPressedShape)) {
+                    Image(
+                        cover,
+                        "Track cover",
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier
+                            .size(73.dp, 73.dp)
+                            .clickable { showMoreOptions = true }
+                            .clip(defaultPressedShape)
                 )
+            }
+
             },
             onClick = {
                 onBeforeClick()

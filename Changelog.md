@@ -1,6 +1,12 @@
-# v1.1.0 (Upcoming)
+## v1.1.0 (Upcoming)
 - New: 2 Homescreen widgets that inspired by YT Music app
+- Add settings page for more customization
+- Add option to clear covers cache
+- Add experimental features
 - UI improvements
+- Performance improvements
+- Fix: Folders are includes subfolder files too
+- Update material library to v1.5.0-alpha28
 
 ## v1.0.0-2026.09.10
 First stable release!
