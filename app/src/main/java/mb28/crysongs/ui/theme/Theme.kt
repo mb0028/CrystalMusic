@@ -23,7 +23,7 @@ private fun coverColorScheme(darkTheme: Boolean) : ColorScheme {
     return dynamicColorScheme(
         seedColor = trackCoverPrimary ?: Color(0xFF6650a4),
         isDark = darkTheme,
-        style = PaletteStyle.Rainbow,
+        style = PaletteStyle.Vibrant,
     )
 }
 
