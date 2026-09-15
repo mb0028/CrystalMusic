@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.duration
 import mb28.crysongs.isPlaying
@@ -27,7 +28,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun FSProgressBarRow(modifier: Modifier = Modifier) {
     val pos = position.toFloat()
     val animatedPos = animateFloatAsState(
-        (pos / duration).takeIf { pos != 0f } ?: 0f,
+        (pos.fastCoerceAtLeast(1f) / duration.fastCoerceAtLeast(1)),
         WavyProgressIndicatorDefaults.ProgressAnimationSpec
     )
     Row(modifier) {

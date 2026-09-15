@@ -93,37 +93,36 @@ class FullscreenPlayerActivity : ComponentActivity() {
             exitTransition = Slide()
             isNavigationBarContrastEnforced = false
         }
-        super.onCreate(savedInstanceState)
 
         if (intent.getBooleanExtra(EXTRA_LOAD_FROM_OTHER_APPS, false)) {
             val path = intent.getStringExtra(EXTRA_PATH)
             if (!Environment.isExternalStorageManager() ||
                 !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
+                super.onCreate(savedInstanceState)
                 setContent { CrySongsTheme { PermissionsPage(Modifier.fillMaxSize(), this) } }
                 return
             }
             Settings.load()
-            lifecycleScope.launch {
+
+            setupPlayer {
                 refreshTracksList(this@FullscreenPlayerActivity)
-            }
-            var track: Track? = null
-            tracks.forEach {
-                if (it.path.startsWith(path!!)) {
-                    track = it
+                var track: Track? = null
+                tracks.forEach {
+                    if (it.path.startsWith(path!!)) {
+                        track = it
+                    }
                 }
+                if (track == null) {
+                    finish()
+                }
+                setAndPlay(track!!, false)
             }
-            if (track == null) {
-                finish()
-            }
-            if (!isPlayerLoopStarted) {
-                playerLoop(getSystemService<NotificationManager>()!!, this)
-            }
-            setAndPlay(track!!, false)
         }
 
         if (noCoverBitmap == null) {
             noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
         }
+        super.onCreate(savedInstanceState)
 
         setContent {
             var activityOffset by remember { mutableIntStateOf(0) }

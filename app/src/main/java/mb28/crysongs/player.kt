@@ -78,7 +78,7 @@ var isPlaying by mutableStateOf(false)
 var position by mutableIntStateOf(0)
 var duration by mutableIntStateOf(0)
 
-fun Activity.setupPlayer() {
+fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
     val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
     val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
     controllerFuture.addListener(
@@ -106,6 +106,7 @@ fun Activity.setupPlayer() {
 
                 player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
                 playerLoop(nm, this)
+                onFinished()
             }
             isPlayerLoopStarted = true
         },

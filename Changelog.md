@@ -1,22 +1,22 @@
-## v1.1.0 (Upcoming)
+## v1.1.0
 App now uses ExoPlayer instead of Media player
 
 - App now correctly runs in background
 - Notification is now separated into 2:
   - 1: Android's default media player notification for controlling playback
-  - 2: Small notification that shows lyrics if available
+  - 2: Small live notification that shows lyrics if available
 - New: 2 Homescreen widgets that inspired by YT Music app
 - Add settings page for more customization
 - Add option to clear covers cache
-- Add option to use now playing cover accent color for UI 
+- Add option to use now playing cover accent color for UI
 - Add experimental features
 - UI improvements
 - Performance improvements
 - Fix folders are includes subfolder files too
-- Fix app crashes if lyrics contains '\[' or '\]'
+- Fix app crashes if lyric contains more than one '\[' or '\]'
 - Update material library to v1.5.0-alpha28
 
-## v1.0.0-2026.09.10
+## v1.0.0
 First stable release!
 
 - Rename playlists with the new button
@@ -33,7 +33,7 @@ First stable release!
 
 ## v0.0.4-pre-release
 - Fix app crashes after song ends
-- Add ignore battery optimization so app stay open a bit longer. Next update foreground service will be added too
+- Add ignore battery optimization so app stays open a bit longer. Next update foreground service will be added too
 - New: Create playlists
 - New: Add tracks to favorites and access them in playlists tab
 - Open more actions panel by clicking track cover

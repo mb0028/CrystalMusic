@@ -20,11 +20,10 @@ class PlayerExportedActivity : Activity() {
         }
 
         if (lastUriPath == uriPath) {
-            startActivity( Intent(this, FullscreenPlayerActivity::class.java))
+            startActivity(Intent(this, FullscreenPlayerActivity::class.java))
             finish()
             return
         }
-        setupPlayer()
 
         if (!uriPath!!.contains("storage/emulated")) {
             contentResolver.query(

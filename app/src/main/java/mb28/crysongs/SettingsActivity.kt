@@ -129,37 +129,37 @@ private fun UISettings() {
 
 @Composable
 private fun FsSettings() {
-    val count = 2
+    val count = 1
     var fsShapeExpanded by remember { mutableStateOf(false) }
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.whiteText,
             "Force white texts", 0, count
         ) { Settings.whiteText = it; Settings.save() }
-        SegmentedListItem(
-            ListItemDefaults.segmentedShapes(1, count),
-            Modifier.padding(bottom = 3.dp),
-            colors = ListItemDefaults.segmentedColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-        ) {
-            Column {
-                Text("Cover shape:")
-                DropdownMenuPopup(fsShapeExpanded, {fsShapeExpanded = false}) {
-                    DropdownMenuItem({ Text("Square") },
-                        { Settings.coverShapeMode = -1; Settings.save() })
-                    DropdownMenuItem({ Text("Rounded Square") },
-                        { Settings.coverShapeMode = 0; Settings.save() })
-                    DropdownMenuItem({ Text("Rounded Polygon 1") },
-                        { Settings.coverShapeMode = 1; Settings.save() })
-                    DropdownMenuItem({ Text("Rounded Polygon 2") },
-                        { Settings.coverShapeMode = 2; Settings.save() })
-                    DropdownMenuItem({ Text("Circle") },
-                        { Settings.coverShapeMode = 3; Settings.save() })
-                }
-                Text("Note: you can switch between shapes by clicking the cover in fullscreen player")
-            }
-        }
+//        SegmentedListItem(
+//            ListItemDefaults.segmentedShapes(1, count),
+//            Modifier.padding(bottom = 3.dp),
+//            colors = ListItemDefaults.segmentedColors(
+//                containerColor = MaterialTheme.colorScheme.surface
+//            ),
+//        ) {
+//            Column {
+//                Text("Cover shape:")
+//                DropdownMenuPopup(fsShapeExpanded, {fsShapeExpanded = false}) {
+//                    DropdownMenuItem({ Text("Square") },
+//                        { Settings.coverShapeMode = -1; Settings.save() })
+//                    DropdownMenuItem({ Text("Rounded Square") },
+//                        { Settings.coverShapeMode = 0; Settings.save() })
+//                    DropdownMenuItem({ Text("Rounded Polygon 1") },
+//                        { Settings.coverShapeMode = 1; Settings.save() })
+//                    DropdownMenuItem({ Text("Rounded Polygon 2") },
+//                        { Settings.coverShapeMode = 2; Settings.save() })
+//                    DropdownMenuItem({ Text("Circle") },
+//                        { Settings.coverShapeMode = 3; Settings.save() })
+//                }
+//                Text("Note: you can switch between shapes by clicking the cover in fullscreen player")
+//            }
+//        }
     }
 }
 
@@ -217,7 +217,7 @@ private fun AboutSection() {
                 showFlags = true
             }
         }
-//        EasySegmentedListItem(null, "Open source licences", 4, count) {
+//        EasySegmentedListItem(null, "Open source licenses", 4, count) {
 //
 //        }
     }
