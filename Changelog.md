@@ -2,10 +2,12 @@
 - New: 2 Homescreen widgets that inspired by YT Music app
 - Add settings page for more customization
 - Add option to clear covers cache
+- Add option to use now playing cover accent color for UI 
 - Add experimental features
 - UI improvements
 - Performance improvements
-- Fix: Folders are includes subfolder files too
+- Fix folders are includes subfolder files too
+- Fix app crashes if lyrics contains '\[' or '\]'
 - Update material library to v1.5.0-alpha28
 
 ## v1.0.0-2026.09.10

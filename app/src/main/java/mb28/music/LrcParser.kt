@@ -100,13 +100,13 @@ data class LyricLine(val TimeStomp: Float, val Lyric: String) {
     var Lyric3: String? = null
     companion object {
         fun FromString(text: String) : LyricLine {
-            val time = text.substring(0, text.lastIndexOf(']')).removePrefix("[") // xx:xx.xx?
+            val time = text.substring(0, text.indexOf(']')).removePrefix("[") // xx:xx.xx?
             val sec = (time.substring(0, 2).toFloat() * 60f) + time.substring(3).toFloat()
 
-            return if (text.lastIndexOf('[') + 1 != text.count()) {
+            return if (text.indexOf('[') + 1 != text.count()) {
                 LyricLine(
                     sec,
-                    text.substring(text.lastIndexOf(']') + 1).trimStart()
+                    text.substring(text.indexOf(']') + 1).trimStart()
                 )
             } else {
                 LyricLine(sec, "")
