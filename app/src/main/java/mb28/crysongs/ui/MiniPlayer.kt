@@ -148,7 +148,7 @@ private fun PlayPauseNextPrevious() {
     Row {
         IconButton(
             {
-                playNextOrPrevious()
+                playNextOrPrevious(false)
             }
         ) {
             Icon(painterResource(R.drawable.skip_previous_24px), null)
