@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val playlist_play: ImageVector
+val playlist_play: ImageVector
     get() {
         if (_playlist_play != null) {
             return _playlist_play!!

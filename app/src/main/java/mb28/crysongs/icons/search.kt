@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val search: ImageVector
+val search: ImageVector
     get() {
         if (_search != null) {
             return _search!!

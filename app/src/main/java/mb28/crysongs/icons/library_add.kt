@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val library_add: ImageVector
+val library_add: ImageVector
     get() {
         if (_library_add != null) {
             return _library_add!!

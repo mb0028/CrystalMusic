@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val sound_detection_loud_sound: ImageVector
+val sound_detection_loud_sound: ImageVector
     get() {
         if (_sound_detection_loud_sound != null) {
             return _sound_detection_loud_sound!!

@@ -34,10 +34,6 @@ import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import java.io.File
-import java.io.FileFilter
-import java.io.FilenameFilter
-import java.nio.file.Path
-import kotlin.io.path.listDirectoryEntries
 
 @Composable
 fun CreatePlaylistPopup(onDismissRequired: () -> Unit) {

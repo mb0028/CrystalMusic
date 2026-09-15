@@ -13,8 +13,7 @@ var lastUriPath: String? = null
 class PlayerExportedActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         var uriPath = intent.data?.path
-        Log.i("Crystal Songs",
-            "App started with external app. Intent data: $uriPath")
+        Log.i("Crystal Songs", "App started with external app. Intent data: $uriPath")
 
         if (uriPath == null) {
             finish()
@@ -25,6 +24,7 @@ class PlayerExportedActivity : Activity() {
             finish()
             return
         }
+        setupPlayer()
 
         if (!uriPath!!.contains("storage/emulated")) {
             contentResolver.query(

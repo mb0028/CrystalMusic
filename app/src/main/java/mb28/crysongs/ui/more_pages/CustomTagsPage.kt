@@ -2,8 +2,6 @@ package mb28.crysongs.ui.more_pages
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,11 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastMap
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.icons.arrow_back
-import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.shuffle
 import mb28.crysongs.playerQuery
 import mb28.crysongs.setAndPlay
@@ -38,8 +34,6 @@ import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
-import kotlin.text.lastIndexOf
-import kotlin.text.substring
 
 @Composable
 fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {

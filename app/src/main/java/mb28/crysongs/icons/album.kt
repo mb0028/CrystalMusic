@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val album: ImageVector
+val album: ImageVector
     get() {
         if (_album != null) {
             return _album!!

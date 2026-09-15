@@ -115,7 +115,7 @@ fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, acti
                 Settings.appVolume,
                 {
                     Settings.appVolume = it
-                    player.setVolume(Settings.appVolume, Settings.appVolume)
+                    player.volume = Settings.appVolume
                     Settings.save()
                 },
                 modifier = Modifier

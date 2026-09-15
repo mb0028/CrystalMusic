@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val playlist_add_check_circle: ImageVector
+val playlist_add_check_circle: ImageVector
     get() {
         if (_playlist_add_check_circle != null) {
             return _playlist_add_check_circle!!

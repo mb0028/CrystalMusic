@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val swap_horiz: ImageVector
+val swap_horiz: ImageVector
     get() {
         if (_swap_horiz != null) {
             return _swap_horiz!!

@@ -2,12 +2,13 @@ package mb28.crysongs
 
 import android.app.Activity
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.MediaPlayer
 import android.net.Uri
+import androidx.media3.common.Player
 import android.provider.MediaStore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -18,14 +19,20 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
+import androidx.media3.common.MediaItem
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mb28.crysongs.core.PlayerService
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Settings.tagsSpacer
+import mb28.crysongs.core.Settings.loopTrack
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.updateNotification
 import mb28.crysongs.glance.PlayerWidget
@@ -34,7 +41,7 @@ import mb28.music.LrcParser
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-var player by mutableStateOf(MediaPlayer())
+lateinit var player: MediaController
 var nowPlayingI by mutableIntStateOf(-1)
 var nowPlaying: Track? by mutableStateOf(null)
 private var pNowPlayingCover: Bitmap? by mutableStateOf(null)
@@ -46,7 +53,7 @@ var lastLrcLineI by mutableIntStateOf(-1)
 
 
 private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 250.milliseconds
+private val playerLoopDelay = 120.milliseconds
 private var hasLrc = false
 private var lastNowPlaying: Track? = null
 private val scope = CoroutineScope(Dispatchers.Main)
@@ -71,6 +78,41 @@ var isPlaying by mutableStateOf(false)
 var position by mutableIntStateOf(0)
 var duration by mutableIntStateOf(0)
 
+fun Activity.setupPlayer() {
+    val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
+    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+    controllerFuture.addListener(
+        {
+            if (!isPlayerLoopStarted) {
+                player = controllerFuture.get()
+
+                val nm = getSystemService<NotificationManager>()!!
+
+                player.addListener(
+                    object : Player.Listener {
+                        override fun onPlaybackStateChanged(playbackState: Int) {
+                            if (playbackState == Player.STATE_ENDED) {
+                                try {
+                                    setAndPlay(
+                                        playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
+                                        false
+                                    )
+                                } catch (_: Exception) { }
+                            }
+                            super.onPlaybackStateChanged(playbackState)
+                        }
+                    }
+                )
+
+                player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+                playerLoop(nm, this)
+            }
+            isPlayerLoopStarted = true
+        },
+        ContextCompat.getMainExecutor(this)
+    )
+}
+
 fun setAndPlay(track: Track, resetQuery: Boolean) {
     try {
         isReloading = true
@@ -80,10 +122,9 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
         if (player.isPlaying) {
             player.stop()
         }
-        player.reset()
-        player.setDataSource(track.path)
+        player.setMediaItem(MediaItem.fromUri(track.path))
         player.prepare()
-        player.start()
+        player.play()
         nowPlaying = track
         nowPlayingI = playerQuery.indexOf(nowPlaying)
         updateDisplayQuery()
@@ -103,11 +144,10 @@ fun playNextOrPrevious(next: Boolean = true) {
 }
 
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
-    isPlayerLoopStarted = true
     while (true) {
         isPlaying = player.isPlaying
         // Pos needs to update even when player is paused for seekbar
-        position = player.currentPosition
+        position = player.currentPosition.toInt()
 
         if (nowPlaying != null && isPlaying) {
             if (lrcParser != null) {
@@ -117,15 +157,12 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                 // On lyric line changes
                 if (line != lastLrcLine) {
                     PlayerWidget().updateAll(context)
-                    updateNotification(nm, context, nowPlaying!!.title + "$tagsSpacer${nowPlaying!!.artist}", line,
-                        line,
-                        position.milliseconds, player.duration.milliseconds)
+                    updateNotification(nm, context, line)
                     lastLrcLine = line
                 }
             } else {
                 lastLrcLine = NO_LYRIC
-                updateNotification(nm, context, nowPlaying!!.title, nowPlaying!!.artist,
-                    nowPlaying!!.title, position.milliseconds, player.duration.milliseconds)
+                nm.cancel(0)
             }
 
             // On track changed
@@ -145,7 +182,7 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                 hasLrc = nowPlaying!!.hasLRC
                 lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }
 
-                duration = player.duration
+                duration = player.duration.toInt()
                 lastNowPlaying = nowPlaying
             }
         }

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Suppress("CheckReturnValue")
-public val favorite: ImageVector
+val favorite: ImageVector
     get() {
         if (_favorite != null) {
             return _favorite!!

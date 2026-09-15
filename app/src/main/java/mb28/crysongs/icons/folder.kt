@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val folder: ImageVector
+val folder: ImageVector
     get() {
         if (_folder != null) {
             return _folder!!

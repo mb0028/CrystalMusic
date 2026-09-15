@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
-import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -32,33 +31,21 @@ fun formatDurationMs(d: Duration) : String {
 private var nIcon: IconCompat? = null
 private const val colWhite = 0xffaaaaaa.toInt()
 
-fun updateNotification(nm: NotificationManager, context: Activity, title: String, subtitle: String,
-                       shortCriticalText: String, progress: Duration,
-                       duration: Duration, id: Int = 0) {
+fun updateNotification(nm: NotificationManager, context: Activity, lyric: String, id: Int = 0) {
     if (nIcon == null) {
         nIcon = IconCompat.createWithResource(context, R.drawable.now_playing_icon)
     }
-    val d = duration.inWholeSeconds.toInt()
-    val s = progress.inWholeSeconds.toInt().fastCoerceAtLeast(1)
-    val style: NotificationCompat.ProgressStyle = NotificationCompat.ProgressStyle()
-        .setProgress(s)
-        .setProgressSegments(
-            listOf(
-                NotificationCompat.ProgressStyle.Segment(d).setColor(notificationColor ?: colWhite)
-            )
-        )
 
     val n = NotificationCompat.Builder(context, CHANNEL_NOW_PLAYING)
         .setSmallIcon(nIcon!!)
         .setColor(notificationColor ?: colWhite)
-        .setContentTitle(title)
-        .setContentText(subtitle)
-        .setShortCriticalText(shortCriticalText)
-        .setStyle(style)
+        .setContentTitle(lyric)
+//        .setContentTitle("🎵 Lyrics")
+//        .setContentText(lyric)
+        .setShortCriticalText(lyric)
         .setOngoing(true)
         .setRequestPromotedOngoing(true)
         .build()
-
 
     if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
         nm.notify(id, n)

@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val edit_note: ImageVector
+val edit_note: ImageVector
     get() {
         if (_edit_note != null) {
             return _edit_note!!

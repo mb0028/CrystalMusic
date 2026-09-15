@@ -6,7 +6,7 @@ Android music player app designed for local library, simplicity & performance, w
 
 - 🪶 Simple UI, easy to navigate
 - ✨ Play any audio format, include mp3, m4a, flac, wav, ogg, ...
-- 📃 Live notification with lyrics
+- 📃 Live notification that shows lyrics if LRC file for music is available
 - 🍃 Material 3 expressive
 - 🧱 Homescreen widgets (that inspired by YT Music app)
 - 📦 Only 3 megabytes

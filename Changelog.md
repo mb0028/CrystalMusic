@@ -1,4 +1,10 @@
 ## v1.1.0 (Upcoming)
+App now uses ExoPlayer instead of Media player
+
+- App now correctly runs in background
+- Notification is now separated into 2:
+  - 1: Android's default media player notification for controlling playback
+  - 2: Small notification that shows lyrics if available
 - New: 2 Homescreen widgets that inspired by YT Music app
 - Add settings page for more customization
 - Add option to clear covers cache

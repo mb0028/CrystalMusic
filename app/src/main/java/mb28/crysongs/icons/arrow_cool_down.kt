@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val arrow_cool_down: ImageVector
+val arrow_cool_down: ImageVector
     get() {
         if (_arrow_cool_down != null) {
             return _arrow_cool_down!!

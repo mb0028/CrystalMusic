@@ -18,8 +18,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
 import mb28.crysongs.R
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.Settings.loopTrack
 import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
 import mb28.crysongs.icons.repeat
@@ -78,7 +80,7 @@ fun FSPlayerButtonsRow() {
                 if (player.isPlaying) {
                     player.pause()
                 } else {
-                    player.start()
+                    player.play()
                 }
                 isPlaying = player.isPlaying
             },
@@ -104,13 +106,13 @@ fun FSPlayerButtonsRow() {
         }
         IconButton(
             {
-                Settings.loopTrack = !Settings.loopTrack
-                player.isLooping = Settings.loopTrack
+                loopTrack = !loopTrack
+                player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
                 Settings.save()
             },
             modifier = Modifier.scale(0.8f)
         ) {
-            Icon(if (Settings.loopTrack) repeat_on else repeat, null)
+            Icon(if (loopTrack) repeat_on else repeat, null)
         }
     }
 }

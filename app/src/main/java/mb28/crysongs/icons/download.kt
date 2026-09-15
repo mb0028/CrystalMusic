@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val download: ImageVector
+val download: ImageVector
     get() {
         if (_download != null) {
             return _download!!

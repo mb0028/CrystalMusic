@@ -117,7 +117,7 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
                             lerp(
                                 0, duration,
                                 inverseLerp(0f, duration / 1000f, line.TimeStomp),
-                            )
+                            ).toLong()
                         )
                         state.scrollToItem(i, -500)
                     }

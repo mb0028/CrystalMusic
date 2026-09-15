@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val queue_music: ImageVector
+val queue_music: ImageVector
     get() {
         if (_queue_music != null) {
             return _queue_music!!

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -38,7 +37,6 @@ import mb28.crysongs.MainActivity
 import mb28.crysongs.R
 import mb28.crysongs.core.Track
 import mb28.crysongs.lastLrcLine
-import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
@@ -145,7 +143,7 @@ private fun PlaybackControls() {
 fun controlPlayback(action: Int, context: Context) {
     try {
         when (action) {
-            1 -> if (player.isPlaying) player.pause() else player.start()
+            1 -> if (player.isPlaying) player.pause() else player.play()
             2 -> playNextOrPrevious(false)
             3 -> playNextOrPrevious()
         }

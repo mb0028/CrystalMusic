@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val arrow_back: ImageVector
+val arrow_back: ImageVector
     get() {
         if (_arrow_back != null) {
             return _arrow_back!!

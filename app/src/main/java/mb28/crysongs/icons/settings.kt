@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val settings: ImageVector
+val settings: ImageVector
     get() {
         if (_settings != null) {
             return _settings!!

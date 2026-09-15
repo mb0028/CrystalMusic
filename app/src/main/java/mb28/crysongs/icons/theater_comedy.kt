@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val theater_comedy: ImageVector
+val theater_comedy: ImageVector
     get() {
         if (_theater_comedy != null) {
             return _theater_comedy!!

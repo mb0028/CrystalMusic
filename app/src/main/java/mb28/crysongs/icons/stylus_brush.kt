@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val stylus_brush: ImageVector
+val stylus_brush: ImageVector
     get() {
         if (_stylus_brush != null) {
             return _stylus_brush!!

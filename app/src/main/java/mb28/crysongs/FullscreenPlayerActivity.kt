@@ -2,7 +2,6 @@ package mb28.crysongs
 
 import android.app.Activity
 import android.app.NotificationManager
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -47,8 +46,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -62,7 +59,6 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
-import androidx.graphics.shapes.toPath
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings

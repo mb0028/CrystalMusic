@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val swipe_down_alt: ImageVector
+val swipe_down_alt: ImageVector
     get() {
         if (_swipe_down_alt != null) {
             return _swipe_down_alt!!

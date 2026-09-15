@@ -2,7 +2,6 @@ package mb28.crysongs.ui
 
 import android.app.ActivityOptions
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -33,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,24 +42,15 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.R
-import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.duration
-import mb28.crysongs.icons.pause_circle
-import mb28.crysongs.icons.play_circle
-import mb28.crysongs.icons.skip_next
-import mb28.crysongs.icons.skip_previous
 import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
-import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.nowPlayingCover
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
-import mb28.crysongs.playerQuery
 import mb28.crysongs.position
-import mb28.crysongs.setAndPlay
-import mb28.crysongs.ui.other.NoCoverImage
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -139,7 +127,8 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                     contentAlignment = Alignment.Center
                 ) {
                     CircularWavyProgressIndicator(
-                        progress = { position.toFloat() / duration }
+                        progress = { position.toFloat() / duration },
+                        amplitude = { if (isPlaying) 1f else 0.1f }
                     )
                     Text(
                         formatDurationMs(position.milliseconds),
@@ -159,7 +148,7 @@ private fun PlayPauseNextPrevious() {
     Row {
         IconButton(
             {
-                playNextOrPrevious(false)
+                playNextOrPrevious()
             }
         ) {
             Icon(painterResource(R.drawable.skip_previous_24px), null)
@@ -169,7 +158,7 @@ private fun PlayPauseNextPrevious() {
                 if (player.isPlaying) {
                     player.pause()
                 } else {
-                    player.start()
+                    player.play()
                 }
                 isPlaying = player.isPlaying
             },

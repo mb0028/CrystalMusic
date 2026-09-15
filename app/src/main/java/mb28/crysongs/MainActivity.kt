@@ -1,6 +1,5 @@
 package mb28.crysongs
 
-import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
@@ -92,29 +91,14 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        setupPermissions()
         Settings.load()
+        setupPlayer()
+        setupPermissions()
         super.onCreate(savedInstanceState)
 
         if (noCoverBitmap == null) {
             noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
         }
-
-        val nm = getSystemService<NotificationManager>()!!
-
-        player.setOnCompletionListener {
-            try {
-                nm.cancel(0)
-                setAndPlay(
-                    playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
-                    false
-                )
-            } catch (_: Exception) {
-
-            }
-        }
-
-        playerLoop(nm, this)
 
         lifecycleScope.launch {
             refreshTracksList(this@MainActivity)

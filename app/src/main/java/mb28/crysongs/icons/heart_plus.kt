@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
 @Suppress("CheckReturnValue")
-public val heart_plus: ImageVector
+val heart_plus: ImageVector
     get() {
         if (_favorite != null) {
             return _favorite!!

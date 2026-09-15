@@ -44,6 +44,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
+
     implementation(libs.material.kolor)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.glance.appwidget)

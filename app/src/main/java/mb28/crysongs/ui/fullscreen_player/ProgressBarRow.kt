@@ -20,7 +20,7 @@ import mb28.crysongs.duration
 import mb28.crysongs.isPlaying
 import mb28.crysongs.player
 import mb28.crysongs.position
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -32,7 +32,7 @@ fun FSProgressBarRow(modifier: Modifier = Modifier) {
     )
     Row(modifier) {
         TextButton(
-            { player.seekTo(position - 5000) }
+            { player.seekTo((position - 5000).toLong()) }
         ) {
             Text(formatDurationMs(position.milliseconds))
         }
@@ -45,16 +45,16 @@ fun FSProgressBarRow(modifier: Modifier = Modifier) {
             LinearWavyProgressIndicator(
                 { animatedPos.value },
                 wavelength = 24.dp,
-                amplitude = { if (isPlaying) 1f else 0f }
+                amplitude = { if (isPlaying) 1f else 0.1f }
             )
             Slider(
                 0f,
-                { player.seekTo((it * duration).roundToInt()) },
+                { player.seekTo((it * duration).roundToLong()) },
                 Modifier.alpha(0f)
             )
         }
         TextButton(
-            { player.seekTo(position + 5000) }
+            { player.seekTo((position + 5000).toLong()) }
         ) {
             Text(formatDurationMs(duration.milliseconds))
         }
