@@ -292,6 +292,7 @@ fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
                 )
 
                 player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+                player.volume = Settings.appVolume
                 playerLoop(nm, this)
                 onFinished()
             }

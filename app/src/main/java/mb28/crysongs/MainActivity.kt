@@ -90,8 +90,8 @@ class MainActivity : ComponentActivity() {
         }
 
         Settings.load()
-        setupPlayer()
         setupPermissions()
+        setupPlayer()
         super.onCreate(savedInstanceState)
 
         if (noCoverBitmap == null) {
