@@ -30,6 +30,9 @@ object Settings {
     var experimental by mutableStateOf(false)
     var whiteText by mutableStateOf(false)
     var gradientColoring by mutableStateOf(false)
+    var edgeLighting by mutableStateOf(false)
+    var edgeLightingSaturation by mutableFloatStateOf(0.6f)
+    var edgeLightingLightness by mutableFloatStateOf(0.75f)
 
     fun addOrRemoveFavorite(path: String) {
         if (favorites.contains(path)) {
@@ -77,6 +80,9 @@ object Settings {
                     s.startsWith("[FeatureFlags]") -> experimental = s.removePrefix("[FeatureFlags]").toBooleanStrict()
                     s.startsWith("[WhiteTexts]") -> whiteText = s.removePrefix("[WhiteTexts]").toBooleanStrict()
                     s.startsWith("[GradientColoring]") -> gradientColoring = s.removePrefix("[GradientColoring]").toBooleanStrict()
+                    s.startsWith("[EdgeLighting]") -> edgeLighting = s.removePrefix("[EdgeLighting]").toBooleanStrict()
+                    s.startsWith("[EdgeLightingSaturation]") -> edgeLightingSaturation = s.removePrefix("[EdgeLightingSaturation]").toFloat()
+                    s.startsWith("[EdgeLightingLightness]") -> edgeLightingLightness = s.removePrefix("[EdgeLightingLightness]").toFloat()
                 }
             }
         } else {
@@ -98,6 +104,9 @@ object Settings {
         data += "[FeatureFlags]$experimental\n"
         data += "[WhiteTexts]$whiteText\n"
         data += "[GradientColoring]$gradientColoring\n"
+        data += "[EdgeLighting]$edgeLighting\n"
+        data += "[EdgeLightingSaturation]$edgeLightingSaturation\n"
+        data += "[EdgeLightingLightness]$edgeLightingLightness\n"
 
         data += "\n"
         playlists.forEach {

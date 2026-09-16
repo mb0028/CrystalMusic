@@ -14,12 +14,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -70,10 +68,9 @@ import mb28.crysongs.ui.SearchPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
+import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.theme.CrySongsTheme
 
-//const val ACTION_CONTROL_PLAYBACK = "mb28.CrystalMusic.ACTION_CONTROL_PLAYBACK"
-//const val EXTRA_CONTROL_PLAYBACK = "EXTRA_ACTION_CONTROL_PLAYBACK"
 var noCoverBitmap: ImageBitmap? = null
 var notificationColor: Int? = null
 
@@ -121,7 +118,8 @@ class MainActivity : ComponentActivity() {
                     },
                     topBar = {
                         Row(
-                            Modifier.fillMaxWidth()
+                            Modifier
+                                .fillMaxWidth()
                                 .statusBarsPadding()
                                 .padding(5.dp),
                             Arrangement.End
@@ -136,22 +134,26 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    when (selectedIndex.intValue) {
-                        0 -> TracksList(Modifier.padding(innerPadding))
-                        1 -> QueryPage()
-                        2 -> PlaylistsPage()
-                        3 -> FoldersPage()
-                        4 -> SearchPage()
-                        5 -> CustomTagsPage(artists, "artists")
-                        6 -> CustomTagsPage(albums, "albums")
-                        7 -> CustomTagsPage(genres, "genres")
-                        8 -> CustomTagsPage(composers, "composers")
-                        else -> {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Coming soon!")
+                    Box {
+                        when (selectedIndex.intValue) {
+                            0 -> TracksList(Modifier.padding(innerPadding))
+                            1 -> QueryPage()
+                            2 -> PlaylistsPage()
+                            3 -> FoldersPage()
+                            4 -> SearchPage()
+                            5 -> CustomTagsPage(artists, "artists")
+                            6 -> CustomTagsPage(albums, "albums")
+                            7 -> CustomTagsPage(genres, "genres")
+                            8 -> CustomTagsPage(composers, "composers")
+                            else -> {
+                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    Text("Coming soon!")
+                                }
                             }
                         }
                     }
+
+                    EdgeLightingEffect(this)
                 }
             }
         }
@@ -177,9 +179,10 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
     HorizontalFloatingToolbar(
         expanded = true,
         contentPadding = PaddingValues(horizontal = 10.dp),
-        modifier = Modifier.padding(
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 2.dp
-        ).padding(horizontal = 15.dp)
+        modifier = Modifier
+            .navigationBarsPadding()
+            .padding(horizontal = 15.dp)
+            .padding(bottom = 2.dp)
             .height(65.dp),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
             toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.95f)
