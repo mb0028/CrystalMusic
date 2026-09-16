@@ -1,3 +1,6 @@
+## v1.2.0 (Upcoming)
+- Fix app crashes when full adaptive coloring is on and track has no cover art
+
 ## v1.1.0
 App now uses ExoPlayer instead of Media player
 

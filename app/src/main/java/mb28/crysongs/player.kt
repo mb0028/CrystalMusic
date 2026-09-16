@@ -172,11 +172,11 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                 pNowPlayingCover = if (coverPath == null) null
                     else BitmapFactory.decodeFile(coverPath)
 
-                if (Settings.useCoverColor) {
+                if (Settings.useCoverColor && coverPath != null) {
                     trackCoverPrimary = if (pNowPlayingCover != null) {
                         pNowPlayingCover!!.asImageBitmap().themeColors(fallback = Color.Blue).first()
                     } else null
-                    notificationColor = trackCoverPrimary!!.toArgb()
+                    notificationColor = trackCoverPrimary?.toArgb()
                 }
 
                 PlayerWidget().updateAll(context)
