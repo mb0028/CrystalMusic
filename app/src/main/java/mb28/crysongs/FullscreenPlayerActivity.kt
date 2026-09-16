@@ -12,6 +12,8 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -69,6 +72,7 @@ import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
+import mb28.crysongs.ui.other.audioBand
 import mb28.crysongs.ui.theme.CrySongsTheme
 
 const val EXTRA_LOAD_FROM_OTHER_APPS = "EXTRA_LOAD_FROM_OTHER_APPS"
@@ -269,9 +273,15 @@ private fun Cover(modifier: Modifier = Modifier) {
         3 -> CircleShape
         else -> RoundedCornerShape(40.dp)
     }
+
+    val animScale by animateFloatAsState((if (Settings.experimental && Settings.edgeLighting)
+        1 + audioBand(0.0005) else 1f),
+        animationSpec = TweenSpec(100))
+
     Box(
         modifier
             .fillMaxWidth()
+            .scale(animScale)
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
                 coverShape

@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
 import mb28.crysongs.core.Settings
+import mb28.crysongs.setupVisu
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.SettingSwitch
 
 @Composable
 fun FlagsPopup(onDismissRequired: () -> Unit) {
+    val activity = LocalActivity.current
     AlertDialog(
         { onDismissRequired() },
         { },
@@ -43,13 +45,19 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                     SettingSwitch(
                         Settings.edgeLighting,
                         "Edge lighting effect", 1, count
-                    ) { Settings.edgeLighting = it; Settings.save() }
+                    ) {
+                        Settings.edgeLighting = it
+                        Settings.save()
+                        if (Settings.experimental && Settings.edgeLighting) {
+                            activity?.setupVisu()
+                        }
+                    }
                 }
 
                 if (Settings.edgeLighting) {
                     item {
                         Box(Modifier.height(100.dp).padding(vertical = 10.dp)) {
-                            EdgeLightingEffect(LocalActivity.current!!)
+                            EdgeLightingEffect(LocalActivity.current!!, true)
                         }
                     }
                     item {

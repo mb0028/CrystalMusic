@@ -1,15 +1,19 @@
 package mb28.crysongs
 
+import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.ContentUris
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.audiofx.Visualizer
 import android.net.Uri
-import androidx.media3.common.Player
 import android.provider.MediaStore
+import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -23,6 +27,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.materialkolor.ktx.themeColors
@@ -34,6 +40,7 @@ import mb28.crysongs.core.PlayerService
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.loopTrack
 import mb28.crysongs.core.Track
+import mb28.crysongs.core.VisualizerData
 import mb28.crysongs.core.updateNotification
 import mb28.crysongs.glance.PlayerWidget
 import mb28.crysongs.ui.theme.trackCoverPrimary
@@ -50,13 +57,6 @@ val nowPlayingCover get() = pNowPlayingCover?.asImageBitmap() ?: noCoverBitmap!!
 var lrcParser: LrcParser? by mutableStateOf(null)
 var lastLrcLine by mutableStateOf("")
 var lastLrcLineI by mutableIntStateOf(-1)
-
-
-private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 120.milliseconds
-private var hasLrc = false
-private var lastNowPlaying: Track? = null
-private val scope = CoroutineScope(Dispatchers.Main)
 
 
 var albums = mutableStateListOf<String>()
@@ -77,42 +77,15 @@ var isReloading by mutableStateOf(false)
 var isPlaying by mutableStateOf(false)
 var position by mutableIntStateOf(0)
 var duration by mutableIntStateOf(0)
+var visualizationData by mutableStateOf(VisualizerData())
 
-fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
-    val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
-    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
-    controllerFuture.addListener(
-        {
-            if (!isPlayerLoopStarted) {
-                player = controllerFuture.get()
-
-                val nm = getSystemService<NotificationManager>()!!
-
-                player.addListener(
-                    object : Player.Listener {
-                        override fun onPlaybackStateChanged(playbackState: Int) {
-                            if (playbackState == Player.STATE_ENDED) {
-                                try {
-                                    setAndPlay(
-                                        playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
-                                        false
-                                    )
-                                } catch (_: Exception) { }
-                            }
-                            super.onPlaybackStateChanged(playbackState)
-                        }
-                    }
-                )
-
-                player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
-                playerLoop(nm, this)
-                onFinished()
-            }
-            isPlayerLoopStarted = true
-        },
-        ContextCompat.getMainExecutor(this)
-    )
-}
+private const val NO_LYRIC = "No lyrics..."
+private val playerLoopDelay = 120.milliseconds
+private var hasLrc = false
+private var lastNowPlaying: Track? = null
+private val scope = CoroutineScope(Dispatchers.Main)
+private var visualizer: Visualizer? = null
+private var lastWaveFormDataCapture: Long? = null
 
 fun setAndPlay(track: Track, resetQuery: Boolean) {
     try {
@@ -120,19 +93,19 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
         if (playerQuery.isEmpty() || resetQuery) {
             playerQuery = tracks.toMutableStateList()
         }
-        if (player.isPlaying) {
-            player.stop()
+        player.apply {
+            if (isPlaying) {
+                stop()
+            }
+            setMediaItem(MediaItem.fromUri(track.path))
+            prepare()
+            play()
         }
-        player.setMediaItem(MediaItem.fromUri(track.path))
-        player.prepare()
-        player.play()
         nowPlaying = track
         nowPlayingI = playerQuery.indexOf(nowPlaying)
         updateDisplayQuery()
     }
-    catch (_: Exception) {
-
-    }
+    catch (_: Exception) { }
     isReloading = false
 }
 
@@ -290,4 +263,86 @@ fun refreshTracksList(context: Context) {
     albums.sort()
     genres.sort()
     composers.sort()
+}
+
+fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
+    val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
+    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+    controllerFuture.addListener(
+        {
+            if (!isPlayerLoopStarted) {
+                player = controllerFuture.get()
+
+                val nm = getSystemService<NotificationManager>()!!
+
+                player.addListener(
+                    object : Player.Listener {
+                        override fun onPlaybackStateChanged(playbackState: Int) {
+                            if (playbackState == Player.STATE_ENDED) {
+                                try {
+                                    setAndPlay(
+                                        playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
+                                        false
+                                    )
+                                } catch (_: Exception) { }
+                            }
+                            super.onPlaybackStateChanged(playbackState)
+                        }
+                    }
+                )
+
+                player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+                playerLoop(nm, this)
+                onFinished()
+            }
+            isPlayerLoopStarted = true
+
+            if (Settings.experimental && Settings.edgeLighting) {
+                setupVisu()
+            }
+        },
+        ContextCompat.getMainExecutor(this)
+    )
+}
+
+@OptIn(UnstableApi::class)
+fun Activity.setupVisu() {
+    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 2)
+        if (Settings.edgeLighting) {
+            Settings.edgeLighting = false
+            Settings.save()
+            Toast.makeText(this, "Edge lighting turned off because Microphone permission is denied",
+                Toast.LENGTH_LONG).show()
+        }
+    } else {
+        visualizer?.release()
+        visualizer = Visualizer(player.audioSessionId).apply {
+            enabled = false
+            val captureS = Visualizer.getCaptureSizeRange()[1]
+            captureSize = captureS
+            setDataCaptureListener(
+                object : Visualizer.OnDataCaptureListener {
+                    override fun onFftDataCapture(visualizer: Visualizer, fft: ByteArray, samplingRate: Int) {
+                    }
+                    override fun onWaveFormDataCapture(visualizer: Visualizer, waveform: ByteArray, samplingRate: Int
+                    ) {
+                        val now = System.currentTimeMillis()
+                        val durationSinceLastCapture = lastWaveFormDataCapture?.let { now - it } ?: 0
+                        if (lastWaveFormDataCapture == null || durationSinceLastCapture > 100) {
+                            visualizationData = VisualizerData(
+                                rawWaveform = waveform.clone(),
+                                captureSize = captureS,
+                            )
+                            lastWaveFormDataCapture = now
+                        }
+                    }
+                },
+                Visualizer.getMaxCaptureRate(),
+                true,
+                true
+            )
+            enabled = true
+        }
+    }
 }
