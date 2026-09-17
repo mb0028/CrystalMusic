@@ -13,10 +13,10 @@ android {
 
     defaultConfig {
         applicationId = "mb28.CrySongs"
-        minSdk = 33
+        minSdk = 31
         targetSdk = 37
-        versionCode = 6
-        versionName = "v1.1.0-2026.09.15"
+        versionCode = 7
+        versionName = "v1.1.1-2026.09.17"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

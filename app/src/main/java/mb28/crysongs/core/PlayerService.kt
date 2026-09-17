@@ -113,22 +113,20 @@ private class FavoriteMSC : MediaSession.Callback {
         customCommand: SessionCommand,
         args: Bundle,
     ): ListenableFuture<SessionResult> {
-        if (customCommand.customAction == ADD_OR_REMOVE_FAVORITES) {
-
-            if (Settings.favorites.contains(nowPlaying!!.path)) {
-                Settings.favorites.remove(nowPlaying!!.path)
-                mediaSession?.setMediaButtonPreferences(listOf(favoriteAddButton, nextButton, aaa, previousButton))
-            } else {
-                Settings.favorites.add(nowPlaying!!.path)
-                mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
+        when (customCommand.customAction) {
+            ADD_OR_REMOVE_FAVORITES -> {
+                if (Settings.favorites.contains(nowPlaying!!.path)) {
+                    Settings.favorites.remove(nowPlaying!!.path)
+                    mediaSession?.setMediaButtonPreferences(listOf(favoriteAddButton, nextButton, aaa, previousButton)
+                    )
+                } else {
+                    Settings.favorites.add(nowPlaying!!.path)
+                    mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
+                }
+                Settings.save()
             }
-            Settings.save()
-        }
-        else if (customCommand.customAction == PLAY_NEXT) {
-            playNextOrPrevious()
-        }
-        else if (customCommand.customAction == PLAY_PREVIOUS) {
-            playNextOrPrevious(false)
+            PLAY_NEXT -> { playNextOrPrevious() }
+            PLAY_PREVIOUS -> { playNextOrPrevious(false) }
         }
         return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
     }

@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.core.app.NotificationChannelCompat
@@ -53,8 +54,10 @@ fun updateNotification(nm: NotificationManager, context: Activity, lyric: String
 }
 
 fun Activity.setupPermissions() {
-    if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+        }
     }
 
     val nm = NotificationManagerCompat.from(this)

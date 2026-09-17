@@ -10,14 +10,14 @@ Android music player app designed for local library, simplicity & performance, w
 - 🍃 Material 3 expressive
 - 🧱 Homescreen widgets
 - 📦 Only 5.5 megabytes
-- 🟢 Android 13+ and TV support
+- 🟢 Android 11+ and TV support
 
 To-Do
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Better landscape support
-- [ ] Support for android 12, 11 & 10
 - [ ] Tag editor
+- [x] ~~Support for android 12 and 11~~
 - [x] ~~Home widget~~
 
 ## Screenshots

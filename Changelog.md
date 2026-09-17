@@ -1,4 +1,5 @@
-## v1.2.0 (Upcoming)
+## v1.1.1
+- App now supports Android 12 and 11
 - Playback control notification buttons are now works correctly & added 3 more buttons: Next - Add/Remove favorite - Seek +15s
 - Fix app crashes when full adaptive coloring is on and track has no cover art
 - Fix saved volume is not applied after load

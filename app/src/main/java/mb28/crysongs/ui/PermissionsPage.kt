@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Environment
 import android.os.PowerManager
 import android.provider.Settings
@@ -26,7 +27,9 @@ import androidx.core.net.toUri
 @Composable
 fun PermissionsPage(modifier: Modifier = Modifier, activity: Activity) {
     val isFilesGranted = Environment.isExternalStorageManager()
-    val isNotifGranted = activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+    val isNotifGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+    } else { true }
     val isBatteryGranted = activity.getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(activity.packageName)
     Column(
         modifier,
@@ -68,7 +71,9 @@ fun PermissionsPage(modifier: Modifier = Modifier, activity: Activity) {
             Spacer(Modifier.height(5.dp))
             Button(
                 {
-                    activity.requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        activity.requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+                    }
                 }
             ) {
                 Text("Grant (Notifications)")
