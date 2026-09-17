@@ -19,6 +19,7 @@ class PlayerService : MediaSessionService() {
             release()
             mediaSession = null
         }
+        NotificationManagerCompat.from(this).cancel(0)
         super.onDestroy()
     }
 
