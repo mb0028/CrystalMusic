@@ -1,4 +1,5 @@
 ## v1.2.0 (Upcoming)
+- Playback control notification buttons are now works correctly & added 3 more buttons: Next - Add/Remove favorite - Seek +15s
 - Fix app crashes when full adaptive coloring is on and track has no cover art
 - Fix saved volume is not applied after load
 

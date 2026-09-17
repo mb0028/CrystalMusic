@@ -41,6 +41,12 @@ import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.loopTrack
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.VisualizerData
+import mb28.crysongs.core.aaa
+import mb28.crysongs.core.favoriteAddButton
+import mb28.crysongs.core.favoriteRemoveButton
+import mb28.crysongs.core.mediaSession
+import mb28.crysongs.core.nextButton
+import mb28.crysongs.core.previousButton
 import mb28.crysongs.core.updateNotification
 import mb28.crysongs.glance.PlayerWidget
 import mb28.crysongs.ui.theme.trackCoverPrimary
@@ -117,6 +123,7 @@ fun playNextOrPrevious(next: Boolean = true) {
     )
 }
 
+@OptIn(UnstableApi::class)
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
     while (true) {
         isPlaying = player.isPlaying
@@ -155,6 +162,12 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                 PlayerWidget().updateAll(context)
                 hasLrc = nowPlaying!!.hasLRC
                 lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }
+
+                if (Settings.favorites.contains(nowPlaying!!.path)) {
+                    mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
+                } else {
+                    mediaSession?.setMediaButtonPreferences(listOf(favoriteAddButton, nextButton, aaa, previousButton))
+                }
 
                 duration = player.duration.toInt()
                 lastNowPlaying = nowPlaying
