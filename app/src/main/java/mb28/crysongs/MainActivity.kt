@@ -49,6 +49,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.album
 import mb28.crysongs.icons.artist
@@ -92,6 +93,7 @@ class MainActivity : ComponentActivity() {
         Settings.load()
         setupPermissions()
         setupPlayer()
+        scheduleNotifications(this)
         super.onCreate(savedInstanceState)
 
         if (noCoverBitmap == null) {

@@ -2,16 +2,20 @@ package mb28.crysongs.core
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
 import android.os.Build
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import mb28.crysongs.R
@@ -21,6 +25,7 @@ import kotlin.time.Duration
 val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
+const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
 
 fun formatDurationMs(d: Duration) : String {
     val hours = d.inWholeHours
@@ -29,7 +34,7 @@ fun formatDurationMs(d: Duration) : String {
             ":${d.inWholeSeconds.rem(60).toString().padStart(2, '0')}"
 }
 
-private var nIcon: IconCompat? = null
+var nIcon: IconCompat? = null
 private const val colWhite = 0xffaaaaaa.toInt()
 
 fun updateNotification(nm: NotificationManager, context: Activity, lyric: String, id: Int = 0) {
@@ -41,8 +46,6 @@ fun updateNotification(nm: NotificationManager, context: Activity, lyric: String
         .setSmallIcon(nIcon!!)
         .setColor(notificationColor ?: colWhite)
         .setContentTitle(lyric)
-//        .setContentTitle("🎵 Lyrics")
-//        .setContentText(lyric)
         .setShortCriticalText(lyric)
         .setOngoing(true)
         .setRequestPromotedOngoing(true)
@@ -62,11 +65,40 @@ fun Activity.setupPermissions() {
 
     val nm = NotificationManagerCompat.from(this)
     val channel = NotificationChannelCompat.Builder(CHANNEL_NOW_PLAYING, NotificationManagerCompat.IMPORTANCE_LOW)
-        .setName("Now playing")
+        .setName("Now playing lyrics")
         .setDescription("Shows now playing track info as live notification")
+        .build()
+    val channelTM = NotificationChannelCompat.Builder(CHANNEL_TODAYS_MUSIC, NotificationManagerCompat.IMPORTANCE_DEFAULT)
+        .setName("Today's music")
+        .setDescription("Shows a notification everyday at 9 AM that shows a random music")
         .build()
 
     nm.createNotificationChannel(channel)
+    nm.createNotificationChannel(channelTM)
+}
+
+fun scheduleNotifications(context: Context) {
+    val alarmManager = context.getSystemService<AlarmManager>()
+    val intent = Intent(context, TodaysTrackNotif::class.java)
+    val pendingIntent = PendingIntent.getBroadcast(context, 28, intent,
+        PendingIntent.FLAG_UPDATE_CURRENT)
+
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis()
+        set(Calendar.HOUR_OF_DAY, 9)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+
+        if (before(Calendar.getInstance())) {
+            add(Calendar.DATE, 1)
+        }
+    }
+
+    alarmManager?.set(
+        AlarmManager.RTC_WAKEUP,
+        calendar.timeInMillis,
+        pendingIntent
+    )
 }
 
 fun inverseLerp(a: Float, b: Float, value: Float): Float {
