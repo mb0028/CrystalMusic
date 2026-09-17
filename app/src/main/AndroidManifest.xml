@@ -78,7 +78,11 @@
             android:exported="true"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.CrySongs"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize" >
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name=".glance.PlayerWidgetReceiver"
