@@ -81,7 +81,7 @@ fun scheduleNotifications(context: Context) {
     val alarmManager = context.getSystemService<AlarmManager>()
     val intent = Intent(context, TodaysTrackNotif::class.java)
     val pendingIntent = PendingIntent.getBroadcast(context, 28, intent,
-        PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
     val calendar = Calendar.getInstance().apply {
         timeInMillis = System.currentTimeMillis()
