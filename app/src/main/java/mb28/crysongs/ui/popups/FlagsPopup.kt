@@ -56,6 +56,12 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
 
                 if (Settings.edgeLighting) {
                     item {
+                        SettingSwitch(
+                            Settings.scaleCoverWithEdgeLighting,
+                            "Scale cover with\nedge lighting", 0, 1
+                        ) { Settings.scaleCoverWithEdgeLighting = it; Settings.save() }
+                    }
+                    item {
                         Box(Modifier.height(100.dp).padding(vertical = 10.dp)) {
                             EdgeLightingEffect(LocalActivity.current!!, true)
                         }

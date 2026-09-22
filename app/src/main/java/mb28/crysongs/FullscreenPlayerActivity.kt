@@ -280,8 +280,8 @@ private fun Cover(modifier: Modifier = Modifier) {
         else -> RoundedCornerShape(40.dp)
     }
 
-    val animScale by animateFloatAsState((if (Settings.experimental && Settings.edgeLighting)
-        1 + audioBand(0.0005) else 1f),
+    val animScale by animateFloatAsState((if (Settings.experimental && Settings.edgeLighting &&
+            Settings.scaleCoverWithEdgeLighting) 1f + audioBand(0.1f) else 1f),
         animationSpec = TweenSpec(100))
 
     Box(

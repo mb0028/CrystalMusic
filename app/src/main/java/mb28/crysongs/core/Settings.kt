@@ -31,6 +31,7 @@ object Settings {
     var experimental by mutableStateOf(false)
     var whiteText by mutableStateOf(false)
     var gradientColoring by mutableStateOf(false)
+    var scaleCoverWithEdgeLighting by mutableStateOf(true)
     var edgeLighting by mutableStateOf(false)
     var edgeLightingSaturation by mutableFloatStateOf(0.6f)
     var edgeLightingLightness by mutableFloatStateOf(0.75f)
@@ -93,6 +94,7 @@ object Settings {
                     s.startsWith("[ELHue2]") -> edgeLightingHue2 = s.removePrefix("[ELHue2]").toFloat()
                     s.startsWith("[ELHue3]") -> edgeLightingHue3 = s.removePrefix("[ELHue3]").toFloat()
                     s.startsWith("[ELHue4]") -> edgeLightingHue4 = s.removePrefix("[ELHue4]").toFloat()
+                    s.startsWith("[SCWEL]") -> scaleCoverWithEdgeLighting = s.removePrefix("[SCWEL]").toBooleanStrict()
                 }
             }
         } else {
@@ -116,6 +118,7 @@ object Settings {
         data += "[FSBlur]$backgroundBlurRadius\n"
         data += "[GradientColoring]$gradientColoring\n"
         data += "[EdgeLighting]$edgeLighting\n"
+        data += "[SCWEL]$scaleCoverWithEdgeLighting\n"
         data += "[ELSaturation]$edgeLightingSaturation\n"
         data += "[ELLightness]$edgeLightingLightness\n"
         data += "[ELHue1]$edgeLightingHue1\n"

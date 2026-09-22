@@ -31,7 +31,7 @@ import mb28.crysongs.visualizationData
 fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
     if (Settings.experimental && Settings.edgeLighting) {
         val alpha by animateFloatAsState(
-            if (demo) 1f else audioBand(0.0035),
+            if (demo) 1f else audioBand(),
             animationSpec = TweenSpec(50)
         )
         val corners = activity.window.decorView.rootWindowInsets
@@ -41,7 +41,7 @@ fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
                 .alpha(alpha)
                 .border(
                     BorderStroke(
-                        6.dp,
+                        7.dp,
                         Brush.verticalGradient(
                             Pair(0f, Color.hsl(edgeLightingHue1, edgeLightingSaturation, edgeLightingLightness)),
                             Pair(0.35f, Color.hsl(edgeLightingHue2, edgeLightingSaturation, edgeLightingLightness)),
@@ -49,17 +49,17 @@ fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
                             Pair(1f, Color.hsl(edgeLightingHue4, edgeLightingSaturation, edgeLightingLightness))
                         )
                     ),
-                    RoundedCornerShape((corners * 0.42f).dp)
+                    RoundedCornerShape((corners * 0.40f).dp)
                 )
         )
     }
 }
 
-fun audioBand(norm: Double) : Float {
+fun audioBand(norm: Float = 1f) : Float {
     if (!isPlaying) return 0f
-    val samp = visualizationData.resample(2)
-    if (samp.count() >= 2) {
-        return (samp[1] * norm).toFloat().coerceIn(0f, 1f)
+    val samp = visualizationData.rawWaveform.firstOrNull()
+    if (samp != null) {
+        return ((samp / 255f) * norm).coerceIn(0f, 1f)
     }
     return 0f
 }
