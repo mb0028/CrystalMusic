@@ -90,8 +90,67 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                         )
                         Spacer(Modifier.height(10.dp))
                     }
+                    item {
+                        val state = rememberSliderState(Settings.edgeLightingHue1, trackRange = 0f..360f)
+                        Text("Edge lighting hue #1: ${Settings.edgeLightingHue1.fastRoundToInt()}")
+                        Slider(
+                            state,
+                            onValueChange = {
+                                state.value = it
+                                Settings.edgeLightingHue1 = it
+                            },
+                            onValueChangeFinished = {
+                                Settings.save()
+                            }
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                    item {
+                        val state = rememberSliderState(Settings.edgeLightingHue2, trackRange = 0f..360f)
+                        Text("Edge lighting hue #2: ${Settings.edgeLightingHue2.fastRoundToInt()}")
+                        Slider(
+                            state,
+                            onValueChange = {
+                                state.value = it
+                                Settings.edgeLightingHue2 = it
+                            },
+                            onValueChangeFinished = {
+                                Settings.save()
+                            }
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                    item {
+                        val state = rememberSliderState(Settings.edgeLightingHue3, trackRange = 0f..360f)
+                        Text("Edge lighting hue #3: ${Settings.edgeLightingHue3.fastRoundToInt()}")
+                        Slider(
+                            state,
+                            onValueChange = {
+                                state.value = it
+                                Settings.edgeLightingHue3 = it
+                            },
+                            onValueChangeFinished = {
+                                Settings.save()
+                            }
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                    item {
+                        val state = rememberSliderState(Settings.edgeLightingHue4, trackRange = 0f..360f)
+                        Text("Edge lighting hue #4: ${Settings.edgeLightingHue4.fastRoundToInt()}")
+                        Slider(
+                            state,
+                            onValueChange = {
+                                state.value = it
+                                Settings.edgeLightingHue4 = it
+                            },
+                            onValueChangeFinished = {
+                                Settings.save()
+                            }
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
                 }
-
             }
         }
     )

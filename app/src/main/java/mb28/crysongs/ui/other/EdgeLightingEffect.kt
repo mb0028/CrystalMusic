@@ -18,6 +18,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.Settings.edgeLightingHue1
+import mb28.crysongs.core.Settings.edgeLightingHue2
+import mb28.crysongs.core.Settings.edgeLightingHue3
+import mb28.crysongs.core.Settings.edgeLightingHue4
 import mb28.crysongs.core.Settings.edgeLightingLightness
 import mb28.crysongs.core.Settings.edgeLightingSaturation
 import mb28.crysongs.isPlaying
@@ -39,10 +43,10 @@ fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
                     BorderStroke(
                         6.dp,
                         Brush.verticalGradient(
-                            Pair(0f, Color.hsl(0f, edgeLightingSaturation, edgeLightingLightness)),
-                            Pair(0.35f, Color.hsl(90f, edgeLightingSaturation, edgeLightingLightness)),
-                            Pair(0.65f, Color.hsl(180f, edgeLightingSaturation, edgeLightingLightness)),
-                            Pair(1f, Color.hsl(320f, edgeLightingSaturation, edgeLightingLightness))
+                            Pair(0f, Color.hsl(edgeLightingHue1, edgeLightingSaturation, edgeLightingLightness)),
+                            Pair(0.35f, Color.hsl(edgeLightingHue2, edgeLightingSaturation, edgeLightingLightness)),
+                            Pair(0.65f, Color.hsl(edgeLightingHue3, edgeLightingSaturation, edgeLightingLightness)),
+                            Pair(1f, Color.hsl(edgeLightingHue4, edgeLightingSaturation, edgeLightingLightness))
                         )
                     ),
                     RoundedCornerShape((corners * 0.42f).dp)

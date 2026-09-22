@@ -34,6 +34,10 @@ object Settings {
     var edgeLighting by mutableStateOf(false)
     var edgeLightingSaturation by mutableFloatStateOf(0.6f)
     var edgeLightingLightness by mutableFloatStateOf(0.75f)
+    var edgeLightingHue1 by mutableFloatStateOf(0f)
+    var edgeLightingHue2 by mutableFloatStateOf(90f)
+    var edgeLightingHue3 by mutableFloatStateOf(180f)
+    var edgeLightingHue4 by mutableFloatStateOf(320f)
 
     fun addOrRemoveFavorite(path: String) {
         if (favorites.contains(path)) {
@@ -83,8 +87,12 @@ object Settings {
                     s.startsWith("[WhiteTexts]") -> whiteText = s.removePrefix("[WhiteTexts]").toBooleanStrict()
                     s.startsWith("[GradientColoring]") -> gradientColoring = s.removePrefix("[GradientColoring]").toBooleanStrict()
                     s.startsWith("[EdgeLighting]") -> edgeLighting = s.removePrefix("[EdgeLighting]").toBooleanStrict()
-                    s.startsWith("[EdgeLightingSaturation]") -> edgeLightingSaturation = s.removePrefix("[EdgeLightingSaturation]").toFloat()
-                    s.startsWith("[EdgeLightingLightness]") -> edgeLightingLightness = s.removePrefix("[EdgeLightingLightness]").toFloat()
+                    s.startsWith("[ELSaturation]") -> edgeLightingSaturation = s.removePrefix("[ELSaturation]").toFloat()
+                    s.startsWith("[ELLightness]") -> edgeLightingLightness = s.removePrefix("[ELLightness]").toFloat()
+                    s.startsWith("[ELHue1]") -> edgeLightingHue1 = s.removePrefix("[ELHue1]").toFloat()
+                    s.startsWith("[ELHue2]") -> edgeLightingHue2 = s.removePrefix("[ELHue2]").toFloat()
+                    s.startsWith("[ELHue3]") -> edgeLightingHue3 = s.removePrefix("[ELHue3]").toFloat()
+                    s.startsWith("[ELHue4]") -> edgeLightingHue4 = s.removePrefix("[ELHue4]").toFloat()
                 }
             }
         } else {
@@ -108,8 +116,12 @@ object Settings {
         data += "[FSBlur]$backgroundBlurRadius\n"
         data += "[GradientColoring]$gradientColoring\n"
         data += "[EdgeLighting]$edgeLighting\n"
-        data += "[EdgeLightingSaturation]$edgeLightingSaturation\n"
-        data += "[EdgeLightingLightness]$edgeLightingLightness\n"
+        data += "[ELSaturation]$edgeLightingSaturation\n"
+        data += "[ELLightness]$edgeLightingLightness\n"
+        data += "[ELHue1]$edgeLightingHue1\n"
+        data += "[ELHue2]$edgeLightingHue2\n"
+        data += "[ELHue3]$edgeLightingHue3\n"
+        data += "[ELHue4]$edgeLightingHue4\n"
 
         data += "\n"
         playlists.forEach {
