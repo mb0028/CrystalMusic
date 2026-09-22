@@ -128,7 +128,7 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                 ) {
                     CircularWavyProgressIndicator(
                         progress = { position.toFloat() / duration },
-                        amplitude = { if (isPlaying) 1f else 0.1f }
+                        amplitude = { if (isPlaying) 1f else 0.4f }
                     )
                     Text(
                         formatDurationMs(position.milliseconds),

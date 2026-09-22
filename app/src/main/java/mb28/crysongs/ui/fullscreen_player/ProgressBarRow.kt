@@ -46,7 +46,7 @@ fun FSProgressBarRow(modifier: Modifier = Modifier) {
             LinearWavyProgressIndicator(
                 { animatedPos.value },
                 wavelength = 24.dp,
-                amplitude = { if (isPlaying) 1f else 0.1f }
+                amplitude = { if (isPlaying) 1f else 0.4f }
             )
             Slider(
                 0f,
