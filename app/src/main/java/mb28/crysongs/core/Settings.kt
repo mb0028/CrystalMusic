@@ -26,6 +26,7 @@ object Settings {
     var sortBy = 0
     var sortOrderDesc by mutableStateOf(true)
     var tagsSpacer by mutableStateOf(" • ")
+    var backgroundBlurRadius by mutableIntStateOf(45)
     var useCoverColor by mutableStateOf(false)
     var experimental by mutableStateOf(false)
     var whiteText by mutableStateOf(false)
@@ -76,6 +77,7 @@ object Settings {
                     s.startsWith("[TagsSpacer]") -> tagsSpacer = s.removePrefix("[TagsSpacer]")
                     s.startsWith("[Volume]") -> appVolume = s.removePrefix("[Volume]").toFloat()
                     s.startsWith("[CoverShape]") -> coverShapeMode = s.removePrefix("[CoverShape]").toInt()
+                    s.startsWith("[FSBlur]") -> backgroundBlurRadius = s.removePrefix("[FSBlur]").toInt()
                     s.startsWith("[UseCoverColor]") -> useCoverColor = s.removePrefix("[UseCoverColor]").toBooleanStrict()
                     s.startsWith("[FeatureFlags]") -> experimental = s.removePrefix("[FeatureFlags]").toBooleanStrict()
                     s.startsWith("[WhiteTexts]") -> whiteText = s.removePrefix("[WhiteTexts]").toBooleanStrict()
@@ -103,6 +105,7 @@ object Settings {
         data += "[UseCoverColor]$useCoverColor\n"
         data += "[FeatureFlags]$experimental\n"
         data += "[WhiteTexts]$whiteText\n"
+        data += "[FSBlur]$backgroundBlurRadius\n"
         data += "[GradientColoring]$gradientColoring\n"
         data += "[EdgeLighting]$edgeLighting\n"
         data += "[EdgeLightingSaturation]$edgeLightingSaturation\n"

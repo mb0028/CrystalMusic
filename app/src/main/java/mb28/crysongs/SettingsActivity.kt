@@ -6,14 +6,14 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -23,9 +23,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -33,7 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -129,37 +133,51 @@ private fun UISettings() {
 
 @Composable
 private fun FsSettings() {
-    val count = 1
-    var fsShapeExpanded by remember { mutableStateOf(false) }
+    val count = 2
+    val blurState = rememberSliderState(
+        Settings.backgroundBlurRadius.toFloat(),
+        trackRange = 0f..85f
+    )
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.whiteText,
             "Force white texts", 0, count
         ) { Settings.whiteText = it; Settings.save() }
-//        SegmentedListItem(
-//            ListItemDefaults.segmentedShapes(1, count),
-//            Modifier.padding(bottom = 3.dp),
-//            colors = ListItemDefaults.segmentedColors(
-//                containerColor = MaterialTheme.colorScheme.surface
-//            ),
-//        ) {
-//            Column {
-//                Text("Cover shape:")
-//                DropdownMenuPopup(fsShapeExpanded, {fsShapeExpanded = false}) {
-//                    DropdownMenuItem({ Text("Square") },
-//                        { Settings.coverShapeMode = -1; Settings.save() })
-//                    DropdownMenuItem({ Text("Rounded Square") },
-//                        { Settings.coverShapeMode = 0; Settings.save() })
-//                    DropdownMenuItem({ Text("Rounded Polygon 1") },
-//                        { Settings.coverShapeMode = 1; Settings.save() })
-//                    DropdownMenuItem({ Text("Rounded Polygon 2") },
-//                        { Settings.coverShapeMode = 2; Settings.save() })
-//                    DropdownMenuItem({ Text("Circle") },
-//                        { Settings.coverShapeMode = 3; Settings.save() })
-//                }
-//                Text("Note: you can switch between shapes by clicking the cover in fullscreen player")
-//            }
-//        }
+        SegmentedListItem(
+            ListItemDefaults.segmentedShapes(1, count),
+            Modifier.padding(bottom = 3.dp),
+            colors = ListItemDefaults.segmentedColors(
+                MaterialTheme.colorScheme.surface
+            ),
+            overlineContent = {
+                Text(
+                    "Background blur: ${Settings.backgroundBlurRadius}",
+                    fontSize = 16.sp
+                )
+            },
+            trailingContent = {
+                Image(
+                    painterResource(R.drawable.widget_turntable_preview),
+                    null,
+                    Modifier
+                        .size(80.dp)
+                        .blur(Settings.backgroundBlurRadius.dp)
+
+                )
+            }
+        ) {
+            Slider(
+                blurState,
+                onValueChange = {
+                    blurState.value = it
+                    Settings.backgroundBlurRadius = it.roundToInt()
+                },
+                onValueChangeFinished = {
+                    Settings.save()
+                }
+            )
+        }
+        Text("Tip: you can switch between cover shapes by clicking the cover in fullscreen player")
     }
 }
 

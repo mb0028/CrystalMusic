@@ -187,7 +187,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
             contentScale = ContentScale.FillHeight,
             modifier = Modifier
                 .fillMaxSize()
-                .blur(45.dp)
+                .blur(Settings.backgroundBlurRadius.dp)
                 .alpha(0.5f),
         )
         HorizontalPager(
