@@ -85,7 +85,7 @@ fun scheduleNotifications(context: Context) {
 
     val calendar = Calendar.getInstance().apply {
         timeInMillis = System.currentTimeMillis()
-        set(Calendar.HOUR_OF_DAY, 9)
+        set(Calendar.HOUR_OF_DAY, 7)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
 

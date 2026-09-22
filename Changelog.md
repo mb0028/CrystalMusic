@@ -1,3 +1,7 @@
+## v1.2.0
+- Screen stays on when Fullscreen player is visible
+- New feature, music of the day: A notification that everyday around 7 AM that suggests a random music
+
 ## v1.1.1
 - App now supports Android 12 and 11
 - Playback control notification buttons are now works correctly & added 3 more buttons: Next - Add/Remove favorite - Seek +15s

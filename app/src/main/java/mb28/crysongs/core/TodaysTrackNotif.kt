@@ -1,6 +1,7 @@
 package mb28.crysongs.core
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import mb28.crysongs.tracks
 import kotlin.random.Random
 
 class TodaysTrackNotif : BroadcastReceiver() {
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         refreshTracksList(context)
         val track = tracks.shuffled(Random(System.currentTimeMillis())).first()

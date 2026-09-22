@@ -1,7 +1,6 @@
 package mb28.crysongs
 
 import android.app.Activity
-import android.app.NotificationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -62,8 +61,6 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
 import mb28.crysongs.ui.PermissionsPage
@@ -96,6 +93,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
             enterTransition = Slide()
             exitTransition = Slide()
             isNavigationBarContrastEnforced = false
+            decorView.keepScreenOn = true
         }
 
         if (intent.getBooleanExtra(EXTRA_LOAD_FROM_OTHER_APPS, false)) {
@@ -160,6 +158,16 @@ class FullscreenPlayerActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        window.decorView.keepScreenOn = true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        window.decorView.keepScreenOn = false
+    }
 }
 
 @Composable
@@ -185,7 +193,6 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
         HorizontalPager(
             selectedTab
         ) { page ->
-            activity.window.decorView.keepScreenOn = false
             when(page) {
                 1 -> {
                    Column(
@@ -224,7 +231,6 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                    }
                 }
                 2 -> {
-                    activity.window.decorView.keepScreenOn = true
                     FSLyricsTab(Modifier.fillMaxSize())
                 }
                 0 -> {
