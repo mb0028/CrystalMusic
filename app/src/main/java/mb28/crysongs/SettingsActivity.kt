@@ -101,8 +101,8 @@ private fun UISettings() {
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.useCoverColor,
-            "Full adaptive coloring", 0, count,
-            desc = "Use track cover accent color for UI if available"
+            "Use artwork color for ui", 0, count,
+            desc = "When on: App uses now playing's cover accent color for UI"
         ) { Settings.useCoverColor = it; Settings.save() }
 
         SegmentedListItem(
