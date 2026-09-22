@@ -1,6 +1,7 @@
 ## v1.2.0
 - Screen stays on when Fullscreen player is visible
-- New feature, music of the day: A notification that everyday around 7 AM that suggests a random music
+- New feature, music of the day: A notification that everyday around 7 AM suggests a random music
+- UI improvements
 
 ## v1.1.1
 - App now supports Android 12 and 11

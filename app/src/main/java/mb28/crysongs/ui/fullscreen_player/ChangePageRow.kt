@@ -1,6 +1,7 @@
 package mb28.crysongs.ui.fullscreen_player
 
 import android.app.Activity
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -64,19 +65,22 @@ fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, acti
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEachIndexed { i, tab ->
+                val corners by animateDpAsState(if (selectedTab.currentPage == i) 10.dp else 20.dp)
                 Surface(
-                    onClick = {selectedTab.requestScrollToPage(i)},
+                    onClick = { selectedTab.requestScrollToPage(i) },
                     modifier = Modifier.size(80.dp, 30.dp),
-                    color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondaryContainer
-                    else MaterialTheme.colorScheme.surface.copy(0.5f),
-                    shape = RoundedCornerShape(35.dp)
+                    color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.surface.copy(0.5f),
+                    shape = RoundedCornerShape(corners)
                 ) {
                     Text(
                         tab,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 2.dp)
+                            .padding(top = 2.dp),
+                        color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSecondaryContainer,
                     )
                 }
             }
