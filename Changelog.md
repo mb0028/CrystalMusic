@@ -2,7 +2,7 @@
 - Screen stays on when Fullscreen player is visible
 - New feature, music of the day: A notification that everyday around 7 AM suggests a random music
 - New setting: Background cover blur radius
-- Fix: 'Use artwork color for ui' is no longer freezes ui for ~1s when now playing changes
+- Option 'Use artwork color for ui' is no longer freezes ui for ~1s when now playing changes
 - UI improvements
 
 ## v1.1.1

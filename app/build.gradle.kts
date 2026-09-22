@@ -15,8 +15,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 31
         targetSdk = 37
-        versionCode = 7
-        versionName = "v1.1.1-2026.09.17"
+        versionCode = 8
+        versionName = "v1.1.1-2026.09.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

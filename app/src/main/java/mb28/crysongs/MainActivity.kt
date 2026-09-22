@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -188,51 +191,76 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
             .padding(bottom = 2.dp)
             .height(65.dp),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
-            toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.95f)
+            toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(0.95f)
         ),
     ) {
         if (!secondSet.value) {
-            firstTabs.forEachIndexed { index, label ->
-                NavigationBarItem(
-                    selected = selectedIndex.intValue == index,
-                    onClick = { selectedIndex.intValue = index },
-                    icon = {
-                        Icon(
-                            when(index) {
-                                0 -> music_note_2
-                                1 -> queue_music
-                                2 -> library_music
-                                3 -> folder
-                                4 -> search
-                                else -> throw Exception()
+            val state = remember {
+                MutableTransitionState(false).apply {
+                    targetState = true
+                }
+            }
+            AnimatedVisibility(
+                state,
+                enter = slideInHorizontally { -100 }
+            ) {
+                Row {
+                    firstTabs.forEachIndexed { index, label ->
+                        NavigationBarItem(
+                            selected = selectedIndex.intValue == index,
+                            onClick = { selectedIndex.intValue = index },
+                            icon = {
+                                Icon(
+                                    when(index) {
+                                        0 -> music_note_2
+                                        1 -> queue_music
+                                        2 -> library_music
+                                        3 -> folder
+                                        4 -> search
+                                        else -> throw Exception()
+                                    },
+                                    null
+                                )
                             },
-                            null
+                            label = { Text(label) }
                         )
-                    },
-                    label = { Text(label) }
-                )
+                    }
+                }
             }
         }
         else {
-            secondTabs.forEachIndexed { index, label ->
-                NavigationBarItem(
-                    selected = selectedIndex.intValue == index + 5,
-                    onClick = { selectedIndex.intValue = index + 5 },
-                    icon = {
-                        Icon(
-                            when(index + 5) {
-                                5 -> artist
-                                6 -> album
-                                7 -> theater_comedy
-                                8 -> stylus_brush
-                                9 -> list_2
-                                else -> throw Exception()
+            val state = remember {
+                MutableTransitionState(false).apply {
+                    targetState = true
+                }
+            }
+            AnimatedVisibility(
+                state,
+                enter = slideInHorizontally { 100 }
+            ) {
+                Row {
+                    secondTabs.forEachIndexed { index, label ->
+                        NavigationBarItem(
+                            selected = selectedIndex.intValue == index + 5,
+                            onClick = { selectedIndex.intValue = index + 5 },
+                            icon = {
+                                Icon(
+                                    when(index + 5) {
+                                        5 -> artist
+                                        6 -> album
+                                        7 -> theater_comedy
+                                        8 -> stylus_brush
+                                        9 -> list_2
+                                        else -> throw Exception()
+                                    },
+                                    null
+                                )
                             },
-                            null
+                            label = { Text(label) },
                         )
-                    },
-                    label = { Text(label) },
-                )
+                    }
+                }
+
             }
         }
     }
