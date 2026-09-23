@@ -1,5 +1,6 @@
 package mb28.crysongs.ui
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -27,6 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,12 +57,13 @@ import mb28.crysongs.nowPlayingCover
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.position
+import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MiniPlayer(secondSet: MutableState<Boolean>) {
-    val context = LocalActivity.current!!
+fun MiniPlayer(secondSet: MutableState<Boolean>, context: Activity) {
+    var showMoreOptions by remember { mutableStateOf(false) }
     val size = 0.52f
     val shape = RoundedPolygon.star(
         12,
@@ -86,8 +93,8 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                 .padding(start = 5.dp)
                 .clip(RoundedCornerShape(35.dp))
                 .background(
-                    MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.92f),
-                    shape = RoundedCornerShape(35.dp)
+                    MaterialTheme.colorScheme.inversePrimary.copy(0.9f),
+                    shape = CircleShape
                 )
                 .clickable {
                     val intent = Intent(context, FullscreenPlayerActivity::class.java)
@@ -103,6 +110,7 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
                     "Track cover",
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier.width(70.dp).height(70.dp).clip(shape)
+                        .clickable { showMoreOptions = true }
                 )
 
                 Column(
@@ -139,6 +147,12 @@ fun MiniPlayer(secondSet: MutableState<Boolean>) {
             } else {
                 Text("Play something", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             }
+        }
+    }
+
+    if (showMoreOptions) {
+        TrackMoreOptionsPopup(nowPlaying!!) {
+            showMoreOptions = false
         }
     }
 }

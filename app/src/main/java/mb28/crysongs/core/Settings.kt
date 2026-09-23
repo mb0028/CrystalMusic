@@ -31,7 +31,7 @@ object Settings {
     var experimental by mutableStateOf(false)
     var whiteText by mutableStateOf(false)
     var gradientColoring by mutableStateOf(false)
-    var scaleCoverWithEdgeLighting by mutableStateOf(true)
+    var coverParallax by mutableStateOf(true)
     var edgeLighting by mutableStateOf(false)
     var edgeLightingSaturation by mutableFloatStateOf(0.6f)
     var edgeLightingLightness by mutableFloatStateOf(0.75f)
@@ -39,6 +39,8 @@ object Settings {
     var edgeLightingHue2 by mutableFloatStateOf(90f)
     var edgeLightingHue3 by mutableFloatStateOf(180f)
     var edgeLightingHue4 by mutableFloatStateOf(320f)
+    var waveformDataCapture by mutableStateOf(false)
+    var windEffect by mutableStateOf(false)
 
     fun addOrRemoveFavorite(path: String) {
         if (favorites.contains(path)) {
@@ -94,7 +96,9 @@ object Settings {
                     s.startsWith("[ELHue2]") -> edgeLightingHue2 = s.removePrefix("[ELHue2]").toFloat()
                     s.startsWith("[ELHue3]") -> edgeLightingHue3 = s.removePrefix("[ELHue3]").toFloat()
                     s.startsWith("[ELHue4]") -> edgeLightingHue4 = s.removePrefix("[ELHue4]").toFloat()
-                    s.startsWith("[SCWEL]") -> scaleCoverWithEdgeLighting = s.removePrefix("[SCWEL]").toBooleanStrict()
+                    s.startsWith("[SCWEL]") -> coverParallax = s.removePrefix("[SCWEL]").toBooleanStrict()
+                    s.startsWith("[WaveCapture]") -> waveformDataCapture = s.removePrefix("[WaveCapture]").toBooleanStrict()
+                    s.startsWith("[Wind]") -> windEffect = s.removePrefix("[Wind]").toBooleanStrict()
                 }
             }
         } else {
@@ -117,8 +121,10 @@ object Settings {
         data += "[WhiteTexts]$whiteText\n"
         data += "[FSBlur]$backgroundBlurRadius\n"
         data += "[GradientColoring]$gradientColoring\n"
+        data += "[WaveCapture]$waveformDataCapture\n"
         data += "[EdgeLighting]$edgeLighting\n"
-        data += "[SCWEL]$scaleCoverWithEdgeLighting\n"
+        data += "[SCWEL]$coverParallax\n"
+        data += "[Wind]$windEffect\n"
         data += "[ELSaturation]$edgeLightingSaturation\n"
         data += "[ELLightness]$edgeLightingLightness\n"
         data += "[ELHue1]$edgeLightingHue1\n"

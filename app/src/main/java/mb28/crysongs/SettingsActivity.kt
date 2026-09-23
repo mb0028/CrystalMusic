@@ -1,5 +1,6 @@
 package mb28.crysongs
 
+import android.app.Activity
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Toast
@@ -74,7 +75,7 @@ class SettingsActivity : ComponentActivity() {
                     ) {
                         item {
                             SectionHeader("UI Customization")
-                            UISettings()
+                            UISettings(this@SettingsActivity)
                         }
                         item {
                             SectionHeader("Fullscreen Player")
@@ -96,8 +97,8 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-private fun UISettings() {
-    val count = 2
+private fun UISettings(activity: Activity) {
+    val count = 3
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.useCoverColor,
@@ -124,9 +125,21 @@ private fun UISettings() {
                     fontSize = 20.sp
                 ),
                 label = {
-                    Text("Spacer")
+                    Text("Separator")
                 }
             )
+        }
+        SettingSwitch(
+            Settings.waveformDataCapture,
+            "Enable waveform capture", 2, count,
+            desc = "Needed for effects like Edge lighting, Parallax & Wind. Requires microphone permission\n * Effects are currently under experimental features",
+            enable = Settings.experimental
+        ) {
+            Settings.waveformDataCapture = it
+            if (Settings.waveformDataCapture) {
+                activity.setupVisu()
+            }
+            Settings.save()
         }
     }
 }

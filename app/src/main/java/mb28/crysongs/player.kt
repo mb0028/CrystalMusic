@@ -313,7 +313,7 @@ fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
             }
             isPlayerLoopStarted = true
 
-            if (Settings.experimental && Settings.edgeLighting) {
+            if (Settings.waveformDataCapture) {
                 setupVisu()
             }
         },
@@ -325,10 +325,10 @@ fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
 fun Activity.setupVisu() {
     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
         requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 2)
-        if (Settings.edgeLighting) {
-            Settings.edgeLighting = false
+        if (Settings.waveformDataCapture) {
+            Settings.waveformDataCapture = false
             Settings.save()
-            Toast.makeText(this, "Edge lighting turned off because Microphone permission is denied",
+            Toast.makeText(this, "Enable waveform capture turned off because Microphone permission is denied",
                 Toast.LENGTH_LONG).show()
         }
     } else {

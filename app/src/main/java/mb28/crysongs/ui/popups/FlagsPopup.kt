@@ -15,13 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
 import mb28.crysongs.core.Settings
-import mb28.crysongs.setupVisu
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.SettingSwitch
 
 @Composable
 fun FlagsPopup(onDismissRequired: () -> Unit) {
-    val activity = LocalActivity.current
     AlertDialog(
         { onDismissRequired() },
         { },
@@ -30,7 +28,7 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
         },
         text = {
             LazyColumn {
-                val count = 2
+                val count = 4
                 item {
                     Text("This features are experimental and might not work as expected.")
                     Spacer(Modifier.height(10.dp))
@@ -44,23 +42,25 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                 item {
                     SettingSwitch(
                         Settings.edgeLighting,
-                        "Edge lighting effect", 1, count
-                    ) {
-                        Settings.edgeLighting = it
-                        Settings.save()
-                        if (Settings.experimental && Settings.edgeLighting) {
-                            activity?.setupVisu()
-                        }
-                    }
+                        "Edge lighting effect", 1, count,
+                        Settings.waveformDataCapture
+                    ) { Settings.edgeLighting = it; Settings.save() }
                 }
-
-                if (Settings.edgeLighting) {
-                    item {
-                        SettingSwitch(
-                            Settings.scaleCoverWithEdgeLighting,
-                            "Scale cover with\nedge lighting", 0, 1
-                        ) { Settings.scaleCoverWithEdgeLighting = it; Settings.save() }
-                    }
+                item {
+                    SettingSwitch(
+                        Settings.coverParallax,
+                        "Cover parallax", 2, count,
+                        Settings.waveformDataCapture
+                    ) { Settings.coverParallax = it; Settings.save() }
+                }
+                item {
+                    SettingSwitch(
+                        Settings.windEffect,
+                        "Wind effect", 3, count,
+                        Settings.waveformDataCapture
+                    ) { Settings.windEffect = it; Settings.save() }
+                }
+                if (Settings.waveformDataCapture && Settings.edgeLighting) {
                     item {
                         Box(Modifier.height(100.dp).padding(vertical = 10.dp)) {
                             EdgeLightingEffect(LocalActivity.current!!, true)

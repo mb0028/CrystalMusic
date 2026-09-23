@@ -29,7 +29,7 @@ import mb28.crysongs.visualizationData
 
 @Composable
 fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
-    if (Settings.experimental && Settings.edgeLighting) {
+    if (Settings.waveformDataCapture && Settings.edgeLighting) {
         val alpha by animateFloatAsState(
             if (demo) 1f else audioBand(),
             animationSpec = TweenSpec(50)
@@ -49,7 +49,7 @@ fun EdgeLightingEffect(activity: Activity, demo: Boolean = false) {
                             Pair(1f, Color.hsl(edgeLightingHue4, edgeLightingSaturation, edgeLightingLightness))
                         )
                     ),
-                    RoundedCornerShape((corners * 0.40f).dp)
+                    RoundedCornerShape((corners * 0.36f).dp)
                 )
         )
     }

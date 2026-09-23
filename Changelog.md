@@ -1,4 +1,6 @@
-## 1.2.1
+## v1.2.1
+- Move some settings out of experimental
+- UI improvements
 - Fix notification's color bug
 
 ## v1.2.0

@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     bottomBar = {
                         Column {
-                            MiniPlayer(selectedSet)
+                            MiniPlayer(selectedSet, this@MainActivity)
                             Spacer(Modifier.height(3.dp))
                             NavBar(selectedIndex, selectedSet)
                         }
@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (!hasFocus && !isPlaying) {
-            NotificationManagerCompat.from(this).cancelAll()
+            NotificationManagerCompat.from(this).cancel(0)
         }
     }
 
