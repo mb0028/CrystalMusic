@@ -1,3 +1,6 @@
+## 1.2.1
+- Fix notification's color bug
+
 ## v1.2.0
 - Screen stays on when Fullscreen player is visible
 - New feature, music of the day: A notification that everyday around 7 AM suggests a random music
