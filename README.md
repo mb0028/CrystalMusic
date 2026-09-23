@@ -13,10 +13,11 @@ Android music player app designed for local library, simplicity & performance, w
 - 🟢 Android 11+ and TV support
 
 To-Do
+- [ ] Tag editor
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Better landscape support
-- [ ] Tag editor
+- [ ] History system. like most played track - total/daily/weekly listening time
 - [x] ~~Support for android 12 and 11~~
 - [x] ~~Home widget~~
 
