@@ -44,7 +44,7 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
     if (nowPlaying != null) {
         val tag = remember { AudioFileIO.read(File(nowPlaying!!.path)).tag }
         val tags = remember {
-            val txxx = tag.getFields("TXXX")
+//            val txxx = tag.getFields("TXXX")
             listOf(
                 "Title: ${tag.getFirst(FieldKey.TITLE)}",
                 "Artist: ${tag.getFirst(FieldKey.ARTIST)}",
@@ -64,15 +64,16 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                 "Language: ${tag.getFirst(FieldKey.LANGUAGE)}",
                 "Tags: ${tag.getFirst(FieldKey.TAGS)}",
                 "Rating: ${tag.getFirst(FieldKey.RATING)}",
+                "Comment: ${tag.getFirst(FieldKey.COMMENT)}",
                 " ",
                 "Path:\n${nowPlaying!!.path.removePrefix("/storage/emulated/")}",
                 "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath.removePrefix("/storage/emulated/")}" else "No lrc file found"}",
-                "URL: ${txxx.getSpecial("purl")}",
-                " ",
-                "Comment:\n${txxx.getSpecial("comment")}",
-                "Description:\n${txxx.getSpecial("description")}",
-                "Synopsis:\n${txxx.getSpecial("synopsis")}",
-                "Embedded lyrics:\n${txxx.getSpecial("lyrics-   ")}",
+//                "URL: ${txxx.getSpecial("purl")}",
+//                " ",
+//                "Comment:\n${txxx.getSpecial("comment")}",
+//                "Description:\n${txxx.getSpecial("description")}",
+//                "Synopsis:\n${txxx.getSpecial("synopsis")}",
+//                "Embedded lyrics:\n${txxx.getSpecial("lyrics-   ")}",
             )
         }
         LazyColumn(
@@ -104,13 +105,13 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
             }
             val count = tags.count()
             items(count) { i ->
-                val a = remember { i }
+                val t = tags[i]
                 Text(
-                    tags[i],
+                    t,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                if (tags[a].isNotBlank() && a != count - 1) {
+                if (t.isNotBlank() && i != count - 1) {
                     HorizontalDivider(
                         Modifier.padding(vertical = 1.dp).clip(CircleShape),
                         1.dp
@@ -130,7 +131,11 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                     Modifier.padding(vertical = 10.dp).clip(CircleShape),
                     8.dp
                 )
-                Text("All extracted tags:")
+                Text(
+                    "All extracted tags:",
+                    fontSize = 22.sp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
                 Text(allTags)
             }
         }
