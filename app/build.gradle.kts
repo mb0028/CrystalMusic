@@ -28,6 +28,7 @@ android {
             optimization {
                 enable = false
             }
+            proguardFiles.add(File("src/main/keepRules/rules.keep"))
         }
     }
     compileOptions {
