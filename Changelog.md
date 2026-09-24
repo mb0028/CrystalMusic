@@ -1,6 +1,6 @@
 ## v1.3.0 (Upcoming)
 - Add tag editor
-- Fullscreen player now shows all tags
+- Fullscreen player now shows all now playing tags
 
 ## v1.2.1
 - Move some settings out of experimental
