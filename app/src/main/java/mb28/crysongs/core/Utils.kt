@@ -20,12 +20,23 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
+import org.jaudiotagger.tag.TagField
 import kotlin.time.Duration
 
 val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
 const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
+
+fun MutableList<TagField>.getSpecial(tag: String) : String {
+    val tag = find { it.toString().contains("Description=\"$tag\";") }.toString()
+    return try {
+        tag.substring(tag.lastIndexOf("Text=\"") + 6, tag.length - 3)
+    } catch (_: Exception) {
+        ""
+    }
+}
+
 
 fun formatDurationMs(d: Duration) : String {
     val hours = d.inWholeHours
