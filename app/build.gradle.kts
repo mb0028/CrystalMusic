@@ -44,13 +44,12 @@ android {
 }
 
 dependencies {
+    implementation("com.github.maxbruecken:jaudiotagger-android:master")
+
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
-
-//    implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
-//    implementation(libs.androidx.glance.material)
 
     implementation(libs.material.kolor)
     implementation(libs.androidx.graphics.shapes)

@@ -14,6 +14,7 @@ Android music player app designed for local library, simplicity & performance, w
 
 To-Do
 - [ ] Tag editor
+- [ ] Online lyric finder & downloader
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Better landscape support

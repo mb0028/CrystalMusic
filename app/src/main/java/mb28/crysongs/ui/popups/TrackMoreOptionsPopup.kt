@@ -1,5 +1,6 @@
 package mb28.crysongs.ui.popups
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
@@ -10,8 +11,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import mb28.crysongs.EXTRA_PATH
+import mb28.crysongs.TagEditorActivity
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.icons.edit
 import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
 import mb28.crysongs.icons.playlist_add
@@ -35,27 +39,37 @@ fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
         },
         text = {
             LazyColumn {
-                val count = 3
+                val count = 4
                 item {
                     val contains = Settings.favorites.contains(track.path)
                     EasySegmentedListItem(
+                        edit,
+                        "Edit tags",
+                        0, count,
+                    ) {
+                        val intent = Intent(context, TagEditorActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra(EXTRA_PATH, track.path)
+                        context.startActivity(intent)
+                    }
+                    EasySegmentedListItem(
                         if (contains) favorite else heart_plus,
                         if (contains) "Remove from favorites" else "Add to favorites",
-                        0, count,
+                        1, count,
                     ) {
                         Settings.addOrRemoveFavorite(track.path)
                     }
                     EasySegmentedListItem(
                         playlist_add,
                         "Add to playlist",
-                        1, count,
+                        2, count,
                     ) {
                         showAddToPL = true
                     }
                     EasySegmentedListItem(
                         queue_music,
                         "Play next",
-                        2, count,
+                        3, count,
                     ) {
                         if (playerQuery.isEmpty()) {
                             playerQuery.add(track)
