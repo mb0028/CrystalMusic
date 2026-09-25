@@ -1,7 +1,10 @@
 package mb28.crysongs.ui.more_pages
 
+import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.core.Settings
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.folders
 import mb28.crysongs.icons.arrow_back
@@ -34,7 +41,13 @@ import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
+import java.io.File
 
+
+@SuppressLint("SdCardPath")
+private val tree = mutableStateListOf("/sdcard/")
+
+@SuppressLint("SdCardPath")
 @Composable
 fun FoldersPage() {
     var folderView by remember { mutableStateOf(false) }
@@ -43,6 +56,13 @@ fun FoldersPage() {
         MutableTransitionState(false).apply {
             targetState = true
         }
+    }
+    val last = tree.last()
+
+    if (folderView) {
+        BackHandler { folderView = false }
+    } else if (tree.count() > 1) {
+        BackHandler { tree.remove(last) }
     }
 
     AnimatedVisibility(
@@ -68,7 +88,8 @@ fun FoldersPage() {
 
             item {
                 Row(
-                    Modifier.fillMaxWidth()
+                    Modifier
+                        .fillMaxWidth()
                         .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
@@ -79,7 +100,7 @@ fun FoldersPage() {
                             Icon(arrow_back, null)
                         }
                         FilledTonalIconButton(
-                            {
+                            { //TODO: Reduce ram usage
                                 val folderTracks = tracks.toMutableList()
                                 folderTracks.removeIf {
                                     !it.path.startsWith(clickedFolderPath)
@@ -91,11 +112,65 @@ fun FoldersPage() {
                         ) {
                             Icon(shuffle, null)
                         }
+                    } else {
+                        ToggleButton(
+                            Settings.hierarchyView,
+                            { Settings.hierarchyView = it; Settings.save() }
+                        ) {
+                            Text("Hierarchy")
+                        }
+                        if (Settings.hierarchyView && tree.count() > 1)
+                            FilledTonalIconButton(
+                                { tree.remove(last) }
+                            ) {
+                                Icon(arrow_back, null)
+                            }
                     }
                 }
             }
+            if (Settings.hierarchyView) {
+                val files = File(last).listFiles()?.toList()?.sortedBy { it.isFile } ?: listOf<File>()
+                val count = files.count()
 
-            if (folderView) {
+                item {
+                    Text(
+                        last.removePrefix("/sdcard/").replace("/", " > "),
+                        modifier = Modifier
+                            .padding(10.dp, 5.dp)
+                            .horizontalScroll(rememberScrollState())
+                    )
+                }
+                items(count) {
+                    val file = files[it]
+                    val f = file.path
+                    if (file.isDirectory) {
+                        EasySegmentedListItem(
+                            folder,
+                            f.substring(f.lastIndexOf('/') + 1),
+                            it, count,
+                            Modifier.padding(horizontal = 10.dp)
+                        ) {
+                            tree.add(f)
+                        }
+                    }
+                    else if (f.endsWith(".mp3") || f.endsWith(".m4a") ||
+                        f.endsWith(".flac") || f.endsWith(".wav") || f.endsWith(".ogg"))
+                    {
+                        val t = tracks.find { t -> t.path == f }
+                        if (t != null) {
+                            TrackTile(
+                                t,
+                                it, count,
+                                resetQueryOnClick = false
+                            ) {
+                                playerQuery = mutableStateListOf(t) // TODO: Put whole folder in query
+                                updateDisplayQuery()
+                            }
+                        }
+                    }
+                }
+            }
+            else if (folderView) {
                 val folderTracks = tracks.toMutableList()
                 folderTracks.removeIf {
                     !it.path.substring(0, it.path.lastIndexOf('/'))
@@ -115,7 +190,7 @@ fun FoldersPage() {
             } else {
                 val count = folders.count()
                 items(count) { i ->
-                    val f = folders[i]
+                    val f = folders.elementAt(i)
                     EasySegmentedListItem(
                         folder,
                         f.substring(f.lastIndexOf('/') + 1),

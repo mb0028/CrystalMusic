@@ -20,22 +20,12 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
-import org.jaudiotagger.tag.TagField
 import kotlin.time.Duration
 
 val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
 const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
-
-fun MutableList<TagField>.getSpecial(tag: String) : String {
-    val tag = find { it.toString().contains("Description=\"$tag\";") }.toString()
-    return try {
-        tag.substring(tag.lastIndexOf("Text=\"") + 6, tag.length - 3)
-    } catch (_: Exception) {
-        ""
-    }
-}
 
 
 fun formatDurationMs(d: Duration) : String {
@@ -77,11 +67,11 @@ fun Activity.setupPermissions() {
     val nm = NotificationManagerCompat.from(this)
     val channel = NotificationChannelCompat.Builder(CHANNEL_NOW_PLAYING, NotificationManagerCompat.IMPORTANCE_LOW)
         .setName("Now playing lyrics")
-        .setDescription("Shows now playing track info as live notification")
+        .setDescription("Shows lyrics in a live notification")
         .build()
     val channelTM = NotificationChannelCompat.Builder(CHANNEL_TODAYS_MUSIC, NotificationManagerCompat.IMPORTANCE_DEFAULT)
         .setName("Today's music")
-        .setDescription("Shows a notification everyday at 9 AM that shows a random music")
+        .setDescription("Shows a notification everyday at 7 AM that suggests a random music")
         .build()
 
     nm.createNotificationChannel(channel)

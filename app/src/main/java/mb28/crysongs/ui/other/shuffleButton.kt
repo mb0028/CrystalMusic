@@ -25,10 +25,10 @@ fun ShuffleButton() {
 fun ShuffleButtonQuery() {
     FilledTonalIconButton(
         {
-            playerQuery = if (playerQuery.isEmpty()) {
-                tracks.shuffled().toMutableStateList()
+            if (playerQuery.isEmpty()) {
+                playerQuery = tracks.shuffled().toMutableStateList()
             } else {
-                playerQuery.shuffled().toMutableStateList()
+                playerQuery.shuffle()
             }
             setAndPlay(playerQuery.first(), false)
         }

@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
@@ -32,6 +33,7 @@ import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +50,8 @@ import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.flag
 import mb28.crysongs.ui.other.EasySegmentedListItem
+import mb28.crysongs.ui.other.EditNavigationItemPopup
+import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.other.SettingSwitch
 import mb28.crysongs.ui.popups.FlagsPopup
 import mb28.crysongs.ui.theme.CrySongsTheme
@@ -98,16 +102,40 @@ class SettingsActivity : ComponentActivity() {
 
 @Composable
 private fun UISettings(activity: Activity) {
-    val count = 3
+    var lastClickedNavTab by remember { mutableIntStateOf(-1) }
+    val count = 4
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.useCoverColor,
             "Use artwork color for ui", 0, count,
             desc = "When on: App uses now playing's cover accent color for UI"
         ) { Settings.useCoverColor = it; Settings.save() }
-
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),
+            Modifier.padding(bottom = 3.dp),
+            colors = ListItemDefaults.segmentedColors(
+                MaterialTheme.colorScheme.surface
+            ),
+            supportingContent = {
+                Column {
+                    Row {
+                        "00000".forEachIndexed { i, _ -> // IDK how to use for in kotlin. TODO: Fix it
+                            NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
+                        }
+                    }
+                    Row { // IDK how to use for in kotlin. TODO: Fix it
+                        "00000".forEachIndexed { a, _ -> val i = a + 5
+                            NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
+                        }
+                    }
+                    Text("Click to edit items")
+                }
+            }
+        ) {
+            Text("Navigation bar items")
+        }
+        SegmentedListItem(
+            ListItemDefaults.segmentedShapes(2, count),
             Modifier.padding(bottom = 3.dp),
             colors = ListItemDefaults.segmentedColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -131,9 +159,9 @@ private fun UISettings(activity: Activity) {
         }
         SettingSwitch(
             Settings.waveformDataCapture,
-            "Enable waveform capture", 2, count,
-            desc = "Needed for effects like Edge lighting, Parallax & Wind. Requires microphone permission\n * Effects are currently under experimental features",
-            enable = Settings.experimental
+            "Enable waveform capture", 3, count,
+            desc = "Required for effects like Edge lighting, Parallax & Wind. Requires microphone permission\n * Effects are currently under experimental features",
+            enable = experimental
         ) {
             Settings.waveformDataCapture = it
             if (Settings.waveformDataCapture) {
@@ -142,6 +170,13 @@ private fun UISettings(activity: Activity) {
             Settings.save()
         }
     }
+
+    if (lastClickedNavTab != -1) {
+        EditNavigationItemPopup(lastClickedNavTab) {
+            lastClickedNavTab = -1
+        }
+    }
+
 }
 
 @Composable

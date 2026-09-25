@@ -15,12 +15,13 @@
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="AllFilesAccessPolicy,ScopedStorage" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE"
@@ -43,19 +44,18 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".FullscreenPlayerActivity"
             android:exported="false"
             android:label="@string/title_activity_fullscreen_player"
             android:theme="@style/Theme.Transparent"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".PlayerExportedActivity"
             android:exported="true"
@@ -72,7 +72,6 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
@@ -83,7 +82,6 @@
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".TagEditorActivity"
             android:exported="false"
@@ -135,5 +133,12 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".CacheCoversActivity"
+            android:exported="false"
+            android:label="@string/title_activity_cache_covers"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize" />
     </application>
+
 </manifest>

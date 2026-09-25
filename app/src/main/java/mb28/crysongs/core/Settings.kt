@@ -19,6 +19,9 @@ object Settings {
 
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()
+    val navTabs = mutableStateListOf<Int>()
+    var initTab by mutableIntStateOf(0)
+
     var loopTrack by mutableStateOf(false)
     var verticalLyrics by mutableStateOf(false)
     var appVolume by mutableFloatStateOf(1f)
@@ -41,6 +44,15 @@ object Settings {
     var edgeLightingHue4 by mutableFloatStateOf(320f)
     var waveformDataCapture by mutableStateOf(false)
     var windEffect by mutableStateOf(false)
+    var hierarchyView by mutableStateOf(false)
+    var tips_cacheThumbs by mutableStateOf(true)
+
+    val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
+
+    fun resetFirstTimeTips() {
+        tips_cacheThumbs = true
+        save()
+    }
 
     fun addOrRemoveFavorite(path: String) {
         if (favorites.contains(path)) {
@@ -54,6 +66,7 @@ object Settings {
     fun load() {
         favorites.clear()
         playlists.clear()
+        navTabs.clear()
         val a = File(appFolder)
         val atc = File(appCacheThumbsFolder)
         if (!a.exists() || !atc.exists()) {
@@ -77,6 +90,7 @@ object Settings {
                             playlists.add(path)
                         }
                     }
+                    s.startsWith("[Nav]") -> navTabs.add(s.removePrefix("[Nav]").toInt())
                     s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
                     s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
                     s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
@@ -99,17 +113,25 @@ object Settings {
                     s.startsWith("[SCWEL]") -> coverParallax = s.removePrefix("[SCWEL]").toBooleanStrict()
                     s.startsWith("[WaveCapture]") -> waveformDataCapture = s.removePrefix("[WaveCapture]").toBooleanStrict()
                     s.startsWith("[Wind]") -> windEffect = s.removePrefix("[Wind]").toBooleanStrict()
+                    s.startsWith("[Hierarchy]") -> hierarchyView = s.removePrefix("[Hierarchy]").toBooleanStrict()
+                    s.startsWith("[TipsCacheCovers]") -> tips_cacheThumbs = s.removePrefix("[TipsCacheCovers]").toBooleanStrict()
+                    s.startsWith("[InitTab]") -> initTab = s.removePrefix("[InitTab]").toInt()
                 }
             }
         } else {
             file.createNewFile()
             save()
         }
+        if (navTabs.count() != 10) {
+            // IDK how to use for in kotlin. TODO: Fix it
+            "0000000000".forEachIndexed { i, _ ->
+                navTabs.add(i)
+            }
+        }
     }
 
     fun save() {
-        var data = "[Settings]\n"
-        data += "[SortBy]$sortBy\n"
+        var data = "[SortBy]$sortBy\n"
         data += "[SortOrderDesc]$sortOrderDesc\n"
         data += "[Loop]$loopTrack\n"
         data += "[Volume]$appVolume\n"
@@ -121,16 +143,16 @@ object Settings {
         data += "[WhiteTexts]$whiteText\n"
         data += "[FSBlur]$backgroundBlurRadius\n"
         data += "[GradientColoring]$gradientColoring\n"
+
         data += "[WaveCapture]$waveformDataCapture\n"
+        data += "[SCWEL]$coverParallax\n[Wind]$windEffect\n"
         data += "[EdgeLighting]$edgeLighting\n"
-        data += "[SCWEL]$coverParallax\n"
-        data += "[Wind]$windEffect\n"
-        data += "[ELSaturation]$edgeLightingSaturation\n"
-        data += "[ELLightness]$edgeLightingLightness\n"
-        data += "[ELHue1]$edgeLightingHue1\n"
-        data += "[ELHue2]$edgeLightingHue2\n"
-        data += "[ELHue3]$edgeLightingHue3\n"
-        data += "[ELHue4]$edgeLightingHue4\n"
+        data += "[ELSaturation]$edgeLightingSaturation\n[ELLightness]$edgeLightingLightness\n"
+        data += "[ELHue1]$edgeLightingHue1\n[ELHue2]$edgeLightingHue2\n"
+        data += "[ELHue3]$edgeLightingHue3\n[ELHue4]$edgeLightingHue4\n"
+
+        data += "[Hierarchy]$hierarchyView\n"
+        data += "[TipsCacheCovers]$tips_cacheThumbs\n"
 
         data += "\n"
         playlists.forEach {
@@ -140,6 +162,11 @@ object Settings {
         data += "\n"
         favorites.forEach {
             data += "[Favorite]$it\n"
+        }
+
+        data += "[InitTab]$initTab\n"
+        navTabs.forEach {
+            data += "[Nav]$it\n"
         }
 
         val file = File(settingsFile)

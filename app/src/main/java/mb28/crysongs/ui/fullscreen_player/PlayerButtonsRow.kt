@@ -90,10 +90,11 @@ fun FSPlayerButtonsRow() {
                 .padding(horizontal = 8.dp)
         ) {
             Icon(
-                if (isPlaying) painterResource(R.drawable.pause_40px)
-                    else painterResource(R.drawable.play_arrow_40px),
+                if (isPlaying) painterResource(R.drawable.pause)
+                    else painterResource(R.drawable.play),
                 "Play / Pause",
-                Modifier.padding(7.dp)
+                Modifier.padding(5.dp),
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
         FilledIconButton(

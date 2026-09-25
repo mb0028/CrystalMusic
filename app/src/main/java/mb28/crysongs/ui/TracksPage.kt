@@ -20,26 +20,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.core.Settings
 import mb28.crysongs.isReloading
+import mb28.crysongs.memUsage
 import mb28.crysongs.tracks
+import mb28.crysongs.ui.other.CacheCoversCard
 import mb28.crysongs.ui.other.ShuffleButton
 import mb28.crysongs.ui.other.TrackTile
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TracksList(modifier: Modifier = Modifier) {
+fun TracksList() {
     val state = rememberLazyListState()
     LazyColumn(
         contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = state,
     ) {
+        val count = tracks.count()
         item {
+            if (Settings.tips_cacheThumbs) {
+                CacheCoversCard(
+                    Modifier.fillMaxWidth().padding(horizontal = 15.dp)
+                )
+            }
             Text(
-                "All Tracks (${tracks.count()})", fontSize = 36.sp, textAlign = TextAlign.Center,
+                "All Tracks (${count})", fontSize = 36.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(33.dp))
+            if (Settings.experimental) {
+                Spacer(Modifier.height(10.dp))
+                Text("experimental features are on\njvm memory usage: ${memUsage / 1024 / 1024}mb",
+                    textAlign = TextAlign.Center, fontSize = 13.sp)
+            } else {
+                Spacer(Modifier.height(33.dp))
+            }
         }
 
         item {
@@ -52,7 +67,6 @@ fun TracksList(modifier: Modifier = Modifier) {
         }
 
         if (!isReloading) {
-            val count = tracks.count()
             items(count) { i ->
                 TrackTile(tracks[i], i, count)
             }

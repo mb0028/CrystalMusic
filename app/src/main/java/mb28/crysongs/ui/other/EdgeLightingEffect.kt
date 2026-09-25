@@ -2,7 +2,6 @@ package mb28.crysongs.ui.other
 
 import android.app.Activity
 import android.view.RoundedCorner
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke

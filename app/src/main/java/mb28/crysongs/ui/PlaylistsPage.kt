@@ -1,5 +1,6 @@
 package mb28.crysongs.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
@@ -72,6 +73,10 @@ fun PlaylistsPage() {
         MutableTransitionState(false).apply {
             targetState = true
         }
+    }
+
+    if (playlistView) {
+        BackHandler { playlistView = false }
     }
 
     fun save(newName: String = plName) {
@@ -167,12 +172,10 @@ fun PlaylistsPage() {
                         plName = pl.first().removePrefix("Name -> ")
                         pl.forEach { plItem ->
                             if (plItem.startsWith("Music -> ")) {
-                                val path = plItem.substring(9)
-                                if (plItem.contains(path)) {
+                                val path = plItem.substring(9).replaceFirst("storage/emulated/0", "sdcard")
                                     val t = tracks.find { it.path == path }
                                     if (t != null) {
                                         songs.add(t)
-                                    }
                                 }
                             }
                         }

@@ -53,7 +53,7 @@ fun QueryPage() {
                 )
                 Spacer(Modifier.height(15.dp))
                 Text(
-                    "Query only shows last 4 & next 10 tracks.\nTo see more, play one of next/previous tracks",
+                    "Query only shows last 4 & next 10 tracks\n ",
                     fontSize = 16.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

@@ -3,7 +3,6 @@ package mb28.crysongs.ui
 import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalToggleButton
@@ -91,7 +89,7 @@ fun MiniPlayer(secondSet: MutableState<Boolean>, context: Activity) {
                 .fillMaxWidth()
                 .height(80.dp)
                 .padding(start = 5.dp)
-                .clip(RoundedCornerShape(35.dp))
+                .clip(CircleShape)
                 .background(
                     MaterialTheme.colorScheme.inversePrimary.copy(0.9f),
                     shape = CircleShape

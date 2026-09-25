@@ -128,7 +128,7 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
         Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                { Text("Tag Editor") },
+                { Text("Tag Editor (Experimental)") },
                 navigationIcon = {
                     IconButton(
                         { activity.finish() },

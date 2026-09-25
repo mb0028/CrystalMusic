@@ -4,25 +4,26 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.ComponentName
-import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.audiofx.Visualizer
-import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.util.fastForEach
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
@@ -63,13 +64,13 @@ val nowPlayingCover get() = pNowPlayingCover?.asImageBitmap() ?: noCoverBitmap!!
 var lrcParser: LrcParser? by mutableStateOf(null)
 var lastLrcLine by mutableStateOf("")
 var lastLrcLineI by mutableIntStateOf(-1)
+var memUsage by mutableLongStateOf(0L)
 
 
-var albums = mutableStateListOf<String>()
-var artists = mutableStateListOf<String>()
-var genres = mutableStateListOf<String>()
-var composers = mutableStateListOf<String>()
-var folders = mutableStateListOf<String>()
+var albums = mutableStateSetOf<String>()
+var artists = mutableStateSetOf<String>()
+var genres = mutableStateSetOf<String>()
+var folders = mutableStateSetOf<String>()
 var tracks = mutableStateListOf<Track>()
 var playerQuery = mutableStateListOf<Track>()
 var displayQuery = mutableStateListOf<Track>()
@@ -117,14 +118,21 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
 
 fun playNextOrPrevious(next: Boolean = true) {
     val add = if (next) 1 else -1
+    val count = playerQuery.count()
+    var i = (nowPlayingI + add).coerceIn(0, count)
+    if (i == count) {
+        i = 0
+    }
     setAndPlay(
-        playerQuery[(nowPlayingI + add).coerceIn(0, playerQuery.count() - 1)],
+        playerQuery[i],
         false
     )
 }
 
 @OptIn(UnstableApi::class)
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
+    val rt = Runtime.getRuntime()
+
     while (true) {
         isPlaying = player.isPlaying
         // Pos needs to update even when player is paused for seekbar
@@ -176,6 +184,10 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
             }
         }
 
+        if (Settings.experimental) {
+            memUsage = rt.totalMemory() - rt.freeMemory()
+        }
+
         delay(playerLoopDelay)
     }
 }
@@ -190,8 +202,9 @@ fun updateDisplayQuery() {
 }
 
 fun refreshTracksList(context: Context) {
+    println("Refreshing")
     tracks.clear(); folders.clear(); albums.clear()
-    artists.clear(); genres.clear(); composers.clear()
+    artists.clear(); genres.clear()
 
     val projection = arrayOf(
         MediaStore.MediaColumns.DATA,
@@ -200,11 +213,9 @@ fun refreshTracksList(context: Context) {
         MediaStore.Video.Media.ARTIST,
         MediaStore.Video.Media.ALBUM,
         MediaStore.Video.Media.GENRE,
-        MediaStore.Video.Media.COMPOSER,
         MediaStore.Video.Media.DURATION,
         MediaStore.Video.Media.BITRATE,
         MediaStore.Video.Media.YEAR,
-        MediaStore.Video.Media.ALBUM_ARTIST,
     )
 
     context.contentResolver.query(
@@ -215,69 +226,45 @@ fun refreshTracksList(context: Context) {
         when(Settings.sortBy) {
             0 -> MediaStore.Audio.Media.DATE_MODIFIED
             else -> MediaStore.Audio.Media.TITLE
-        } + " ${if (Settings.sortOrderDesc) "DESC" else "ASC"}",
+        } + " ${Settings.getSorting}",
 
         )?.use { cursor ->
-        val idc = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
         val pc = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
         val titleC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
         val artistC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
         val albumC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
         val genreC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
-        val composerC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
         val durationC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
         val bitrateC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BITRATE)
         val yearC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
-        val aaC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ARTIST)
 
         while (cursor.moveToNext()) {
-            val id = cursor.getLong(idc)
-            val path = cursor.getString(pc)
-            val contentUri: Uri = ContentUris.withAppendedId(
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                id
-            )
-
+            val path = cursor.getString(pc).replaceFirst("storage/emulated/0", "sdcard")
             val track = Track(
-                contentUri,
                 path,
                 cursor.getString(titleC) ?: "???",
                 cursor.getString(artistC) ?: "???",
                 cursor.getString(albumC) ?: "???",
                 cursor.getString(genreC) ?: "???",
-                cursor.getString(composerC) ?: "???",
                 cursor.getLong(durationC),
                 cursor.getInt(bitrateC),
                 cursor.getString(yearC) ?: "???",
-                cursor.getString(aaC) ?: "???",
             )
             tracks += track
-
-            val folder = File(path).parent
-            if (folder != null && !folders.contains(folder)) {
-                folders.add(folder)
-            }
-            track.run {
-                if (album != "???" && !albums.contains(album)) {
-                    albums.add(album)
-                }
-                if (artist != "???" && !artists.contains(artist)) {
-                    artists.add(artist)
-                }
-                if (genre != "???" && !genres.contains(genre)) {
-                    genres.add(genre)
-                }
-                if (composer != "???" && !composers.contains(composer)) {
-                    composers.add(composer)
-                }
-            }
         }
     }
-    folders.sort()
-    artists.sort()
-    albums.sort()
-    genres.sort()
-    composers.sort()
+    tracks.fastForEach {
+        it.run {
+            val folder = File(path).parent
+            if (folder != null) {
+                folders.add(folder)
+            }
+            albums.add(album)
+            artists.add(artist)
+            genres.add(genre)
+        }
+    }
+    println("Refresh completed")
 }
 
 fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
@@ -295,10 +282,7 @@ fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
                         override fun onPlaybackStateChanged(playbackState: Int) {
                             if (playbackState == Player.STATE_ENDED) {
                                 try {
-                                    setAndPlay(
-                                        playerQuery[(playerQuery.indexOf(nowPlaying) + 1).coerceIn(0, playerQuery.count() - 1)],
-                                        false
-                                    )
+                                    playNextOrPrevious(true)
                                 } catch (_: Exception) { }
                             }
                             super.onPlaybackStateChanged(playbackState)

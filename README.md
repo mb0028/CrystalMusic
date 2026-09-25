@@ -1,28 +1,31 @@
 # Crystal Songs
 
-Android music player app designed for local library, simplicity & performance, without any unnecessary futures.
+Android music player app designed for local library, simplicity & performance.
 
 ## Features
 
 - 🪶 Simple UI, easy to navigate
-- ✨ Play any audio format, include mp3, m4a, flac, wav, ogg, ...
+- ✨ Play any audio format
 - 📃 Live notification that shows lyrics if LRC file for music is available
 - 🍃 Material 3 expressive
 - 🧱 Homescreen widgets
-- 📦 Only 5.5 megabytes
+- 📦 Only 7 megabytes
 - 🟢 Android 11+ and TV support
 
 To-Do
-- [ ] Tag editor
-- [ ] Online lyric finder & downloader
+- [x] Tag editor
 - [ ] Add edge lighting effect
 - [ ] Widget settings
-- [ ] Better landscape support
-- [ ] History system. like most played track - total/daily/weekly listening time
-- [x] ~~Support for android 12 and 11~~
-- [x] ~~Home widget~~
+- [ ] Favorite folders/albums/artists
+- [ ] Better landscape  support
+- [ ] Online lyric finder & downloader
+
+[//]: # (- [x] ~~Support for android 12 and 11~~)
+[//]: # (- [x] ~~Home widget~~)
 
 ## Screenshots
+
+Screenshots are taken in v1.1.0
 
 |                           | Light                          | Dark                           |
 |---------------------------|--------------------------------|--------------------------------|

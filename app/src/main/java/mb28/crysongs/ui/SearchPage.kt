@@ -33,29 +33,6 @@ import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 
-private var searchPageSearchText by mutableStateOf("")
-private var searchResult = mutableStateListOf<Track>()
-
-fun searchPageResearch(input: String) {
-    searchPageSearchText = input
-    searchResult.clear()
-    if (input == "#fav") {
-        tracks.fastForEach { track ->
-            if (Settings.favorites.contains(track.path)) {
-                searchResult.add(track)
-            }
-        }
-    }
-    else if (input.isNotBlank()) {
-        tracks.fastForEach { track ->
-            if (track.title.lowercase().contains(input.lowercase())
-                || track.artist.lowercase().contains(input.lowercase())) {
-                searchResult.add(track)
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SearchPage() {
@@ -64,6 +41,30 @@ fun SearchPage() {
             targetState = true
         }
     }
+
+    var searchPageSearchText by remember { mutableStateOf("") }
+    val searchResult = remember { mutableStateListOf<Track>() }
+
+    fun searchPageResearch(input: String) {
+        searchPageSearchText = input
+        searchResult.clear()
+        if (input == "#fav") {
+            tracks.fastForEach { track ->
+                if (Settings.favorites.contains(track.path)) {
+                    searchResult.add(track)
+                }
+            }
+        }
+        else if (input.isNotBlank()) {
+            tracks.fastForEach { track ->
+                if (track.title.lowercase().contains(input.lowercase())
+                    || track.artist.lowercase().contains(input.lowercase())) {
+                    searchResult.add(track)
+                }
+            }
+        }
+    }
+
     AnimatedVisibility(
         visibleState = state,
         enter = pageAnimation,

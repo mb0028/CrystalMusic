@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
@@ -17,19 +18,22 @@ import kotlin.random.Random
 class TodaysTrackNotif : BroadcastReceiver() {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
-        refreshTracksList(context)
-        val track = tracks.shuffled(Random(System.currentTimeMillis())).first()
-        val nm = NotificationManagerCompat.from(context)
-        val n = NotificationCompat.Builder(context, CHANNEL_TODAYS_MUSIC)
-            .setSmallIcon(IconCompat.createWithResource(context, R.drawable.music_note_24px))
-            .setContentTitle("Today's music")
-            .setContentText("${track.title} - ${track.artist}")
-            .build()
+        val h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        if (h in 7..8) {
+            refreshTracksList(context)
+            try {
+                val track = tracks.shuffled(Random(System.currentTimeMillis())).first()
+                val nm = NotificationManagerCompat.from(context)
+                val n = NotificationCompat.Builder(context, CHANNEL_TODAYS_MUSIC)
+                    .setSmallIcon(IconCompat.createWithResource(context, R.drawable.music_note_24px))
+                    .setContentTitle("Today's music")
+                    .setContentText("${track.title} - ${track.artist}")
+                    .build()
 
-        if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            nm.notify(0, n)
+                if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    nm.notify(8, n)
+                }
+            } catch (_: Exception) { }
         }
-
-        scheduleNotifications(context)
     }
 }

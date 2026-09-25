@@ -9,10 +9,12 @@ import android.transition.Slide
 import android.view.RoundedCorner
 import android.view.Window
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +41,7 @@ import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -71,6 +74,7 @@ import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
 import mb28.crysongs.ui.other.audioBand
 import mb28.crysongs.ui.theme.CrySongsTheme
+import kotlin.coroutines.cancellation.CancellationException
 
 const val EXTRA_LOAD_FROM_OTHER_APPS = "EXTRA_LOAD_FROM_OTHER_APPS"
 const val EXTRA_PATH = "EXTRA_PATH"
@@ -126,13 +130,21 @@ class FullscreenPlayerActivity : ComponentActivity() {
         }
         super.onCreate(savedInstanceState)
 
+
         setContent {
+            var backHeld by remember { mutableStateOf(false) }
             var activityOffset by remember { mutableIntStateOf(0) }
+            val animateOffset by animateIntAsState(if (backHeld) 800 else 0)
             CrySongsTheme {
+                PredictiveBackHandler { progress ->
+                    backHeld = true
+                    try { progress.collect { }; finish() }
+                    catch (_: CancellationException) { backHeld = false }
+                }
                 Scaffold(
                     Modifier
                         .fillMaxSize()
-                        .offset { IntOffset(0, activityOffset) }
+                        .offset { IntOffset(0, activityOffset + animateOffset) }
                         .pointerInput(Unit) {
                             fun onRelease() {
                                 if (activityOffset > 200) {
@@ -153,7 +165,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
                     containerColor = Color.Transparent,
                     contentColor = if (Settings.whiteText) Color.White else MaterialTheme.colorScheme.onSurface
                 ) { innerPadding ->
-                    Pager(innerPadding, this, activityOffset)
+                    Pager(innerPadding, this, activityOffset + animateOffset)
                 }
             }
         }

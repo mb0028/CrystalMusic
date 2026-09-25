@@ -1,6 +1,24 @@
 ## v1.3.0 (Upcoming)
+
+Performance:
+- App ram usage reduced by 20%
+- indexing time reduced by 65%
+- .crym3u playlists size decreased by 14%
+- App performance is ~25% better than older versions
+- Add option to cache all thumbnails so app doesn't lag when loading thumbnails for the first time
+
+Changes:
 - Add tag editor
 - Fullscreen player now shows all now playing tags
+- Query is now restarts when it reaches the end instead of looping last track
+- Navigation back button/gesture now works when a playlist/folder/album/... is opened
+- Add option to change order and default navigation tab
+- Add hierarchy mode for folders tab
+- Insane amount of improvements. Some:
+  - Add predictive back animations
+  - Seekbar improvements
+  - Fix permissions page background is always white
+  - Update material design library to 1.5.0-alpha29
 
 ## v1.2.1
 - Move some settings out of experimental

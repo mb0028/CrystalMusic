@@ -15,8 +15,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 31
         targetSdk = 37
-        versionCode = 9
-        versionName = "v1.2.1-2026.09.23"
+        versionCode = 10
+        versionName = "v1.3.0-2026.09.26"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,7 +45,8 @@ android {
 }
 
 dependencies {
-    implementation("com.github.maxbruecken:jaudiotagger-android:master")
+    implementation(libs.jaudiotagger.android)
+    implementation(libs.jsoup)
 
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)

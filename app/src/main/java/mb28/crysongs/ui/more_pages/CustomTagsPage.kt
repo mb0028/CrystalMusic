@@ -1,5 +1,6 @@
 package mb28.crysongs.ui.more_pages
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -36,7 +37,7 @@ import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 
 @Composable
-fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
+fun CustomTagsPage(list: SnapshotStateSet<String>, listType: String) {
     var listItemsView by remember { mutableStateOf(false) }
     var clickedListItem by remember { mutableStateOf("") }
     val state = remember {
@@ -57,12 +58,13 @@ fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
             "genres" -> listTracks.removeIf {
                 it.genre != clickedListItem
             }
-            "composers" -> listTracks.removeIf {
-                it.composer != clickedListItem
-            }
             else -> { listTracks.clear() }
         }
         return listTracks
+    }
+
+    if (listItemsView) {
+        BackHandler { listItemsView = false }
     }
 
     AnimatedVisibility(
@@ -130,14 +132,14 @@ fun CustomTagsPage(list: SnapshotStateList<String>, listType: String) {
             } else {
                 val count = list.count()
                 items(count) { i ->
-                    val f = list[i]
+                    val f = list.elementAt(i)
                     EasySegmentedListItem(
                         null,
                         f,
                         i, count,
                         Modifier.padding(horizontal = 10.dp)
                     ) {
-                        clickedListItem = list[i]
+                        clickedListItem = list.elementAt(i)
                         listItemsView = true
                     }
                 }
