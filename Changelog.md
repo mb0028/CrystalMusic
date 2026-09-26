@@ -1,8 +1,8 @@
-## v1.3.0 (Upcoming)
+## v1.3.0
 
 Performance:
 - App ram usage reduced by 80%
-- Refreshing time reduced by 75%
+- Refreshing time reduced by 75%. Closed [#1](https://github.com/mb0028/CrystalMusic/issues/1)
 - App performance is now 5 times better
 - Add option to cache all thumbnails with one click
 
@@ -11,8 +11,8 @@ Changes:
 - Fullscreen player now shows all now playing tags
 - Query is now restarts when it reaches the end instead of looping last track
 - Navigation back button/gesture now works when a playlist/folder/album/... is opened
-- Add option to change order and default navigation tab
-- Add hierarchy mode for folders tab
+- Add option to change order and default navigation tab. Closed [#2](https://github.com/mb0028/CrystalMusic/issues/2)
+- Add hierarchy mode for folders tab. Closed [#2](https://github.com/mb0028/CrystalMusic/issues/2)
 - Insane amount of improvements. Some:
   - Add predictive back animations
   - Seekbar improvements
