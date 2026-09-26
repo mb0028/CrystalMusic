@@ -179,7 +179,9 @@ fun FoldersPage() {
                                 it, count,
                                 resetQueryOnClick = false
                             ) {
-                                playerQuery = files.map { f -> f.path }.toMutableStateList()
+                                val q = files.map { f -> f.path }.toMutableList()
+                                q.removeIf { !isAudioFile(it) }
+                                playerQuery = q.toMutableStateList()
                                 updateDisplayQuery()
                             }
                         }

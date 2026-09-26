@@ -1,6 +1,7 @@
 package mb28.crysongs
 
 import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,12 +49,14 @@ class CacheCoversActivity : ComponentActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             tracks.fastForEachIndexed { i, path ->
-                Track.createOrGetThumbnail(path)
-                with(File("${Settings.appCacheThumbsFolder}/${nowPlaying!!.hashCode()}.color")) {
-                    if (!exists())
-                        writeText(privateNowPlayingCover!!.asImageBitmap().themeColors(1,
-                            Color.Blue).first().toArgb().toString())
+                Track.createOrGetThumbnail(path)?.let {
+                    with(File("${Settings.appCacheThumbsFolder}/${path.hashCode()}.color")) {
+                        if (!exists())
+                            writeText(BitmapFactory.decodeFile(it).asImageBitmap().themeColors(1,
+                                Color.Blue).first().toArgb().toString())
+                    }
                 }
+
                 last = path
                 progress = i
             }

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mb28.crysongs.canChangeTrack
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.displayQuery
 import mb28.crysongs.displayQueryMA
@@ -70,7 +71,7 @@ fun QueryPage() {
                 }
             }
 
-            if (isReloading) {
+            if (isReloading || !canChangeTrack) {
                 item {
                     Box(Modifier.fillMaxSize(), Alignment.Center) {
                         ContainedLoadingIndicator()

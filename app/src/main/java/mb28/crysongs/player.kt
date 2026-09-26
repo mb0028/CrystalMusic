@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.audiofx.Visualizer
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
@@ -247,12 +248,16 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 }
 
 fun updateDisplayQuery() {
-    val pqc = playerQuery.count()
-    val first = (nowPlayingI - 4).coerceAtLeast(0)
-    val last = (nowPlayingI + 11).coerceAtMost(pqc)
-    displayQuery = playerQuery.subList(first,last).toMutableStateList()
-    displayQueryMB = playerQuery.subList(0, first).count()
-    displayQueryMA = playerQuery.subList(last, pqc).count()
+    try {
+        val pqc = playerQuery.count()
+        val first = (nowPlayingI - 4).coerceIn(0, pqc)
+        val last = (nowPlayingI + 11).coerceIn(0, pqc)
+        displayQuery = playerQuery.subList(first, last).toMutableStateList()
+        displayQueryMB = playerQuery.subList(0, first).count()
+        displayQueryMA = playerQuery.subList(last, pqc).count()
+    } catch (e: Exception) {
+        Log.e("Crystal Songs - updateDisplayQuery", e.toString())
+    }
 }
 
 suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
