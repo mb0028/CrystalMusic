@@ -51,7 +51,7 @@ import java.io.File
 private val external = Environment.getExternalStorageDirectory().path
 private val tree = mutableStateListOf(external)
 private val uselessDirs = listOf("Android", "DCIM", "Pictures", "Movies", ".trash-storage")
-private val uselessDirsLevel2 = listOf("Podcasts", "Ringtones", "Alarms", "Notifications", "Audiobooks")
+private val moreUselessDirs = listOf("Podcasts", "Ringtones", "Alarms", "Notifications", "Audiobooks")
 
 private fun isAudioFile(path: String) : Boolean {
     return path.endsWith(".mp3") || path.endsWith(".m4a") ||
@@ -164,10 +164,10 @@ fun FoldersPage() {
                         val file = files[it]
                         val fPath = file.path
                         val isUseless = uselessDirs.contains(fPath.removePrefix("$external/"))
-                        val isUseless2 = Settings.hideSystemSounds && uselessDirsLevel2.contains(fPath.removePrefix("$external/"))
+                        val isUseless2 = Settings.hideSystemSounds && moreUselessDirs.contains(fPath.removePrefix("$external/"))
                         if (file.isDirectory && !isUseless && !isUseless2) {
                             EasySegmentedListItem(
-                                folder,
+                                if (Settings.hideSystemSounds) null else folder,
                                 fPath.substring(fPath.lastIndexOf('/') + 1),
                                 it, count,
                                 Modifier.padding(horizontal = 10.dp)

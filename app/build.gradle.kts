@@ -23,13 +23,13 @@ android {
 
     buildTypes {
         release {
+            isProfileable = true
             isMinifyEnabled = true
             isShrinkResources = true
             optimization {
                 enable = false
             }
             proguardFiles.add(File("src/main/keepRules/rules.keep"))
-            isProfileable = true
         }
     }
     compileOptions {

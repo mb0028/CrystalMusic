@@ -13,19 +13,19 @@ Android music player app designed for local library, simplicity & performance.
 - 🟢 Android 11+ and TV support
 
 To-Do
-- [x] Tag editor
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Favorite folders/albums/artists
-- [ ] Better landscape  support
+- [ ] Better landscape support
 - [ ] Online lyric finder & downloader
+- [x] ~~Tag editor~~
 
 [//]: # (- [x] ~~Support for android 12 and 11~~)
 [//]: # (- [x] ~~Home widget~~)
 
 ## Screenshots
 
-Screenshots are taken in v1.1.0
+Screenshots are taken in v1.3.0
 
 |                           | Light                          | Dark                           |
 |---------------------------|--------------------------------|--------------------------------|

@@ -2,6 +2,7 @@ package mb28.crysongs
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
@@ -84,6 +85,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+        window.decorView.setBackgroundColor(Color.BLACK)
 
         if (!Environment.isExternalStorageManager() ||
             !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
@@ -153,21 +155,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Box {
                         when (selectedIndex.intValue) {
-                            0 -> {
-                                var refreshing by remember { mutableStateOf(false) }
-                                PullToRefreshBox(
-                                    refreshing,
-                                    {
-                                        refreshing = true
-                                        lifecycleScope.launch {
-                                            refreshTracksList(this@MainActivity)
-                                            refreshing = false
-                                        }
-                                    }
-                                ) {
-                                    TracksList()
-                                }
-                            }
+                            0 -> TracksList()
                             1 -> QueryPage()
                             2 -> PlaylistsPage()
                             3 -> FoldersPage()

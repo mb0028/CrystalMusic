@@ -46,6 +46,7 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.R
+import mb28.crysongs.canChangeTrack
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.duration
 import mb28.crysongs.icons.swap_horiz
@@ -55,6 +56,7 @@ import mb28.crysongs.nowPlayingCover
 import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
+import mb28.crysongs.playerQuery
 import mb28.crysongs.position
 import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.time.Duration.Companion.milliseconds
@@ -162,7 +164,8 @@ private fun PlayPauseNextPrevious() {
         IconButton(
             {
                 playNextOrPrevious(false)
-            }
+            },
+            enabled = playerQuery.isNotEmpty() && canChangeTrack,
         ) {
             Icon(painterResource(R.drawable.skip_previous_24px), null)
         }
@@ -183,7 +186,8 @@ private fun PlayPauseNextPrevious() {
         IconButton(
             {
                 playNextOrPrevious()
-            }
+            },
+            enabled = playerQuery.isNotEmpty() && canChangeTrack,
         ) {
             Icon(painterResource(R.drawable.skip_next_24px), null)
         }

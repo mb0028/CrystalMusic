@@ -117,6 +117,7 @@ object Settings {
                     s.startsWith("[Hierarchy]") -> hierarchyView = s.removePrefix("[Hierarchy]").toBooleanStrict()
                     s.startsWith("[TipsCacheCovers]") -> tips_cacheThumbs = s.removePrefix("[TipsCacheCovers]").toBooleanStrict()
                     s.startsWith("[InitTab]") -> initTab = s.removePrefix("[InitTab]").toInt()
+                    s.startsWith("[HierarchyCompact]") -> hideSystemSounds = s.removePrefix("[HierarchyCompact]").toBooleanStrict()
                 }
             }
         } else {
@@ -151,6 +152,7 @@ object Settings {
         data += "[ELHue3]$edgeLightingHue3\n[ELHue4]$edgeLightingHue4\n"
 
         data += "[Hierarchy]$hierarchyView\n"
+        data += "[HierarchyCompact]$hideSystemSounds\n"
         data += "[TipsCacheCovers]$tips_cacheThumbs\n"
 
         data += "\n"

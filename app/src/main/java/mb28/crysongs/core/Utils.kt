@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
 import kotlin.time.Duration
@@ -50,6 +51,13 @@ fun updateNotification(nm: NotificationManager, context: Activity, lyric: String
         .setShortCriticalText(lyric)
         .setOngoing(true)
         .setRequestPromotedOngoing(true)
+        .setContentIntent(
+            context.createPendingResult( //TODO: fix
+                800,
+                Intent(context, FullscreenPlayerActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        )
         .build()
 
     if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

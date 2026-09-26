@@ -34,6 +34,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import mb28.crysongs.MainActivity
 import mb28.crysongs.R
+import mb28.crysongs.canChangeTrack
 import mb28.crysongs.isPlaying
 import mb28.crysongs.lastLrcLine
 import mb28.crysongs.nowPlayingTags
@@ -103,7 +104,8 @@ private fun PlaybackControls() {
                         controlPlayback(2, context)
                     },
                     backgroundColor = GlanceTheme.colors.tertiary,
-                    contentColor = GlanceTheme.colors.onTertiary
+                    contentColor = GlanceTheme.colors.onTertiary,
+                    enabled = canChangeTrack
                 )
                 Spacer(GlanceModifier.width(5.dp))
                 SquareIconButton(
@@ -122,7 +124,8 @@ private fun PlaybackControls() {
                         controlPlayback(3, context)
                     },
                     backgroundColor = GlanceTheme.colors.secondary,
-                    contentColor = GlanceTheme.colors.onSecondary
+                    contentColor = GlanceTheme.colors.onSecondary,
+                    enabled = canChangeTrack
                 )
 
                 Spacer(GlanceModifier.width(10.dp))

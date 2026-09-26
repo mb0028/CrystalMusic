@@ -26,6 +26,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.size
 import mb28.crysongs.MainActivity
 import mb28.crysongs.R
+import mb28.crysongs.canChangeTrack
 import mb28.crysongs.isPlaying
 import mb28.crysongs.privateNowPlayingCover
 
@@ -92,7 +93,8 @@ private fun Turntable() {
                     controlPlayback(3, context)
                 },
                 backgroundColor = GlanceTheme.colors.tertiary,
-                contentColor = GlanceTheme.colors.onTertiary
+                contentColor = GlanceTheme.colors.onTertiary,
+                enabled = canChangeTrack
             )
         }
     }

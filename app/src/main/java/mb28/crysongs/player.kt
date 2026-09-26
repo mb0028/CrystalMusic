@@ -85,6 +85,7 @@ var displayQueryMA by mutableIntStateOf(0)
 
 var isPlayerLoopStarted by mutableStateOf(false)
 var isReloading by mutableStateOf(false)
+var canChangeTrack by mutableStateOf(true)
 var isPlaying by mutableStateOf(false)
 var position by mutableLongStateOf(0L)
 var duration by mutableLongStateOf(0L)
@@ -179,7 +180,6 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
     while (true) {
         position = player.currentPosition
-
         if (nowPlaying != null && isPlaying) {
             if (lrcParser != null) {
                 val line = lrcParser!!.LineByAudioPosition(position)
@@ -198,32 +198,30 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
+                canChangeTrack = false
+                PlayerWidget().updateAll(context)
                 nowPlayingTags = Track.getTags(nowPlaying, context)
                 val coverPath = Track.createOrGetThumbnail(nowPlaying!!)
 
                 if (coverPath != null) {
                     withContext(Dispatchers.IO) {
-                        while (!isReloading) {
-                            println("hahaha") //TODO: remove
-                            privateNowPlayingCover = BitmapFactory.decodeFile(coverPath)
-                            if (Settings.useCoverColor && privateNowPlayingCover != null) {
-                                val color = File("${Settings.appCacheThumbsFolder}/${nowPlaying!!.hashCode()}.color")
-                                trackCoverPrimary = if (color.exists()) {
-                                    Color(color.readText().toInt())
-                                } else {
-                                    val acc = privateNowPlayingCover!!.asImageBitmap().themeColors(
-                                        1, Color.Blue).first()
-                                    color.writeText(acc.toArgb().toString())
-                                    acc
-                                }
-                                notificationColor = trackCoverPrimary?.toArgb()
+                        privateNowPlayingCover = BitmapFactory.decodeFile(coverPath)
+                        if (Settings.useCoverColor && privateNowPlayingCover != null) {
+                            val color = File("${Settings.appCacheThumbsFolder}/${nowPlaying!!.hashCode()}.color")
+                            trackCoverPrimary = if (color.exists()) {
+                                Color(color.readText().toInt())
                             } else {
-                                notificationColor = null
-                                trackCoverPrimary = null
+                                val acc = privateNowPlayingCover!!.asImageBitmap().themeColors(
+                                    1, Color.Blue).first()
+                                color.writeText(acc.toArgb().toString())
+                                acc
                             }
-                            return@withContext
+                            notificationColor = trackCoverPrimary?.toArgb()
+                        } else {
+                            notificationColor = null
+                            trackCoverPrimary = null
                         }
-                        cancel()
+                        return@withContext
                     }
                 } else privateNowPlayingCover = null
 
@@ -234,9 +232,9 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                     favoriteRemoveButton else favoriteAddButton, nextButton, aaa, previousButton)
                 mediaSession?.setMediaButtonPreferences(notifBtn)
 
-                PlayerWidget().updateAll(context)
                 duration = player.duration
                 lastNowPlaying = nowPlaying
+                canChangeTrack = true
             }
         }
 

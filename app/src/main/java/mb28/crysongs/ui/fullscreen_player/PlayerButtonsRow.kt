@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import mb28.crysongs.R
+import mb28.crysongs.canChangeTrack
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.loopTrack
 import mb28.crysongs.icons.favorite
@@ -67,7 +68,7 @@ fun FSPlayerButtonsRow() {
             {
                 playNextOrPrevious(false)
             },
-            enabled = playerQuery.isNotEmpty(),
+            enabled = playerQuery.isNotEmpty() && canChangeTrack,
             colors = IconButtonDefaults.filledIconButtonColors(
                 MaterialTheme.colorScheme.tertiary,
                 MaterialTheme.colorScheme.onTertiary
@@ -101,7 +102,7 @@ fun FSPlayerButtonsRow() {
             {
                 playNextOrPrevious()
             },
-            enabled = playerQuery.isNotEmpty()
+            enabled = playerQuery.isNotEmpty() && canChangeTrack
         ) {
             Icon(painterResource(R.drawable.skip_next_24px), null)
         }
