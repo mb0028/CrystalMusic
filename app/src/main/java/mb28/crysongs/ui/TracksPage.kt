@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings
-import mb28.crysongs.isReloading
 import mb28.crysongs.memUsage
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.CacheCoversCard
@@ -66,7 +65,7 @@ fun TracksList() {
             }
         }
 
-        if (!isReloading) {
+        if (count != 0) {
             items(count) { i ->
                 TrackTile(tracks[i], i, count)
             }

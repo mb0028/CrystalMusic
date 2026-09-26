@@ -19,14 +19,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.lifecycle.lifecycleScope
+import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
 import mb28.crysongs.ui.theme.CrySongsTheme
+import java.io.File
 
 
 class CacheCoversActivity : ComponentActivity() {
@@ -34,6 +39,7 @@ class CacheCoversActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
+        window.decorView.keepScreenOn = true
         super.onCreate(savedInstanceState)
 
         val count = tracks.count().toFloat()
@@ -41,9 +47,14 @@ class CacheCoversActivity : ComponentActivity() {
         var progress by mutableIntStateOf(1)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            tracks.fastForEachIndexed { i, track ->
-                Track.createOrGetThumbnail(track.path)
-                last = track.path
+            tracks.fastForEachIndexed { i, path ->
+                Track.createOrGetThumbnail(path)
+                with(File("${Settings.appCacheThumbsFolder}/${nowPlaying!!.hashCode()}.color")) {
+                    if (!exists())
+                        writeText(privateNowPlayingCover!!.asImageBitmap().themeColors(1,
+                            Color.Blue).first().toArgb().toString())
+                }
+                last = path
                 progress = i
             }
             Settings.tips_cacheThumbs = false
@@ -64,9 +75,16 @@ class CacheCoversActivity : ComponentActivity() {
                         LinearWavyProgressIndicator(
                             { progress.toFloat() / count }
                         )
+                        Spacer(Modifier.height(10.dp))
+                        Text("Screen stays on until caching is finished") // .\n Have a coffee
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        window.decorView.keepScreenOn = false
+        super.onDestroy()
     }
 }

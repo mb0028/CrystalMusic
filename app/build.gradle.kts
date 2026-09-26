@@ -29,6 +29,7 @@ android {
                 enable = false
             }
             proguardFiles.add(File("src/main/keepRules/rules.keep"))
+            isProfileable = true
         }
     }
     compileOptions {

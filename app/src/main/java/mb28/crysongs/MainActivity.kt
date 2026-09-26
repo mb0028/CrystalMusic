@@ -55,15 +55,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.settings
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
-import mb28.crysongs.ui.PlaylistsPage
-import mb28.crysongs.ui.QueryPage
-import mb28.crysongs.ui.SearchPage
+import mb28.crysongs.ui.more_pages.PlaylistsPage
+import mb28.crysongs.ui.more_pages.QueryPage
+import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
@@ -100,8 +102,11 @@ class MainActivity : ComponentActivity() {
             noCoverBitmap = resources.getDrawable(R.drawable.null_track_cover).toBitmap().asImageBitmap()
         }
 
-        refreshTracksList(this@MainActivity)
-        scheduleNotifications(this)
+        lifecycleScope.launch {
+            refreshTracksList(this@MainActivity)
+            scheduleNotifications(this@MainActivity)
+        }
+
 
         setContent {
             var backHeld by remember { mutableStateOf(false) }
@@ -149,12 +154,15 @@ class MainActivity : ComponentActivity() {
                     Box {
                         when (selectedIndex.intValue) {
                             0 -> {
-                                var refing by remember { mutableStateOf(false) }
+                                var refreshing by remember { mutableStateOf(false) }
                                 PullToRefreshBox(
-                                    refing,
+                                    refreshing,
                                     {
-                                        refreshTracksList(this@MainActivity)
-                                        refing = false
+                                        refreshing = true
+                                        lifecycleScope.launch {
+                                            refreshTracksList(this@MainActivity)
+                                            refreshing = false
+                                        }
                                     }
                                 ) {
                                     TracksList()
@@ -163,10 +171,11 @@ class MainActivity : ComponentActivity() {
                             1 -> QueryPage()
                             2 -> PlaylistsPage()
                             3 -> FoldersPage()
-                            4 -> SearchPage()
-                            5 -> CustomTagsPage(artists, "artists")
-                            6 -> CustomTagsPage(albums, "albums")
-                            7 -> CustomTagsPage(genres, "genres")
+                            4 -> SearchPage(this@MainActivity)
+                            5 -> CustomTagsPage("artists", this@MainActivity)
+                            6 -> CustomTagsPage("albums", this@MainActivity)
+                            7 -> CustomTagsPage("genres", this@MainActivity)
+                            8 -> CustomTagsPage("bitrates", this@MainActivity)
                             else -> {
                                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                     Text("Coming soon!")
@@ -209,10 +218,9 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
                 state,
                 enter = slideInHorizontally { -100 }
             ) {
-                Row { // IDK how to use for in kotlin. TODO: Fix it
-                    "00000".forEachIndexed { i, _ ->
+                Row {
+                    for (i in 0..4)
                         NavTab(i, selectedIndex.intValue == Settings.navTabs[i]) { selectedIndex.intValue = it }
-                    }
                 }
             }
         }
@@ -222,11 +230,9 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
                 state,
                 enter = slideInHorizontally { 100 }
             ) {
-                Row { // IDK how to use for in kotlin. TODO: Fix it
-                    "00000".forEachIndexed { a, _ ->
-                        val i = a + 5
+                Row {
+                    for (i in 5..9)
                         NavTab(i, selectedIndex.intValue == Settings.navTabs[i]) { selectedIndex.intValue = it }
-                    }
                 }
             }
         }

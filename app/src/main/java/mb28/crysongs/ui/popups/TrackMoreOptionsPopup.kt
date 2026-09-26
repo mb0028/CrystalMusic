@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import mb28.crysongs.EXTRA_PATH
 import mb28.crysongs.TagEditorActivity
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Track
 import mb28.crysongs.icons.edit
 import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
@@ -28,20 +27,20 @@ import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.updateDisplayQuery
 
 @Composable
-fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
+fun TrackMoreOptionsPopup(path: String, title: String? = null, onDismissRequired: () -> Unit) {
     val context = LocalContext.current
     var showAddToPL by remember { mutableStateOf(false) }
     AlertDialog(
         { onDismissRequired() },
         { },
         title = {
-            Text(track.title, maxLines = 1)
+            Text(title ?: "???", maxLines = 1)
         },
         text = {
             LazyColumn {
                 val count = 4
                 item {
-                    val contains = Settings.favorites.contains(track.path)
+                    val contains = Settings.favorites.contains(path)
                     EasySegmentedListItem(
                         edit,
                         "Edit tags",
@@ -49,7 +48,7 @@ fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
                     ) {
                         val intent = Intent(context, TagEditorActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            .putExtra(EXTRA_PATH, track.path)
+                            .putExtra(EXTRA_PATH, path)
                         context.startActivity(intent)
                     }
                     EasySegmentedListItem(
@@ -57,7 +56,7 @@ fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
                         if (contains) "Remove from favorites" else "Add to favorites",
                         1, count,
                     ) {
-                        Settings.addOrRemoveFavorite(track.path)
+                        Settings.addOrRemoveFavorite(path)
                     }
                     EasySegmentedListItem(
                         playlist_add,
@@ -72,16 +71,16 @@ fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
                         3, count,
                     ) {
                         if (playerQuery.isEmpty()) {
-                            playerQuery.add(track)
-                            setAndPlay(track, false)
-                        } else if (nowPlaying == track) {
+                            playerQuery.add(path)
+                            setAndPlay(path, false)
+                        } else if (nowPlaying == path) {
                             Toast.makeText(context, "Already playing!", Toast.LENGTH_SHORT).show()
-                        } else if (playerQuery.contains(track)) {
+                        } else if (playerQuery.contains(path)) {
                             playerQuery.run {
-                                add(nowPlayingI + 1, removeAt(indexOf(track)))
+                                add(nowPlayingI + 1, removeAt(indexOf(path)))
                             }
                         } else {
-                            playerQuery.add(nowPlayingI + 1, track)
+                            playerQuery.add(nowPlayingI + 1, path)
                         }
                         updateDisplayQuery()
                         onDismissRequired()
@@ -92,7 +91,7 @@ fun TrackMoreOptionsPopup(track: Track, onDismissRequired: () -> Unit) {
     )
 
     if (showAddToPL) {
-        AddToPlaylistPopup(track) {
+        AddToPlaylistPopup(path) {
             showAddToPL = false
         }
     }

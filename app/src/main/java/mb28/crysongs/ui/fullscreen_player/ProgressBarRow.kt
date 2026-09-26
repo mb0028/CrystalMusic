@@ -49,7 +49,7 @@ fun FSProgressBarRow(modifier: Modifier = Modifier) {
     )
     Row(modifier) {
         TextButton(
-            { player.seekTo((position - 5000).toLong()) }
+            { player.seekTo((position - 5000)) }
         ) {
             Text(formatDurationMs(position.milliseconds))
         }
@@ -84,7 +84,7 @@ fun FSProgressBarRow(modifier: Modifier = Modifier) {
             )
         }
         TextButton(
-            { player.seekTo((position + 5000).toLong()) }
+            { player.seekTo((position + 5000)) }
         ) {
             Text(formatDurationMs(duration.milliseconds))
         }

@@ -31,8 +31,8 @@ fun CacheCoversCard(modifier: Modifier = Modifier) {
             ),
             supportingContent = {
                 Column {
-                    Text("Caching artworks will removes the lag from first time loading artworks. " +
-                        "Takes a few minutes to complete.")
+                    Text("Caching all artworks makes app 10 times faster " +
+                        "Might takes a few minutes to complete.")
                     Spacer(Modifier.height(5.dp))
                     FilledTonalButton({
                         context.startActivity(Intent(context, CacheCoversActivity::class.java)

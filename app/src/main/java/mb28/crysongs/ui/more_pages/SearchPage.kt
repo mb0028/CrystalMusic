@@ -1,5 +1,6 @@
-package mb28.crysongs.ui
+package mb28.crysongs.ui.more_pages
 
+import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import mb28.crysongs.core.Settings
+import kotlinx.coroutines.runBlocking
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.playerQuery
@@ -35,34 +36,27 @@ import mb28.crysongs.updateDisplayQuery
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SearchPage() {
-    val state = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
-        }
-    }
-
+fun SearchPage(activity: Activity) {
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
     var searchPageSearchText by remember { mutableStateOf("") }
-    val searchResult = remember { mutableStateListOf<Track>() }
+    val searchResult = remember { mutableStateListOf<String>() }
 
-    fun searchPageResearch(input: String) {
-        searchPageSearchText = input
-        searchResult.clear()
-        if (input == "#fav") {
-            tracks.fastForEach { track ->
-                if (Settings.favorites.contains(track.path)) {
-                    searchResult.add(track)
+    fun research(input: String)  {
+        val s = mutableListOf<String>()
+        if (input.isNotBlank()) {
+            tracks.fastForEach { path ->
+                runBlocking {
+                    val track = Track.getTags(path, activity)
+                    if (track.title.contains(input, true)
+                        || track.artist.contains(input, true)
+                        || track.album.contains(input, true)) {
+                        s.add(path)
+                    }
                 }
             }
-        }
-        else if (input.isNotBlank()) {
-            tracks.fastForEach { track ->
-                if (track.title.lowercase().contains(input.lowercase())
-                    || track.artist.lowercase().contains(input.lowercase())) {
-                    searchResult.add(track)
-                }
-            }
-        }
+            searchResult.clear()
+            searchResult.addAll(s)
+        } else searchResult.clear()
     }
 
     AnimatedVisibility(
@@ -86,10 +80,11 @@ fun SearchPage() {
                 OutlinedTextField(
                     searchPageSearchText,
                     {
-                        searchPageResearch(it)
+                        searchPageSearchText = it
+                        research(searchPageSearchText)
                     },
                     label = {
-                        Text("Search title or artist (case insensitive)")
+                        Text("Search title, artist or album (case insensitive)")
                     },
                     keyboardOptions = KeyboardOptions(
                         showKeyboardOnFocus = true

@@ -45,6 +45,7 @@ object Settings {
     var waveformDataCapture by mutableStateOf(false)
     var windEffect by mutableStateOf(false)
     var hierarchyView by mutableStateOf(false)
+    var hideSystemSounds by mutableStateOf(false)
     var tips_cacheThumbs by mutableStateOf(true)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
@@ -123,10 +124,8 @@ object Settings {
             save()
         }
         if (navTabs.count() != 10) {
-            // IDK how to use for in kotlin. TODO: Fix it
-            "0000000000".forEachIndexed { i, _ ->
+            for (i in 0..9)
                 navTabs.add(i)
-            }
         }
     }
 

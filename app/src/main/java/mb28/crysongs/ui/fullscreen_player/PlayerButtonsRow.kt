@@ -48,14 +48,14 @@ fun FSPlayerButtonsRow() {
         IconButton(
             {
                 if (nowPlaying != null) {
-                    Settings.addOrRemoveFavorite(nowPlaying!!.path)
+                    Settings.addOrRemoveFavorite(nowPlaying!!)
                 }
             },
             modifier = Modifier.scale(0.8f)
         ) {
             if (nowPlaying != null) {
                 Icon(
-                    if (Settings.favorites.contains(nowPlaying!!.path)) favorite else heart_plus,
+                    if (Settings.favorites.contains(nowPlaying!!)) favorite else heart_plus,
                     null
                 )
             } else {

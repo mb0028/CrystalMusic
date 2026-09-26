@@ -18,6 +18,7 @@ import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.album
 import mb28.crysongs.icons.artist
 import mb28.crysongs.icons.folder
+import mb28.crysongs.icons.fps30_select
 import mb28.crysongs.icons.library_music
 import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.music_note_2
@@ -44,7 +45,7 @@ fun RowScope.NavTab(navIndex: Int, selected: Boolean, onClick: (Int) -> Unit) {
                     5 -> artist
                     6 -> album
                     7 -> theater_comedy
-                    8 -> stylus_brush
+                    8 -> fps30_select
                     9 -> list_2
                     else -> throw Exception()
                 },
@@ -115,7 +116,7 @@ private fun getName(i: Int) : String =
         5 -> "Artists"
         6 -> "Albums"
         7 -> "Genres"
-        8 -> "Composers"
+        8 -> "Bitrates"
         9 -> "Other"
         else -> throw Exception()
     }

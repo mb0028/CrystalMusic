@@ -1,11 +1,10 @@
 ## v1.3.0 (Upcoming)
 
 Performance:
-- App ram usage reduced by 20%
-- indexing time reduced by 65%
-- .crym3u playlists size decreased by 14%
-- App performance is ~25% better than older versions
-- Add option to cache all thumbnails so app doesn't lag when loading thumbnails for the first time
+- App ram usage reduced by 80%
+- Refreshing time reduced by 75%
+- App performance is now 5 times better
+- Add option to cache all thumbnails with one click
 
 Changes:
 - Add tag editor
@@ -18,7 +17,9 @@ Changes:
   - Add predictive back animations
   - Seekbar improvements
   - Fix permissions page background is always white
+  - Massive widgets improvements
   - Update material design library to 1.5.0-alpha29
+  - Artwork's extracted color now will be cached for x10 faster loading
 
 ## v1.2.1
 - Move some settings out of experimental

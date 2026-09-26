@@ -70,7 +70,7 @@ class LrcParser {
             this.startsWith("[offset:") || this.startsWith("[au:") || this.startsWith("[al:")
     }
 
-    fun LineByAudioPosition(audioPosInMillisecond: Int): String {
+    fun LineByAudioPosition(audioPosInMillisecond: Long): String {
         if (IsGettingLineInRealtimePossible) {
             val audioPosInSeconds = audioPosInMillisecond / 1000f
             if (audioPosInSeconds <= LyricLines.first().TimeStomp)
@@ -82,7 +82,7 @@ class LrcParser {
         return "No lyrics..."
     }
 
-    fun LineIndex(audioPosInMillisecond: Int): Int {
+    fun LineIndex(audioPosInMillisecond: Long): Int {
         if (IsGettingLineInRealtimePossible) {
             val audioPosInSeconds = audioPosInMillisecond / 1000f
             if (audioPosInSeconds <= LyricLines.first().TimeStomp)

@@ -23,7 +23,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.util.fastForEach
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
@@ -35,8 +34,10 @@ import androidx.media3.session.SessionToken
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mb28.crysongs.core.PlayerService
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.loopTrack
@@ -57,9 +58,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 lateinit var player: MediaController
 var nowPlayingI by mutableIntStateOf(-1)
-var nowPlaying: Track? by mutableStateOf(null)
-private var pNowPlayingCover: Bitmap? by mutableStateOf(null)
-val nowPlayingCover get() = pNowPlayingCover?.asImageBitmap() ?: noCoverBitmap!!
+var nowPlaying: String? by mutableStateOf(null)
+var nowPlayingTags: Track? by mutableStateOf(null)
+var privateNowPlayingCover: Bitmap? by mutableStateOf(null)
+val nowPlayingCover get() = privateNowPlayingCover?.asImageBitmap() ?: noCoverBitmap!!
 
 var lrcParser: LrcParser? by mutableStateOf(null)
 var lastLrcLine by mutableStateOf("")
@@ -67,13 +69,15 @@ var lastLrcLineI by mutableIntStateOf(-1)
 var memUsage by mutableLongStateOf(0L)
 
 
+
+var tracks = mutableStateListOf<String>()
+var playerQuery = mutableStateListOf<String>()
+var displayQuery = mutableStateListOf<String>()
+var folders = mutableStateSetOf<String>()
 var albums = mutableStateSetOf<String>()
 var artists = mutableStateSetOf<String>()
 var genres = mutableStateSetOf<String>()
-var folders = mutableStateSetOf<String>()
-var tracks = mutableStateListOf<Track>()
-var playerQuery = mutableStateListOf<Track>()
-var displayQuery = mutableStateListOf<Track>()
+var bitrates = mutableStateSetOf<Int>()
 
 var displayQueryMB by mutableIntStateOf(0)
 var displayQueryMA by mutableIntStateOf(0)
@@ -82,19 +86,19 @@ var displayQueryMA by mutableIntStateOf(0)
 var isPlayerLoopStarted by mutableStateOf(false)
 var isReloading by mutableStateOf(false)
 var isPlaying by mutableStateOf(false)
-var position by mutableIntStateOf(0)
-var duration by mutableIntStateOf(0)
+var position by mutableLongStateOf(0L)
+var duration by mutableLongStateOf(0L)
 var visualizationData by mutableStateOf(VisualizerData())
 
 private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 120.milliseconds
+private val playerLoopDelay = 150.milliseconds
 private var hasLrc = false
-private var lastNowPlaying: Track? = null
+private var lastNowPlaying: String? = null
 private val scope = CoroutineScope(Dispatchers.Main)
 private var visualizer: Visualizer? = null
 private var lastWaveFormDataCapture: Long? = null
 
-fun setAndPlay(track: Track, resetQuery: Boolean) {
+fun setAndPlay(path: String, resetQuery: Boolean) {
     try {
         isReloading = true
         if (playerQuery.isEmpty() || resetQuery) {
@@ -104,12 +108,12 @@ fun setAndPlay(track: Track, resetQuery: Boolean) {
             if (isPlaying) {
                 stop()
             }
-            setMediaItem(MediaItem.fromUri(track.path))
+            setMediaItem(MediaItem.fromUri(path))
             prepare()
             play()
         }
-        nowPlaying = track
-        nowPlayingI = playerQuery.indexOf(nowPlaying)
+        nowPlaying = path
+        nowPlayingI = playerQuery.indexOf(path)
         updateDisplayQuery()
     }
     catch (_: Exception) { }
@@ -129,14 +133,52 @@ fun playNextOrPrevious(next: Boolean = true) {
     )
 }
 
+inline fun Activity.setupPlayer(crossinline onFinished: () -> Unit = {}) {
+    val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
+    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+    controllerFuture.addListener({
+        if (!isPlayerLoopStarted) {
+            player = controllerFuture.get()
+
+            val nm = getSystemService<NotificationManager>()!!
+
+            player.addListener(
+                object : Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        if (playbackState == Player.STATE_ENDED) {
+                            try {
+                                playNextOrPrevious(true)
+                            } catch (_: Exception) { }
+                        }
+                        super.onPlaybackStateChanged(playbackState)
+                    }
+                    override fun onIsPlayingChanged(isP: Boolean) {
+                        super.onIsPlayingChanged(isP)
+                        isPlaying = isP
+                    }
+                }
+            )
+
+            player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+            player.volume = Settings.appVolume
+            playerLoop(nm, this)
+        }
+        isPlayerLoopStarted = true
+
+        if (Settings.waveformDataCapture) {
+            setupVisu()
+        }
+        onFinished() },
+        ContextCompat.getMainExecutor(this)
+    )
+}
+
 @OptIn(UnstableApi::class)
 fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
     val rt = Runtime.getRuntime()
 
     while (true) {
-        isPlaying = player.isPlaying
-        // Pos needs to update even when player is paused for seekbar
-        position = player.currentPosition.toInt()
+        position = player.currentPosition
 
         if (nowPlaying != null && isPlaying) {
             if (lrcParser != null) {
@@ -156,30 +198,44 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
-                val coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
-                pNowPlayingCover = if (coverPath == null) null
-                    else BitmapFactory.decodeFile(coverPath)
+                nowPlayingTags = Track.getTags(nowPlaying, context)
+                val coverPath = Track.createOrGetThumbnail(nowPlaying!!)
 
-                if (Settings.useCoverColor && coverPath != null) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        trackCoverPrimary = if (pNowPlayingCover != null) {
-                            pNowPlayingCover!!.asImageBitmap().themeColors(fallback = Color.Blue).first()
-                        } else null
-                        notificationColor = trackCoverPrimary?.toArgb()
+                if (coverPath != null) {
+                    withContext(Dispatchers.IO) {
+                        while (!isReloading) {
+                            println("hahaha") //TODO: remove
+                            privateNowPlayingCover = BitmapFactory.decodeFile(coverPath)
+                            if (Settings.useCoverColor && privateNowPlayingCover != null) {
+                                val color = File("${Settings.appCacheThumbsFolder}/${nowPlaying!!.hashCode()}.color")
+                                trackCoverPrimary = if (color.exists()) {
+                                    Color(color.readText().toInt())
+                                } else {
+                                    val acc = privateNowPlayingCover!!.asImageBitmap().themeColors(
+                                        1, Color.Blue).first()
+                                    color.writeText(acc.toArgb().toString())
+                                    acc
+                                }
+                                notificationColor = trackCoverPrimary?.toArgb()
+                            } else {
+                                notificationColor = null
+                                trackCoverPrimary = null
+                            }
+                            return@withContext
+                        }
+                        cancel()
                     }
-                }
+                } else privateNowPlayingCover = null
+
+                hasLrc = Track.hasLRC(nowPlaying!!)
+                lrcParser = if (hasLrc) { LrcParser(Track.lrcPath(nowPlaying!!)) } else { null }
+
+                val notifBtn = listOf(if (Settings.favorites.contains(nowPlaying!!))
+                    favoriteRemoveButton else favoriteAddButton, nextButton, aaa, previousButton)
+                mediaSession?.setMediaButtonPreferences(notifBtn)
 
                 PlayerWidget().updateAll(context)
-                hasLrc = nowPlaying!!.hasLRC
-                lrcParser = if (hasLrc) { LrcParser(nowPlaying!!.lrcPath) } else { null }
-
-                if (Settings.favorites.contains(nowPlaying!!.path)) {
-                    mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
-                } else {
-                    mediaSession?.setMediaButtonPreferences(listOf(favoriteAddButton, nextButton, aaa, previousButton))
-                }
-
-                duration = player.duration.toInt()
+                duration = player.duration
                 lastNowPlaying = nowPlaying
             }
         }
@@ -201,21 +257,19 @@ fun updateDisplayQuery() {
     displayQueryMA = playerQuery.subList(last, pqc).count()
 }
 
-fun refreshTracksList(context: Context) {
+suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
     println("Refreshing")
-    tracks.clear(); folders.clear(); albums.clear()
-    artists.clear(); genres.clear()
+    val temp = mutableListOf<String>()
+    val tempFolders = mutableSetOf<String>()
+    val tempAlbums = mutableSetOf<String>()
+    val tempArtists = mutableSetOf<String>()
+    val tempGenres = mutableSetOf<String>()
+    val tempBit = mutableSetOf<Int>()
 
     val projection = arrayOf(
-        MediaStore.MediaColumns.DATA,
-        MediaStore.Video.Media._ID,
-        MediaStore.Video.Media.TITLE,
-        MediaStore.Video.Media.ARTIST,
-        MediaStore.Video.Media.ALBUM,
-        MediaStore.Video.Media.GENRE,
-        MediaStore.Video.Media.DURATION,
-        MediaStore.Video.Media.BITRATE,
-        MediaStore.Video.Media.YEAR,
+        MediaStore.MediaColumns.DATA, MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.GENRE,
+        MediaStore.Audio.Media.BITRATE
     )
 
     context.contentResolver.query(
@@ -230,79 +284,36 @@ fun refreshTracksList(context: Context) {
 
         )?.use { cursor ->
         val pc = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-        val titleC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
         val artistC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
         val albumC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
         val genreC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
-        val durationC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
         val bitrateC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BITRATE)
-        val yearC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
 
         while (cursor.moveToNext()) {
-            val path = cursor.getString(pc).replaceFirst("storage/emulated/0", "sdcard")
-            val track = Track(
-                path,
-                cursor.getString(titleC) ?: "???",
-                cursor.getString(artistC) ?: "???",
-                cursor.getString(albumC) ?: "???",
-                cursor.getString(genreC) ?: "???",
-                cursor.getLong(durationC),
-                cursor.getInt(bitrateC),
-                cursor.getString(yearC) ?: "???",
-            )
-            tracks += track
+            val path = cursor.getString(pc)
+            val album = cursor.getString(albumC) ?: "???"
+            val artist = cursor.getString(artistC) ?: "???"
+            val genre = cursor.getString(genreC) ?: "???"
+            val bitrate = cursor.getInt(bitrateC)
+
+            temp.add(path)
+            File(path).parent?.let { tempFolders.add(it) }
+            tempAlbums.add(album)
+            tempArtists.add(artist)
+            tempGenres.add(genre)
+            tempBit.add(bitrate)
         }
     }
-    tracks.fastForEach {
-        it.run {
-            val folder = File(path).parent
-            if (folder != null) {
-                folders.add(folder)
-            }
-            albums.add(album)
-            artists.add(artist)
-            genres.add(genre)
-        }
+
+    withContext(Dispatchers.Main) {
+        tracks.clear(); tracks.addAll(temp)
+        folders.clear(); folders.addAll(tempFolders)
+        albums.clear(); albums.addAll(tempAlbums)
+        artists.clear(); artists.addAll(tempArtists)
+        genres.clear(); genres.addAll(tempGenres)
+        bitrates.clear(); bitrates.addAll(tempBit)
     }
     println("Refresh completed")
-}
-
-fun Activity.setupPlayer(onFinished: () -> Unit = {}) {
-    val sessionToken = SessionToken(this, ComponentName(this, PlayerService::class.java))
-    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
-    controllerFuture.addListener(
-        {
-            if (!isPlayerLoopStarted) {
-                player = controllerFuture.get()
-
-                val nm = getSystemService<NotificationManager>()!!
-
-                player.addListener(
-                    object : Player.Listener {
-                        override fun onPlaybackStateChanged(playbackState: Int) {
-                            if (playbackState == Player.STATE_ENDED) {
-                                try {
-                                    playNextOrPrevious(true)
-                                } catch (_: Exception) { }
-                            }
-                            super.onPlaybackStateChanged(playbackState)
-                        }
-                    }
-                )
-
-                player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
-                player.volume = Settings.appVolume
-                playerLoop(nm, this)
-                onFinished()
-            }
-            isPlayerLoopStarted = true
-
-            if (Settings.waveformDataCapture) {
-                setupVisu()
-            }
-        },
-        ContextCompat.getMainExecutor(this)
-    )
 }
 
 @OptIn(UnstableApi::class)

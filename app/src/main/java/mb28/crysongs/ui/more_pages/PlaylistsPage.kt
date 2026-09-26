@@ -1,4 +1,4 @@
-package mb28.crysongs.ui
+package mb28.crysongs.ui.more_pages
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.delete_sweep
@@ -47,7 +46,6 @@ import mb28.crysongs.icons.swipe_down_alt
 import mb28.crysongs.icons.swipe_up_alt
 import mb28.crysongs.playerQuery
 import mb28.crysongs.setAndPlay
-import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.ui.popups.CreatePlaylistPopup
@@ -66,7 +64,7 @@ fun PlaylistsPage() {
     var showImportPopup by remember { mutableStateOf(false) }
     var reorderMode by remember { mutableStateOf(false) }
 
-    val songs = remember { mutableStateListOf<Track>() }
+    val songs = remember { mutableStateListOf<String>() }
     var lastClickedPlPath by remember { mutableStateOf("") }
     var plName by remember { mutableStateOf("") }
     val state = remember {
@@ -84,7 +82,7 @@ fun PlaylistsPage() {
         val newPl = mutableListOf<String>()
         newPl.add("Name -> $newName")
         songs.forEach {
-            newPl.add("Music -> " + it.path)
+            newPl.add("Music -> $it")
         }
         File(lastClickedPlPath).writeText(newPl.joinToString("\n"))
     }
@@ -162,21 +160,14 @@ fun PlaylistsPage() {
             if (playlistView) {
                 if (songs.isEmpty()) {
                     if (lastClickedPlPath == "#fav") {
-                        tracks.forEach { track ->
-                            if (Settings.favorites.contains(track.path)) {
-                                songs.add(track)
-                            }
-                        }
+                        songs.clear()
+                        songs.addAll(Settings.favorites)
                     } else {
                         val pl = File(lastClickedPlPath).readLines()
                         plName = pl.first().removePrefix("Name -> ")
                         pl.forEach { plItem ->
                             if (plItem.startsWith("Music -> ")) {
-                                val path = plItem.substring(9).replaceFirst("storage/emulated/0", "sdcard")
-                                    val t = tracks.find { it.path == path }
-                                    if (t != null) {
-                                        songs.add(t)
-                                }
+                                songs.add(plItem.substring(9))
                             }
                         }
                     }

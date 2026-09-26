@@ -115,12 +115,12 @@ private class FavoriteMSC : MediaSession.Callback {
     ): ListenableFuture<SessionResult> {
         when (customCommand.customAction) {
             ADD_OR_REMOVE_FAVORITES -> {
-                if (Settings.favorites.contains(nowPlaying!!.path)) {
-                    Settings.favorites.remove(nowPlaying!!.path)
+                if (Settings.favorites.contains(nowPlaying!!)) {
+                    Settings.favorites.remove(nowPlaying!!)
                     mediaSession?.setMediaButtonPreferences(listOf(favoriteAddButton, nextButton, aaa, previousButton)
                     )
                 } else {
-                    Settings.favorites.add(nowPlaying!!.path)
+                    Settings.favorites.add(nowPlaying!!)
                     mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
                 }
                 Settings.save()

@@ -52,6 +52,7 @@ import mb28.crysongs.icons.swap_horiz
 import mb28.crysongs.isPlaying
 import mb28.crysongs.nowPlaying
 import mb28.crysongs.nowPlayingCover
+import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.position
@@ -119,7 +120,7 @@ fun MiniPlayer(secondSet: MutableState<Boolean>, context: Activity) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        nowPlaying!!.title,
+                        nowPlayingTags?.title ?: "Loading...",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Start,

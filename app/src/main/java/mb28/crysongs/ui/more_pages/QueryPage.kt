@@ -1,4 +1,4 @@
-package mb28.crysongs.ui
+package mb28.crysongs.ui.more_pages
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -72,7 +72,7 @@ fun QueryPage() {
 
             if (isReloading) {
                 item {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(Modifier.fillMaxSize(), Alignment.Center) {
                         ContainedLoadingIndicator()
                     }
                 }

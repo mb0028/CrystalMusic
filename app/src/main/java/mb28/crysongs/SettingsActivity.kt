@@ -119,14 +119,12 @@ private fun UISettings(activity: Activity) {
             supportingContent = {
                 Column {
                     Row {
-                        "00000".forEachIndexed { i, _ -> // IDK how to use for in kotlin. TODO: Fix it
+                        for (i in 0..4)
                             NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
-                        }
                     }
-                    Row { // IDK how to use for in kotlin. TODO: Fix it
-                        "00000".forEachIndexed { a, _ -> val i = a + 5
+                    Row {
+                        for (i in 5..9)
                             NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
-                        }
                     }
                     Text("Click to edit items")
                 }

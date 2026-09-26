@@ -39,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,8 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
 import mb28.crysongs.ui.PermissionsPage
@@ -111,17 +114,19 @@ class FullscreenPlayerActivity : ComponentActivity() {
             Settings.load()
 
             setupPlayer {
-                refreshTracksList(this@FullscreenPlayerActivity)
-                var track: Track? = null
-                tracks.forEach {
-                    if (it.path.startsWith(path!!)) {
-                        track = it
+                lifecycleScope.launch {
+                    refreshTracksList(this@FullscreenPlayerActivity)
+                    var track: String? = null
+                    tracks.forEach {
+                        if (it.startsWith(path!!)) {
+                            track = it
+                        }
                     }
+                    if (track == null) {
+                        finish()
+                    }
+                    setAndPlay(track!!, false)
                 }
-                if (track == null) {
-                    finish()
-                }
-                setAndPlay(track!!, false)
             }
         }
 
@@ -220,10 +225,10 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                            Cover()
                            Spacer(Modifier.height(15.dp))
 
-                           Text(nowPlaying?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Text(nowPlayingTags?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                            Spacer(Modifier.height(10.dp))
-                           Text(nowPlaying?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                           Text(nowPlaying?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Text(nowPlayingTags?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Text(nowPlayingTags?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                        }
 
                        Column(

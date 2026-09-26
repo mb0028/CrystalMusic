@@ -1,30 +1,42 @@
 package mb28.crysongs.ui.more_pages
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateSet
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.icons.arrow_back
@@ -36,35 +48,48 @@ import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun CustomTagsPage(list: SnapshotStateSet<String>, listType: String) {
-    var listItemsView by remember { mutableStateOf(false) }
-    var clickedListItem by remember { mutableStateOf("") }
-    val state = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
+fun CustomTagsPage(listType: String, activity: Activity) {
+    val customTabItems = remember { mutableStateSetOf<String>() }
+    val customTabOpenedItems = remember { mutableStateListOf<String>() }
+    var customTabItemOpened by remember { mutableStateOf(false) }
+    var lastClickedCustomTabItem by remember { mutableStateOf("") }
+
+    var loading by remember { mutableStateOf(true) }
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val scope = rememberCoroutineScope { Dispatchers.IO }
+
+    suspend fun getList() : MutableList<String> {
+        val t = mutableListOf<String>()
+        tracks.fastForEach { path ->
+            val track = Track.getTags(path, activity)
+            val add = when(listType) {
+                "artists" -> track.artist == lastClickedCustomTabItem
+                "albums" -> track.album == lastClickedCustomTabItem
+                "genres" -> track.genre == lastClickedCustomTabItem
+                else -> (track.bitrate / 1000).toString() == lastClickedCustomTabItem
+            }
+            if (add) t.add(path)
         }
+        return t
     }
 
-    fun getListTracks() : MutableList<Track> {
-        val listTracks = tracks.toMutableList()
-        when(listType) {
-            "artists" -> listTracks.removeIf {
-                it.artist != clickedListItem
+    LaunchedEffect(Unit) {
+        tracks.fastForEach { path ->
+            val track = Track.getTags(path, activity)
+            when(listType) {
+                "artists" -> customTabItems.add(track.artist)
+                "albums" -> customTabItems.add(track.album)
+                "genres" -> customTabItems.add(track.genre)
+                else -> customTabItems.add((track.bitrate / 1000).toString())
             }
-            "albums" -> listTracks.removeIf {
-                it.album != clickedListItem
-            }
-            "genres" -> listTracks.removeIf {
-                it.genre != clickedListItem
-            }
-            else -> { listTracks.clear() }
         }
-        return listTracks
+        loading = false
     }
 
-    if (listItemsView) {
-        BackHandler { listItemsView = false }
+    if (customTabItemOpened) {
+        BackHandler { customTabItemOpened = false }
     }
 
     AnimatedVisibility(
@@ -76,11 +101,8 @@ fun CustomTagsPage(list: SnapshotStateSet<String>, listType: String) {
         ) {
             item {
                 Text(
-                    if (listItemsView) clickedListItem else "${
-                        listType[0].uppercase() + listType.substring(
-                            1
-                        )
-                    } (${list.count()})",
+                    if (customTabItemOpened) lastClickedCustomTabItem else "${listType[0].uppercase() +
+                        listType.substring(1)} (${customTabItems.count()})",
                     fontSize = 36.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 40.sp,
@@ -96,18 +118,21 @@ fun CustomTagsPage(list: SnapshotStateSet<String>, listType: String) {
                         .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    if (listItemsView) {
+                    if (customTabItemOpened) {
                         FilledTonalIconButton(
-                            { listItemsView = false }
+                            { customTabItemOpened = false }
                         ) {
                             Icon(arrow_back, null)
                         }
                         FilledTonalIconButton(
                             {
-                                val folderTracks = getListTracks()
-                                playerQuery = folderTracks.shuffled().toMutableStateList()
-                                updateDisplayQuery()
-                                setAndPlay(playerQuery.first(), false)
+                                scope.launch {
+                                    val folderTracks = getList()
+                                    folderTracks.shuffle()
+                                    playerQuery = folderTracks.toMutableStateList()
+                                    updateDisplayQuery()
+                                    setAndPlay(playerQuery.first(), false)
+                                }
                             }
                         ) {
                             Icon(shuffle, null)
@@ -116,31 +141,54 @@ fun CustomTagsPage(list: SnapshotStateSet<String>, listType: String) {
                 }
             }
 
-            if (listItemsView) {
-                val listTracks = getListTracks()
-                val count = listTracks.count()
-                items(count) { i ->
-                    TrackTile(
-                        listTracks[i],
-                        i, count,
-                        resetQueryOnClick = false
-                    ) {
-                        playerQuery = listTracks.toMutableStateList()
-                        updateDisplayQuery()
+            when {
+                loading -> {
+                    item {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            ContainedLoadingIndicator()
+                        }
                     }
                 }
-            } else {
-                val count = list.count()
-                items(count) { i ->
-                    val f = list.elementAt(i)
-                    EasySegmentedListItem(
-                        null,
-                        f,
-                        i, count,
-                        Modifier.padding(horizontal = 10.dp)
-                    ) {
-                        clickedListItem = list.elementAt(i)
-                        listItemsView = true
+                customTabItemOpened -> {
+                    val count = customTabOpenedItems.count()
+                    if (count == 0) {
+                        item {
+                            LaunchedEffect(Unit) {
+                                val temp = getList()
+                                customTabOpenedItems.clear()
+                                customTabOpenedItems.addAll(temp)
+                            }
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                ContainedLoadingIndicator()
+                            }
+                        }
+                    } else {
+                        items(count) { i ->
+                            TrackTile(
+                                customTabOpenedItems[i],
+                                i, count,
+                                resetQueryOnClick = false
+                            ) {
+                                playerQuery = customTabOpenedItems.toMutableStateList()
+                                updateDisplayQuery()
+                            }
+                        }
+                    }
+                }
+                else -> {
+                    val count = customTabItems.count()
+                    items(count) { i ->
+                        val f = customTabItems.elementAt(i)
+                        EasySegmentedListItem(
+                            null,
+                            f,
+                            i, count,
+                            Modifier.padding(horizontal = 10.dp)
+                        ) {
+                            customTabOpenedItems.clear()
+                            lastClickedCustomTabItem = customTabItems.elementAt(i)
+                            customTabItemOpened = true
+                        }
                     }
                 }
             }

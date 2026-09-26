@@ -13,14 +13,13 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Track
 import mb28.crysongs.icons.playlist_add
 import mb28.crysongs.icons.playlist_add_check_circle
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import java.io.File
 
 @Composable
-fun AddToPlaylistPopup(track: Track, onDismissRequired: () -> Unit) {
+fun AddToPlaylistPopup(path: String, onDismissRequired: () -> Unit) {
     AlertDialog(
         { onDismissRequired() },
         { },
@@ -31,7 +30,7 @@ fun AddToPlaylistPopup(track: Track, onDismissRequired: () -> Unit) {
             LazyColumn {
                 val count = Settings.playlists.count()
                 items(count) { i ->
-                    val playlistItem by remember { mutableStateOf("Music -> " + track.path) }
+                    val playlistItem by remember { mutableStateOf("Music -> $path") }
                     val pl = remember { File(Settings.playlists[i]).readLines().toMutableStateList() }
                     var isIn by remember { mutableStateOf(pl.contains(playlistItem)) }
                     EasySegmentedListItem(

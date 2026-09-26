@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.EXTRA_PATH
 import mb28.crysongs.TagEditorActivity
+import mb28.crysongs.core.Track
 import mb28.crysongs.icons.edit
 import mb28.crysongs.icons.playlist_add
 import mb28.crysongs.nowPlaying
+import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.ui.popups.AddToPlaylistPopup
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
@@ -40,7 +42,7 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var showAddToPlaylist by remember { mutableStateOf(false) }
     if (nowPlaying != null) {
-        val tag = remember { AudioFileIO.read(File(nowPlaying!!.path)).tag }
+        val tag = remember { AudioFileIO.read(File(nowPlaying!!)).tag }
         val tags = remember {
 //            val txxx = tag.getFields("TXXX")
             listOf(
@@ -50,8 +52,8 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                 "Composer: ${tag.getFirst(FieldKey.COMPOSER)}",
                 "Genre: ${tag.getFirst(FieldKey.GENRE)}",
                 " ",
-                "Duration: ${nowPlaying!!.duration.milliseconds}",
-                "Bitrate: ${(nowPlaying!!.bitrate / 1000f).roundToInt()} kbps",
+                "Duration: ${nowPlayingTags!!.duration.milliseconds}",
+                "Bitrate: ${(nowPlayingTags!!.bitrate / 1000f).roundToInt()} kbps",
                 "Year: ${tag.getFirst(FieldKey.YEAR)}",
                 " ",
                 "Mood: ${tag.getFirst(FieldKey.MOOD)}",
@@ -64,8 +66,8 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                 "Rating: ${tag.getFirst(FieldKey.RATING)}",
                 "Comment: ${tag.getFirst(FieldKey.COMMENT)}",
                 " ",
-                "Path:\n${nowPlaying!!.path.removePrefix("/storage/emulated/")}",
-                "LRC path: ${if (nowPlaying!!.hasLRC) "\n${nowPlaying!!.lrcPath.removePrefix("/storage/emulated/")}" else "No lrc file found"}",
+                "Path:\n${nowPlaying!!.removePrefix("/storage/emulated/")}",
+                "LRC path: ${if (Track.hasLRC(nowPlaying!!)) "\n${Track.lrcPath(nowPlaying!!).removePrefix("/storage/emulated/")}" else "No lrc file found"}",
 //                "URL: ${txxx.getSpecial("purl")}",
 //                " ",
 //                "Comment:\n${txxx.getSpecial("comment")}",
@@ -93,7 +95,7 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                         {
                             val intent = Intent(context, TagEditorActivity::class.java)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .putExtra(EXTRA_PATH, nowPlaying!!.path)
+                                .putExtra(EXTRA_PATH, nowPlaying!!)
                             context.startActivity(intent)
                         }
                     ) {

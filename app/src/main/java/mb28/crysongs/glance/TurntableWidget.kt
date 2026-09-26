@@ -1,7 +1,6 @@
 package mb28.crysongs.glance
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -27,8 +26,8 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.size
 import mb28.crysongs.MainActivity
 import mb28.crysongs.R
-import mb28.crysongs.core.Track
-import mb28.crysongs.nowPlaying
+import mb28.crysongs.isPlaying
+import mb28.crysongs.privateNowPlayingCover
 
 class TurntableReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TurntableWidget()
@@ -55,27 +54,25 @@ private fun Turntable() {
             .clickable(actionStartActivity<MainActivity>()),
         contentAlignment = Alignment.Center
     ) {
-        var coverPath: String? = null
-        if (nowPlaying != null) {
-            coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
+        with(privateNowPlayingCover) {
+            Image(
+                if (this != null) ImageProvider(this)
+                    else ImageProvider(R.drawable.null_track_cover_small),
+                "Track cover",
+                contentScale = ContentScale.FillBounds,
+                modifier = GlanceModifier
+                    .background(GlanceTheme.colors.widgetBackground)
+                    .size(140.dp)
+                    .cornerRadius(100.dp)
+            )
         }
-        Image(
-            if (coverPath != null) ImageProvider(BitmapFactory.decodeFile(coverPath))
-            else ImageProvider(R.drawable.null_track_cover),
-            "Track cover",
-            contentScale = ContentScale.FillBounds,
-            modifier = GlanceModifier
-                .background(GlanceTheme.colors.widgetBackground)
-                .size(140.dp)
-                .cornerRadius(100.dp)
-        )
 
         Box(
             GlanceModifier.fillMaxSize(),
             Alignment.BottomStart
         ) {
             SquareIconButton(
-                ImageProvider(R.drawable.play_pause_24px),
+                ImageProvider(if (isPlaying) R.drawable.pause_24px else R.drawable.play_arrow_24px),
                 null,
                 {
                     controlPlayback(1, context)

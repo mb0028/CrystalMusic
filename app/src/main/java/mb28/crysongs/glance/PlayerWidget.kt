@@ -1,7 +1,6 @@
 package mb28.crysongs.glance
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -35,11 +34,12 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import mb28.crysongs.MainActivity
 import mb28.crysongs.R
-import mb28.crysongs.core.Track
+import mb28.crysongs.isPlaying
 import mb28.crysongs.lastLrcLine
-import mb28.crysongs.nowPlaying
+import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
+import mb28.crysongs.privateNowPlayingCover
 
 class PlayerWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = PlayerWidget()
@@ -65,26 +65,24 @@ private fun PlaybackControls() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var coverPath: String? = null
-        if (nowPlaying != null) {
-            coverPath = Track.createOrGetThumbnail(nowPlaying!!.path)
-        }
         Box(
             GlanceModifier
                 .size(100.dp)
                 .padding(10.dp)
                 .cornerRadius(20.dp)
         ) {
-            Image(
-                if (coverPath != null) ImageProvider(BitmapFactory.decodeFile(coverPath))
-                    else ImageProvider(R.drawable.null_track_cover),
-                "Track cover",
-                contentScale = ContentScale.FillBounds,
-                modifier = GlanceModifier
-                    .background(GlanceTheme.colors.widgetBackground)
-                    .fillMaxSize()
-                    .cornerRadius(20.dp)
-            )
+            with(privateNowPlayingCover) {
+                Image(
+                    if (this != null) ImageProvider(this)
+                    else ImageProvider(R.drawable.null_track_cover_small),
+                    "Track cover",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = GlanceModifier
+                        .background(GlanceTheme.colors.widgetBackground)
+                        .fillMaxSize()
+                        .cornerRadius(20.dp)
+                )
+            }
         }
 
         Column (
@@ -92,8 +90,8 @@ private fun PlaybackControls() {
             Alignment.CenterVertically,
             Alignment.CenterHorizontally
         ) {
-            if (nowPlaying != null) {
-                Text(nowPlaying!!.title, maxLines = 1,
+            if (nowPlayingTags != null) {
+                Text(nowPlayingTags?.title ?: "Nothing is playing", maxLines = 1,
                     style = TextStyle(color = GlanceTheme.colors.onSurface))
             }
 
@@ -109,7 +107,7 @@ private fun PlaybackControls() {
                 )
                 Spacer(GlanceModifier.width(5.dp))
                 SquareIconButton(
-                    ImageProvider(R.drawable.play_pause_24px),
+                    ImageProvider(if (isPlaying) R.drawable.pause_24px else R.drawable.play_arrow_24px),
                     null,
                     {
                         controlPlayback(1, context)

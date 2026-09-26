@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,11 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
@@ -57,7 +62,7 @@ private val endShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bott
 
 @Composable
 fun TrackTile(
-    t: Track,
+    path: String,
     index: Int,
     count: Int,
     resetQueryOnClick: Boolean = true,
@@ -65,17 +70,26 @@ fun TrackTile(
     onBeforeClick: () -> Unit = {}
 ) {
     var showMoreOptions by remember { mutableStateOf(false) }
-    val state = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
-        }
-    }
+    val state = remember { MutableTransitionState(false).apply { targetState = true }}
+    val context = LocalContext.current
+    var t: Track? by remember { mutableStateOf(null) }
+    var cover: ImageBitmap? by remember { mutableStateOf(null) }
     val shape = when {
         count == 1 -> defaultShape
         index == 0 -> topShape
         index == count - 1 -> endShape
         else -> defaultShape
     }
+
+    LaunchedEffect(Unit) {
+        t = Track.getTags(path, context)
+        withContext(Dispatchers.IO) {
+            val coverPath = Track.createOrGetThumbnail(path)
+            if (coverPath != null)
+                cover = BitmapFactory.decodeFile(coverPath).asImageBitmap()
+        }
+    }
+
     AnimatedVisibility(
         visibleState = state,
         enter = scaleIn(initialScale = 0.65f) + fadeIn(initialAlpha = 0.1f),
@@ -92,10 +106,10 @@ fun TrackTile(
             colors = ListItemDefaults.segmentedColors(
                 containerColor = when {
                     Settings.gradientColoring -> Color.Transparent
-                    t == nowPlaying -> MaterialTheme.colorScheme.tertiaryContainer
+                    path == nowPlaying -> MaterialTheme.colorScheme.tertiaryContainer
                     else -> MaterialTheme.colorScheme.surfaceContainerLowest
                 },
-                contentColor = if (t == nowPlaying) MaterialTheme.colorScheme.onTertiaryContainer
+                contentColor = if (path == nowPlaying) MaterialTheme.colorScheme.onTertiaryContainer
                     else MaterialTheme.colorScheme.onSurface,
             ),
             modifier = if (Settings.gradientColoring) modifier
@@ -105,7 +119,7 @@ fun TrackTile(
                     .background(
                         Brush.horizontalGradient(
                             listOf(
-                                if (t == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+                                if (path == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
                                 else MaterialTheme.colorScheme.surfaceContainerLowest,
                                 MaterialTheme.colorScheme.surfaceBright,
                             )
@@ -115,25 +129,21 @@ fun TrackTile(
                 else modifier.padding(bottom = 5.dp).padding(horizontal = 10.dp).height(82.dp),
             contentPadding = PaddingValues(5.dp),
             leadingContent = {
-                val coverPath = Track.createOrGetThumbnail(t.path)
-                val cover = if (coverPath == null) noCoverBitmap!!
-                    else BitmapFactory.decodeFile(coverPath).asImageBitmap()
                 Box(Modifier.clip(defaultPressedShape)) {
                     Image(
-                        cover,
+                        cover ?: noCoverBitmap!!,
                         "Track cover",
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .size(73.dp, 73.dp)
                             .clickable { showMoreOptions = true }
                             .clip(defaultPressedShape)
-                )
-            }
-
+                    )
+                }
             },
             onClick = {
                 onBeforeClick()
-                setAndPlay(t, resetQueryOnClick)
+                setAndPlay(path, resetQueryOnClick)
             }
         ) {
             Column(
@@ -141,14 +151,14 @@ fun TrackTile(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    t.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp
+                    t?.title ?: "Loading..." , maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp
                 )
 
                 Row(
                     Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        t.artist,
+                        t?.artist ?: "🕒",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 13.sp,
@@ -159,7 +169,7 @@ fun TrackTile(
                         modifier = Modifier.fillMaxWidth(0.2f)
                     )
                     Text(
-                        t.album,
+                        t?.album ?: "",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 13.sp,
@@ -167,11 +177,11 @@ fun TrackTile(
                     )
                 }
 
-                val dura = formatDurationMs(t.duration.milliseconds)
-                val bitrate = (t.bitrate / 1000f).roundToInt()
+                val dura = formatDurationMs(t?.duration?.milliseconds ?: 1.milliseconds)
+                val bitrate = ((t?.bitrate ?: 1) / 1000f).roundToInt()
                 Text(
-                    "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t.year}${tagsSpacer}${t.genre}" +
-                            if (t.hasLRC) "${tagsSpacer}LRC" else "",
+                    "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t?.year}${tagsSpacer}${t?.genre}" +
+                            if (Track.hasLRC(path)) "${tagsSpacer}LRC" else "",
                     maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -180,7 +190,7 @@ fun TrackTile(
     }
 
     if (showMoreOptions) {
-        TrackMoreOptionsPopup(t) {
+        TrackMoreOptionsPopup(path) {
             showMoreOptions = false
         }
     }

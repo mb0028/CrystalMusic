@@ -1,6 +1,7 @@
 package mb28.crysongs.ui.more_pages
 
 import android.annotation.SuppressLint
+import android.os.Environment
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.FilledTonalIconButton
@@ -45,24 +47,29 @@ import java.io.File
 
 
 @SuppressLint("SdCardPath")
-private val tree = mutableStateListOf("/sdcard/")
+
+private val external = Environment.getExternalStorageDirectory().path
+private val tree = mutableStateListOf(external)
+private val uselessDirs = listOf("Android", "DCIM", "Pictures", "Movies", ".trash-storage")
+private val uselessDirsLevel2 = listOf("Podcasts", "Ringtones", "Alarms", "Notifications", "Audiobooks")
+
+private fun isAudioFile(path: String) : Boolean {
+    return path.endsWith(".mp3") || path.endsWith(".m4a") ||
+        path.endsWith(".flac") || path.endsWith(".wav") || path.endsWith(".ogg")
+}
 
 @SuppressLint("SdCardPath")
 @Composable
 fun FoldersPage() {
     var folderView by remember { mutableStateOf(false) }
     var clickedFolderPath by remember { mutableStateOf("") }
-    val state = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
-        }
-    }
-    val last = tree.last()
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val lastTrunk = tree.last()
 
     if (folderView) {
         BackHandler { folderView = false }
     } else if (tree.count() > 1) {
-        BackHandler { tree.remove(last) }
+        BackHandler { tree.remove(lastTrunk) }
     }
 
     AnimatedVisibility(
@@ -72,12 +79,12 @@ fun FoldersPage() {
         LazyColumn(
             contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
         ) {
+            // Header
             item {
                 Text(
                     if (folderView) clickedFolderPath.substring(
-                        clickedFolderPath.lastIndexOf('/') + 1
-                    )
-                    else "Folders (${folders.count()})",
+                        clickedFolderPath.lastIndexOf('/') + 1)
+                        else "Folders (${folders.count()})",
                     fontSize = 36.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 40.sp,
@@ -86,6 +93,7 @@ fun FoldersPage() {
                 Spacer(Modifier.height(33.dp))
             }
 
+            // Buttons row
             item {
                 Row(
                     Modifier
@@ -96,14 +104,12 @@ fun FoldersPage() {
                     if (folderView) {
                         FilledTonalIconButton(
                             { folderView = false }
-                        ) {
-                            Icon(arrow_back, null)
-                        }
+                        ) { Icon(arrow_back, null) }
                         FilledTonalIconButton(
                             { //TODO: Reduce ram usage
                                 val folderTracks = tracks.toMutableList()
                                 folderTracks.removeIf {
-                                    !it.path.startsWith(clickedFolderPath)
+                                    !it.startsWith(clickedFolderPath)
                                 }
                                 playerQuery = folderTracks.shuffled().toMutableStateList()
                                 updateDisplayQuery()
@@ -119,86 +125,99 @@ fun FoldersPage() {
                         ) {
                             Text("Hierarchy")
                         }
-                        if (Settings.hierarchyView && tree.count() > 1)
+                        if (lastTrunk == external && Settings.hierarchyView) {
+                            Spacer(Modifier.width(5.dp))
+                            ToggleButton(
+                                Settings.hideSystemSounds,
+                                { Settings.hideSystemSounds = it; Settings.save() }
+                            ) {
+                                Text("Compact")
+                            }
+                        }
+                        if (Settings.hierarchyView && tree.count() > 1) {
+                            Spacer(Modifier.width(5.dp))
                             FilledTonalIconButton(
-                                { tree.remove(last) }
+                                { tree.remove(lastTrunk) }
                             ) {
                                 Icon(arrow_back, null)
                             }
+                        }
                     }
                 }
             }
-            if (Settings.hierarchyView) {
-                val files = File(last).listFiles()?.toList()?.sortedBy { it.isFile } ?: listOf<File>()
-                val count = files.count()
 
-                item {
-                    Text(
-                        last.removePrefix("/sdcard/").replace("/", " > "),
-                        modifier = Modifier
-                            .padding(10.dp, 5.dp)
-                            .horizontalScroll(rememberScrollState())
-                    )
-                }
-                items(count) {
-                    val file = files[it]
-                    val f = file.path
-                    if (file.isDirectory) {
-                        EasySegmentedListItem(
-                            folder,
-                            f.substring(f.lastIndexOf('/') + 1),
-                            it, count,
-                            Modifier.padding(horizontal = 10.dp)
-                        ) {
-                            tree.add(f)
-                        }
+            when {
+                Settings.hierarchyView -> {
+                    val files = File(lastTrunk).listFiles()?.toList()?.sortedBy { it.isFile } ?: listOf<File>()
+                    val count = files.count()
+
+                    item {
+                        Text(
+                            lastTrunk.replaceFirst(external, "Storage").replace("/", " > "),
+                            modifier = Modifier
+                                .padding(10.dp, 5.dp)
+                                .horizontalScroll(rememberScrollState())
+                        )
                     }
-                    else if (f.endsWith(".mp3") || f.endsWith(".m4a") ||
-                        f.endsWith(".flac") || f.endsWith(".wav") || f.endsWith(".ogg"))
-                    {
-                        val t = tracks.find { t -> t.path == f }
-                        if (t != null) {
+
+                    items(count) {
+                        val file = files[it]
+                        val fPath = file.path
+                        val isUseless = uselessDirs.contains(fPath.removePrefix("$external/"))
+                        val isUseless2 = Settings.hideSystemSounds && uselessDirsLevel2.contains(fPath.removePrefix("$external/"))
+                        if (file.isDirectory && !isUseless && !isUseless2) {
+                            EasySegmentedListItem(
+                                folder,
+                                fPath.substring(fPath.lastIndexOf('/') + 1),
+                                it, count,
+                                Modifier.padding(horizontal = 10.dp)
+                            ) { tree.add(fPath) }
+                        }
+                        else if (isAudioFile(fPath)) {
                             TrackTile(
-                                t,
+                                fPath,
                                 it, count,
                                 resetQueryOnClick = false
                             ) {
-                                playerQuery = mutableStateListOf(t) // TODO: Put whole folder in query
+                                playerQuery = files.map { f -> f.path }.toMutableStateList()
                                 updateDisplayQuery()
                             }
                         }
                     }
                 }
-            }
-            else if (folderView) {
-                val folderTracks = tracks.toMutableList()
-                folderTracks.removeIf {
-                    !it.path.substring(0, it.path.lastIndexOf('/'))
-                        .endsWith(clickedFolderPath)
-                }
-                val count = folderTracks.count()
-                items(count) { i ->
-                    TrackTile(
-                        folderTracks[i],
-                        i, count,
-                        resetQueryOnClick = false
-                    ) {
-                        playerQuery = folderTracks.toMutableStateList()
-                        updateDisplayQuery()
+
+                folderView -> {
+                    val folderTracks = tracks.toMutableList()
+                    folderTracks.removeIf {
+                        !it.substring(0, it.lastIndexOf('/'))
+                            .endsWith(clickedFolderPath)
+                    }
+                    val count = folderTracks.count()
+                    items(count) { i ->
+                        TrackTile(
+                            folderTracks[i],
+                            i, count,
+                            resetQueryOnClick = false
+                        ) {
+                            playerQuery = folderTracks.toMutableStateList()
+                            updateDisplayQuery()
+                        }
                     }
                 }
-            } else {
-                val count = folders.count()
-                items(count) { i ->
-                    val f = folders.elementAt(i)
-                    EasySegmentedListItem(
-                        folder,
-                        f.substring(f.lastIndexOf('/') + 1),
-                        i, count,
-                        Modifier.padding(horizontal = 10.dp)
-                    ) {
-                        clickedFolderPath = f
-                        folderView = true
+
+                else -> {
+                    val count = folders.count()
+                    items(count) { i ->
+                        val f = folders.elementAt(i)
+                        EasySegmentedListItem(
+                            folder,
+                            f.substring(f.lastIndexOf('/') + 1),
+                            i, count,
+                            Modifier.padding(horizontal = 10.dp)
+                        ) {
+                            clickedFolderPath = f
+                            folderView = true
+                        }
                     }
                 }
             }
