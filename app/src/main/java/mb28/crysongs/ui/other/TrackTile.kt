@@ -126,7 +126,8 @@ fun TrackTile(
                         ),
                         shape
                     )
-                else modifier.padding(bottom = 5.dp).padding(horizontal = 10.dp).height(82.dp),
+                else modifier.padding(bottom = 5.dp).padding(horizontal = 10.dp)
+                    .height(if (Settings.twoRowTrackCard) 60.dp else 82.dp),
             contentPadding = PaddingValues(5.dp),
             leadingContent = {
                 Box(Modifier.clip(defaultPressedShape)) {
@@ -135,7 +136,7 @@ fun TrackTile(
                         "Track cover",
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier
-                            .size(73.dp, 73.dp)
+                            .size(if (Settings.twoRowTrackCard) 50.dp else 73.dp)
                             .clickable { showMoreOptions = true }
                             .clip(defaultPressedShape)
                     )
@@ -177,14 +178,16 @@ fun TrackTile(
                     )
                 }
 
-                val dura = formatDurationMs(t?.duration?.milliseconds ?: 1.milliseconds)
-                val bitrate = ((t?.bitrate ?: 1) / 1000f).roundToInt()
-                Text(
-                    "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t?.year}${tagsSpacer}${t?.genre}" +
-                            if (Track.hasLRC(path)) "${tagsSpacer}LRC" else "",
-                    maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (!Settings.twoRowTrackCard) {
+                    val dura = formatDurationMs(t?.duration?.milliseconds ?: 1.milliseconds)
+                    val bitrate = ((t?.bitrate ?: 1) / 1000f).roundToInt()
+                    Text(
+                        "$dura${tagsSpacer}${bitrate} kbps${tagsSpacer}${t?.year}${tagsSpacer}${t?.genre}" +
+                                if (Track.hasLRC(path)) "${tagsSpacer}LRC" else "",
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }

@@ -3,6 +3,7 @@
 package mb28.crysongs.core
 
 import android.annotation.SuppressLint
+import android.os.Environment
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -16,6 +17,8 @@ object Settings {
     const val appFolder = "/sdcard/Documents/.Crystal"
     const val appCacheThumbsFolder = "$appFolder/Covers"
     const val settingsFile = "$appFolder/Songs Settings.txt"
+
+    var loadFont by mutableStateOf(false)
 
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()
@@ -47,6 +50,9 @@ object Settings {
     var hierarchyView by mutableStateOf(false)
     var hideSystemSounds by mutableStateOf(false)
     var tips_cacheThumbs by mutableStateOf(true)
+    var showWallpaper by mutableStateOf(false)
+    var paintMode by mutableStateOf(false)
+    var twoRowTrackCard by mutableStateOf(false)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -118,6 +124,9 @@ object Settings {
                     s.startsWith("[TipsCacheCovers]") -> tips_cacheThumbs = s.removePrefix("[TipsCacheCovers]").toBooleanStrict()
                     s.startsWith("[InitTab]") -> initTab = s.removePrefix("[InitTab]").toInt()
                     s.startsWith("[HierarchyCompact]") -> hideSystemSounds = s.removePrefix("[HierarchyCompact]").toBooleanStrict()
+                    s.startsWith("[Wallpaper]") -> showWallpaper = s.removePrefix("[Wallpaper]").toBooleanStrict()
+                    s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
+                    s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
                 }
             }
         } else {
@@ -127,6 +136,9 @@ object Settings {
         if (navTabs.count() != 10) {
             for (i in 0..9)
                 navTabs.add(i)
+        }
+        if (File("${Environment.getExternalStorageDirectory().path}/Documents/.Crystal/UI Font.ttf").exists()) {
+            loadFont = true
         }
     }
 
@@ -154,6 +166,9 @@ object Settings {
         data += "[Hierarchy]$hierarchyView\n"
         data += "[HierarchyCompact]$hideSystemSounds\n"
         data += "[TipsCacheCovers]$tips_cacheThumbs\n"
+        data += "[Wallpaper]$showWallpaper\n"
+        data += "[Paint]$paintMode\n"
+        data += "[2RowTrack]$twoRowTrackCard\n"
 
         data += "\n"
         playlists.forEach {

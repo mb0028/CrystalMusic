@@ -23,9 +23,11 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,29 +71,43 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CrySongsTheme {
+                var selectedTab by remember { mutableIntStateOf(0) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    topBar = { TopBar(this) }
+                    topBar = {
+                        Column {
+                            TopBar(this@SettingsActivity)
+                            PrimaryScrollableTabRow(
+                                selectedTab,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(0.9f)
+                            ) {
+                                for (i in 0..3) {
+                                    Tab(
+                                        selectedTab == i,
+                                        { selectedTab = i },
+                                        text = { Text(when(i) {
+                                            0 -> "Customization"
+                                            1 -> "Fullscreen Player"
+                                            2 -> "Library"
+                                            else -> "Advanced"
+                                        }) },
+                                    )
+                                }
+                            }
+                        }
+                    }
                 ) { innerPadding ->
                     LazyColumn(
                         contentPadding = innerPadding.plus(PaddingValues(bottom = 300.dp))
                     ) {
                         item {
-                            SectionHeader("UI Customization")
-                            UISettings(this@SettingsActivity)
-                        }
-                        item {
-                            SectionHeader("Fullscreen Player")
-                            FsSettings()
-                        }
-                        item {
-                            SectionHeader("Indexing")
-                            IndexingSettings()
-                        }
-                        item {
-                            SectionHeader("About")
-                            AboutSection()
+                            when(selectedTab) {
+                                0 -> UISettings()
+                                1 -> FsSettings()
+                                2 -> IndexingSettings()
+                                3 -> AboutSection(this@SettingsActivity)
+                            }
                         }
                     }
                 }
@@ -101,15 +117,30 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-private fun UISettings(activity: Activity) {
+private fun UISettings() {
     var lastClickedNavTab by remember { mutableIntStateOf(-1) }
-    val count = 4
+    val count = 7
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.useCoverColor,
             "Use artwork color for ui", 0, count,
-            desc = "When on: App uses now playing's cover accent color for UI"
         ) { Settings.useCoverColor = it; Settings.save() }
+        SettingSwitch(
+            Settings.showWallpaper,
+            "Draw wallpaper", 1, count,
+            desc = "Shows system wallpaper behind app",
+            enable = !Settings.paintMode
+        ) { Settings.showWallpaper = it; Settings.save() }
+        SettingSwitch(
+            Settings.paintMode,
+            "Contrast background", 2, count,
+            desc = "Makes app background fully black on dark mode or fully white on light mode",
+            enable = !Settings.showWallpaper
+        ) { Settings.paintMode = it; Settings.save() }
+        SettingSwitch(
+            Settings.twoRowTrackCard,
+            "Compact track tiles", 2, count,
+        ) { Settings.twoRowTrackCard = it; Settings.save() }
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),
             Modifier.padding(bottom = 3.dp),
@@ -133,7 +164,7 @@ private fun UISettings(activity: Activity) {
             Text("Navigation bar items")
         }
         SegmentedListItem(
-            ListItemDefaults.segmentedShapes(2, count),
+            ListItemDefaults.segmentedShapes(6, count),
             Modifier.padding(bottom = 3.dp),
             colors = ListItemDefaults.segmentedColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -155,18 +186,7 @@ private fun UISettings(activity: Activity) {
                 }
             )
         }
-        SettingSwitch(
-            Settings.waveformDataCapture,
-            "Enable waveform capture", 3, count,
-            desc = "Required for effects like Edge lighting, Parallax & Wind. Requires microphone permission\n * Effects are currently under experimental features",
-            enable = experimental
-        ) {
-            Settings.waveformDataCapture = it
-            if (Settings.waveformDataCapture) {
-                activity.setupVisu()
-            }
-            Settings.save()
-        }
+        Text("To change app font, copy and rename any .ttf file into 0/Documents/.Crystal/UI Font.ttf")
     }
 
     if (lastClickedNavTab != -1) {
@@ -239,8 +259,8 @@ private fun IndexingSettings() {
 }
 
 @Composable
-private fun AboutSection() {
-    val count = 5
+private fun AboutSection(activity: Activity) {
+    val count = 6
     val context = LocalContext.current
     val cache = File(Settings.appCacheThumbsFolder)
     var size by remember { mutableFloatStateOf(0f) }
@@ -256,7 +276,19 @@ private fun AboutSection() {
     size = getSize()
 
     Column(Modifier.padding(10.dp)) {
-        EasySegmentedListItem(null, "Source code", 0, count) {
+        SettingSwitch(
+            Settings.waveformDataCapture,
+            "Enable waveform capture", 0, count,
+            desc = "Required for effects like Edge lighting, Parallax & Wind. Requires microphone permission\n * Effects are currently under experimental features",
+            enable = experimental
+        ) {
+            Settings.waveformDataCapture = it
+            if (Settings.waveformDataCapture) {
+                activity.setupVisu()
+            }
+            Settings.save()
+        }
+        EasySegmentedListItem(null, "Source code", 1, count) {
             openLink(context, "https://github.com/mb0028/CrystalMusic")
         }
         EasySegmentedListItem(null, "Developer (mb28)", 1, count) {
@@ -265,7 +297,7 @@ private fun AboutSection() {
         EasySegmentedListItem(null, "Bug report / feature request", 2, count) {
             openLink(context, "https://github.com/mb0028/CrystalMusic/issues/new")
         }
-        EasySegmentedListItem(null, "Clear covers cache (${size} mb)", 3, count) {
+        EasySegmentedListItem(null, "Clear app cache (${size} mb)", 3, count) {
             val f = cache.listFiles()
             f?.forEach { it.delete() }
             Toast.makeText(context, "Cleared ${f?.count() ?: 0} files.",
@@ -274,7 +306,7 @@ private fun AboutSection() {
         }
         SettingSwitch(
             experimental,
-            "Enable experimental features", 4, count
+            "Enable experimental features", count - 1, count
         ) { experimental = it; Settings.save() }
         if (experimental) {
             EasySegmentedListItem(flag, "Flags", 0, 1) {
@@ -292,23 +324,13 @@ private fun AboutSection() {
 }
 
 @Composable
-private fun SectionHeader(text: String) {
-    Text(
-        text, fontSize = 26.sp,
-        modifier = Modifier.padding(start = 20.dp, top = 10.dp)
-    )
-}
-
-@Composable
 private fun TopBar(activity: SettingsActivity) {
     TopAppBar(
         {
             Text("Settings")
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(
-                alpha = 0.9f
-            )
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(0.9f)
         ),
         navigationIcon = {
             IconButton(

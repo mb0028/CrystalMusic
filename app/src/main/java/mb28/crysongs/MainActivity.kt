@@ -1,12 +1,15 @@
 package mb28.crysongs
 
 import android.annotation.SuppressLint
+import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.view.Window
+import android.view.WindowManager
+import android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
@@ -15,6 +18,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,7 +89,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-        window.decorView.setBackgroundColor(Color.BLACK)
 
         if (!Environment.isExternalStorageManager() ||
             !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
@@ -127,7 +130,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                         .scale(animatedOpacity).alpha(animatedOpacity),
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    containerColor = when {
+                        Settings.showWallpaper -> androidx.compose.ui.graphics.Color.Transparent
+                        Settings.paintMode && isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.Black
+                        Settings.paintMode && !isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.White
+                        else -> MaterialTheme.colorScheme.surfaceContainerLow
+                    } ,
                     bottomBar = {
                         Column {
                             MiniPlayer(selectedSet, this@MainActivity)
@@ -182,6 +190,16 @@ class MainActivity : ComponentActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (!hasFocus && !isPlaying) {
             NotificationManagerCompat.from(this).cancel(0)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (Settings.showWallpaper) {
+            window.decorView.background = getSystemService<WallpaperManager>()?.drawable
+        } else {
+            window.decorView.background = null
+            window.decorView.setBackgroundColor(Color.BLACK)
         }
     }
 }
