@@ -125,5 +125,22 @@ data class Track(
             return t
         }
 
+        fun search(que: String, context: Context): MutableList<String> {
+            val t = mutableListOf<String>()
+            context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                arrayOf(MediaStore.Audio.Media.DATA),
+                "${MediaStore.Audio.Media.TITLE} LIKE '%$que%' OR ${MediaStore.Audio.Media.ARTIST} LIKE '%$que%' OR ${MediaStore.Audio.Media.ALBUM} LIKE '%$que%'",
+                null,
+                null
+            )?.use {
+                val dc =  it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                while (it.moveToNext()) {
+                    t.add(it.getString(dc))
+                }
+            }
+            return t
+        }
+
     }
 }
