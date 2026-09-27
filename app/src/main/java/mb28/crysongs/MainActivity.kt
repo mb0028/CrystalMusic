@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
@@ -62,7 +61,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
@@ -182,9 +180,11 @@ class MainActivity : ComponentActivity() {
                                     {
                                         lifecycleScope.launch {
                                             refreshing = true
+                                            isReloading = true
                                             delay(100.milliseconds)
                                             refreshTracksList(this@MainActivity)
                                             refreshing = false
+                                            isReloading = false
                                         }
                                     }
                                 ) {

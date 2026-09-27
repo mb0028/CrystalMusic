@@ -51,6 +51,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.image_arrow_up
@@ -225,6 +229,9 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
                                 Toast.LENGTH_LONG).show()
                             activity.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                                     Uri.fromFile(File(path))))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                refreshTracksList(activity)
+                            }
                             activity.finish()
                         },
                     ) { Icon(save, null) }

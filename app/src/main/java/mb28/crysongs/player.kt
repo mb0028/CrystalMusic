@@ -308,12 +308,14 @@ suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
     }
 
     withContext(Dispatchers.Main) {
+        isReloading = true
         tracks.clear(); tracks.addAll(temp)
         folders.clear(); folders.addAll(tempFolders)
         albums.clear(); albums.addAll(tempAlbums)
         artists.clear(); artists.addAll(tempArtists)
         genres.clear(); genres.addAll(tempGenres)
         bitrates.clear(); bitrates.addAll(tempBit)
+        isReloading = false
 
     }
     println("Refresh completed")
