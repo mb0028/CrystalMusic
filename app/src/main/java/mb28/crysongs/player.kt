@@ -261,6 +261,7 @@ fun updateDisplayQuery() {
 
 suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
     println("Refreshing")
+    isReloading = true
     val temp = mutableListOf<String>()
     val tempFolders = mutableSetOf<String>()
     val tempAlbums = mutableSetOf<String>()
@@ -308,7 +309,6 @@ suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
     }
 
     withContext(Dispatchers.Main) {
-        isReloading = true
         tracks.clear(); tracks.addAll(temp)
         folders.clear(); folders.addAll(tempFolders)
         albums.clear(); albums.addAll(tempAlbums)
