@@ -8,6 +8,7 @@ Android music player app designed for local library, simplicity & performance.
 - ✨ Play any audio format
 - 📃 Live notification that shows lyrics if LRC file for music is available
 - 🍃 Material 3 expressive
+- 🎨 Can change app font to any .ttf font file
 - 🧱 Homescreen widgets
 - 📦 Only 7 megabytes
 - 🟢 Android 11+ and TV support
