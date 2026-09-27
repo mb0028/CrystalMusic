@@ -37,8 +37,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import mb28.crysongs.albums
+import mb28.crysongs.artists
+import mb28.crysongs.bitrates
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
+import mb28.crysongs.genres
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.shuffle
 import mb28.crysongs.playerQuery
@@ -51,12 +55,12 @@ import mb28.crysongs.updateDisplayQuery
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CustomTagsPage(listType: String, activity: Activity) {
-    val customTabItems = remember { mutableStateSetOf<String>() }
+    var customTabItems = remember { mutableStateSetOf<String>() }
     val customTabOpenedItems = remember { mutableStateListOf<String>() }
     var customTabItemOpened by remember { mutableStateOf(false) }
     var lastClickedCustomTabItem by remember { mutableStateOf("") }
 
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
     val scope = rememberCoroutineScope { Dispatchers.IO }
 
@@ -75,21 +79,17 @@ fun CustomTagsPage(listType: String, activity: Activity) {
         return t
     }
 
-    LaunchedEffect(Unit) {
-        tracks.fastForEach { path ->
-            val track = Track.getTags(path, activity)
-            when(listType) {
-                "artists" -> customTabItems.add(track.artist)
-                "albums" -> customTabItems.add(track.album)
-                "genres" -> customTabItems.add(track.genre)
-                else -> customTabItems.add((track.bitrate / 1000).toString())
-            }
-        }
-        loading = false
-    }
-
     if (customTabItemOpened) {
         BackHandler { customTabItemOpened = false }
+    } else {
+        when(listType) {
+            "artists" -> customTabItems = artists
+            "albums" -> customTabItems = albums
+            "genres" -> customTabItems = genres
+            else -> customTabItems.addAll(bitrates.map { (it / 1000).toString() })
+        }
+        println("aaaa")
+
     }
 
     AnimatedVisibility(

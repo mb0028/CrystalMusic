@@ -35,7 +35,6 @@ import androidx.media3.session.SessionToken
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -315,6 +314,7 @@ suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
         artists.clear(); artists.addAll(tempArtists)
         genres.clear(); genres.addAll(tempGenres)
         bitrates.clear(); bitrates.addAll(tempBit)
+
     }
     println("Refresh completed")
 }

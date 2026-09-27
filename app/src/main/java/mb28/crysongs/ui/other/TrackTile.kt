@@ -193,7 +193,7 @@ fun TrackTile(
     }
 
     if (showMoreOptions) {
-        TrackMoreOptionsPopup(path) {
+        TrackMoreOptionsPopup(path, t?.title) {
             showMoreOptions = false
         }
     }

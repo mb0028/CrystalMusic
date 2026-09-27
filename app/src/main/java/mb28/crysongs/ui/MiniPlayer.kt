@@ -152,7 +152,7 @@ fun MiniPlayer(secondSet: MutableState<Boolean>, context: Activity) {
     }
 
     if (showMoreOptions) {
-        TrackMoreOptionsPopup(nowPlaying!!) {
+        TrackMoreOptionsPopup(nowPlaying!!, nowPlayingTags?.title) {
             showMoreOptions = false
         }
     }

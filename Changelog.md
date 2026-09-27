@@ -7,6 +7,9 @@
   - Use wallpaper as app background
   - Full white or black background based on light/dark mode
 - Settings ui improvements
+- Lot of bug fixes. Some:
+  - Mediastore will be refreshes when editing tags
+  - Fix ~50s loading time for artists, albums, genres & bitrates
 
 ## v1.3.0
 

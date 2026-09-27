@@ -1,7 +1,9 @@
 package mb28.crysongs
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -219,7 +221,10 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
                                 }
                             }
                             file.commit()
-                            Toast.makeText(activity, "Saved!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(activity, "Tags are saved, but refresh might needed for tags to update in ui",
+                                Toast.LENGTH_LONG).show()
+                            activity.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                                    Uri.fromFile(File(path))))
                             activity.finish()
                         },
                     ) { Icon(save, null) }

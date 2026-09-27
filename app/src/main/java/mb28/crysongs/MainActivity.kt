@@ -40,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
@@ -62,6 +63,7 @@ import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.checkForUpdate
@@ -81,6 +83,7 @@ import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 var noCoverBitmap: ImageBitmap? = null
 var notificationColor: Int? = null
@@ -172,7 +175,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Box {
                         when (selectedIndex.intValue) {
-                            0 -> TracksList()
+                            0 -> {
+                                var refreshing by remember { mutableStateOf(false) }
+                                PullToRefreshBox(
+                                    refreshing,
+                                    {
+                                        lifecycleScope.launch {
+                                            refreshing = true
+                                            delay(100.milliseconds)
+                                            refreshTracksList(this@MainActivity)
+                                            refreshing = false
+                                        }
+                                    }
+                                ) {
+                                    TracksList()
+                                }
+                            }
                             1 -> QueryPage()
                             2 -> PlaylistsPage()
                             3 -> FoldersPage()
