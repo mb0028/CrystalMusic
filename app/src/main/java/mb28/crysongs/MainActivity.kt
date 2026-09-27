@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.view.Window
-import android.view.WindowManager
-import android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
@@ -31,7 +29,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -39,7 +40,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
@@ -61,19 +61,22 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.checkForUpdate
+import mb28.crysongs.core.openLink
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.settings
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
-import mb28.crysongs.ui.more_pages.PlaylistsPage
-import mb28.crysongs.ui.more_pages.QueryPage
-import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
+import mb28.crysongs.ui.more_pages.PlaylistsPage
+import mb28.crysongs.ui.more_pages.QueryPage
+import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.theme.CrySongsTheme
@@ -110,8 +113,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             refreshTracksList(this@MainActivity)
             scheduleNotifications(this@MainActivity)
+            if (Settings.updateState == 0) {
+                checkForUpdate(this@MainActivity)
+            }
         }
-
 
         setContent {
             var backHeld by remember { mutableStateOf(false) }
@@ -145,19 +150,23 @@ class MainActivity : ComponentActivity() {
                     },
                     topBar = {
                         Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .statusBarsPadding()
-                                .padding(5.dp),
+                            Modifier.fillMaxWidth().statusBarsPadding().padding(5.dp),
                             Arrangement.End
                         ) {
+                            if (Settings.updateState == 1) {
+                                FilledTonalButton(
+                                    { openLink(this@MainActivity,
+                                        "https://github.com/mb0028/CrystalMusic/releases/latest")
+                                    }
+                                ) { Text("Update available")}
+                                Spacer(Modifier.width(5.dp))
+                            }
                             FilledTonalIconButton(
                                 {
-                                    startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                                    startActivity(Intent(this@MainActivity,
+                                        SettingsActivity::class.java))
                                 }
-                            ) {
-                                Icon(settings, null)
-                            }
+                            ) { Icon(settings, null) }
                         }
                     }
                 ) {

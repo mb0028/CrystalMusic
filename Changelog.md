@@ -1,9 +1,11 @@
 ## v1.3.1 (Upcoming)
+
+- App can now check for updates
+- Change app font by copying any .ttf file in 0/Documents/.Crystal/UI Font.ttf
 - Add 3 new settings:
   - Make track tile smaller
   - Use wallpaper as app background
   - Full white or black background based on light/dark mode
-- Change app font by copying any .ttf file in 0/Documents/.Crystal/UI Font.ttf
 - Settings ui improvements
 
 ## v1.3.0

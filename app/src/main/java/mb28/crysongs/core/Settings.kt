@@ -19,6 +19,7 @@ object Settings {
     const val settingsFile = "$appFolder/Songs Settings.txt"
 
     var loadFont by mutableStateOf(false)
+    var updateState by mutableIntStateOf(0)
 
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()

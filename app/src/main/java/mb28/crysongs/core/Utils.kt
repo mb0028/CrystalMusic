@@ -1,5 +1,6 @@
 package mb28.crysongs.core
 
+
 import android.Manifest
 import android.app.Activity
 import android.app.AlarmManager
@@ -7,9 +8,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
 import android.os.Build
+import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.core.app.NotificationChannelCompat
@@ -18,15 +21,37 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.R
 import mb28.crysongs.notificationColor
+import org.jsoup.Jsoup
 import kotlin.time.Duration
+
 
 val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
 const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
+
+suspend fun checkForUpdate(context: Context) = withContext(Dispatchers.IO) {
+    Log.d("Crystal Songs Updater", "Checking for updates...")
+    try {
+        val web = Jsoup.connect("https://raw.githubusercontent.com/mb0028/CrystalMusic/refs/heads/main/app/build.gradle.kts").get().text()
+
+        val ver = web.substring(3, 10)
+        val verInt = ver.substring(0, ver.indexOf(' ')).toLongOrNull()
+
+        val crystalSongs: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        if (verInt!= null && verInt > crystalSongs.versionCode) {
+            Settings.updateState = 1
+        }
+    } catch (e: Exception) {
+        Log.e("Crystal Songs Updater", e.toString())
+        Settings.updateState = -1
+    }
+}
 
 
 fun formatDurationMs(d: Duration) : String {
