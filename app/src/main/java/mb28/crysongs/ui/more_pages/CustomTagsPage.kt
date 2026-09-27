@@ -27,7 +27,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -35,9 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastForEach
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import mb28.crysongs.albums
 import mb28.crysongs.artists
 import mb28.crysongs.bitrates
@@ -48,7 +44,6 @@ import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.shuffle
 import mb28.crysongs.playerQuery
 import mb28.crysongs.setAndPlay
-import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery

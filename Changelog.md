@@ -1,3 +1,7 @@
+## v1.3.2 (Upcoming)
+- Searching is now 20 times faster
+- Fixed visual glitches
+
 ## v1.3.1
 
 - App can now check for updates

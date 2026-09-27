@@ -7,15 +7,19 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.ContainedLoadingIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -25,12 +29,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.folders
@@ -44,6 +53,7 @@ import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @SuppressLint("SdCardPath")
@@ -58,12 +68,15 @@ private fun isAudioFile(path: String) : Boolean {
         path.endsWith(".flac") || path.endsWith(".wav") || path.endsWith(".ogg")
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("SdCardPath")
 @Composable
 fun FoldersPage() {
     var folderView by remember { mutableStateOf(false) }
     var clickedFolderPath by remember { mutableStateOf("") }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val scope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(false) }
     val lastTrunk = tree.last()
 
     if (folderView) {
@@ -137,7 +150,14 @@ fun FoldersPage() {
                         if (Settings.hierarchyView && tree.count() > 1) {
                             Spacer(Modifier.width(5.dp))
                             FilledTonalIconButton(
-                                { tree.remove(lastTrunk) }
+                                {
+                                    scope.launch {
+                                        refreshing = true
+                                        tree.remove(lastTrunk)
+                                        delay(50.milliseconds)
+                                        refreshing = false
+                                    }
+                                }
                             ) {
                                 Icon(arrow_back, null)
                             }
@@ -148,41 +168,57 @@ fun FoldersPage() {
 
             when {
                 Settings.hierarchyView -> {
-                    val files = File(lastTrunk).listFiles()?.toList()?.sortedBy { it.isFile } ?: listOf<File>()
-                    val count = files.count()
+                    if (!refreshing) {
+                        val files = File(lastTrunk).listFiles()?.toList()?.sortedBy { it.isFile } ?: listOf<File>()
+                        val count = files.count()
 
-                    item {
-                        Text(
-                            lastTrunk.replaceFirst(external, "Storage").replace("/", " > "),
-                            modifier = Modifier
-                                .padding(10.dp, 5.dp)
-                                .horizontalScroll(rememberScrollState())
-                        )
-                    }
-
-                    items(count) {
-                        val file = files[it]
-                        val fPath = file.path
-                        val isUseless = uselessDirs.contains(fPath.removePrefix("$external/"))
-                        val isUseless2 = Settings.hideSystemSounds && moreUselessDirs.contains(fPath.removePrefix("$external/"))
-                        if (file.isDirectory && !isUseless && !isUseless2) {
-                            EasySegmentedListItem(
-                                if (Settings.hideSystemSounds) null else folder,
-                                fPath.substring(fPath.lastIndexOf('/') + 1),
-                                it, count,
-                                Modifier.padding(horizontal = 10.dp)
-                            ) { tree.add(fPath) }
+                        item {
+                            Text(
+                                lastTrunk.replaceFirst(external, "Storage").replace("/", " > "),
+                                modifier = Modifier
+                                    .padding(10.dp, 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
                         }
-                        else if (isAudioFile(fPath)) {
-                            TrackTile(
-                                fPath,
-                                it, count,
-                                resetQueryOnClick = false
-                            ) {
-                                val q = files.map { f -> f.path }.toMutableList()
-                                q.removeIf { !isAudioFile(it) }
-                                playerQuery = q.toMutableStateList()
-                                updateDisplayQuery()
+
+                        items(count) {
+                            val file = files[it]
+                            val fPath = file.path
+                            val isUseless = uselessDirs.contains(fPath.removePrefix("$external/"))
+                            val isUseless2 = Settings.hideSystemSounds && moreUselessDirs.contains(fPath.removePrefix("$external/"))
+                            if (file.isDirectory && !isUseless && !isUseless2) {
+                                EasySegmentedListItem(
+                                    if (Settings.hideSystemSounds) null else folder,
+                                    fPath.substring(fPath.lastIndexOf('/') + 1),
+                                    it, count,
+                                    Modifier.padding(horizontal = 10.dp)
+                                ) {
+                                    scope.launch {
+                                        refreshing = true
+                                        tree.add(fPath)
+                                        delay(50.milliseconds)
+                                        refreshing = false
+                                    }
+                                }
+                            }
+                            else if (isAudioFile(fPath)) {
+                                TrackTile(
+                                    fPath,
+                                    it, count,
+                                    resetQueryOnClick = false
+                                ) {
+                                    val q = files.map { f -> f.path }.toMutableList()
+                                    q.removeIf { f -> !isAudioFile(f) }
+                                    playerQuery = q.toMutableStateList()
+                                    updateDisplayQuery()
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        item {
+                            Box(Modifier.fillMaxSize(), Alignment.Center) {
+                                ContainedLoadingIndicator()
                             }
                         }
                     }
