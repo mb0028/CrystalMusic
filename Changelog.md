@@ -1,4 +1,4 @@
-## v1.3.1 (Upcoming)
+## v1.3.1
 
 - App can now check for updates
 - Change app font by copying any .ttf file in 0/Documents/.Crystal/UI Font.ttf
@@ -9,7 +9,7 @@
 - Settings ui improvements
 - Lot of bug fixes. Some:
   - Mediastore will be refreshes when editing tags
-  - Fix ~50s loading time for artists, albums, genres & bitrates
+  - Using media store to load artists/albums/genres/bitrates (at least 50 times faster than before)
 
 ## v1.3.0
 

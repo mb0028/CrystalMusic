@@ -61,7 +61,6 @@ data class Track(
             }
             return null
         }
-
         private val projection = arrayOf(
             MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.GENRE,
@@ -107,5 +106,24 @@ data class Track(
             }
             return@withContext Track("?", "?", "?", "?", -1, -1, "?")
         }
+
+        fun getByAtt(artist: String, att: String = MediaStore.Audio.Media.ARTIST,
+                     context: Context): MutableList<String> {
+            val t = mutableListOf<String>()
+            context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                arrayOf(MediaStore.Audio.Media.DATA, att),
+                "$att = ?",
+                arrayOf(artist),
+                null
+            )?.use {
+                val dc =  it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                while (it.moveToNext()) {
+                    t.add(it.getString(dc))
+                }
+            }
+            return t
+        }
+
     }
 }

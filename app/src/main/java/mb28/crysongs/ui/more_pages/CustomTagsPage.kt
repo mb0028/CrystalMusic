@@ -1,6 +1,7 @@
 package mb28.crysongs.ui.more_pages
 
 import android.app.Activity
+import android.provider.MediaStore
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -62,21 +63,18 @@ fun CustomTagsPage(listType: String, activity: Activity) {
 
     var loading by remember { mutableStateOf(false) }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
-    val scope = rememberCoroutineScope { Dispatchers.IO }
 
-    suspend fun getList() : MutableList<String> {
-        val t = mutableListOf<String>()
-        tracks.fastForEach { path ->
-            val track = Track.getTags(path, activity)
-            val add = when(listType) {
-                "artists" -> track.artist == lastClickedCustomTabItem
-                "albums" -> track.album == lastClickedCustomTabItem
-                "genres" -> track.genre == lastClickedCustomTabItem
-                else -> (track.bitrate / 1000).toString() == lastClickedCustomTabItem
-            }
-            if (add) t.add(path)
-        }
-        return t
+    fun getList() : MutableList<String> {
+        return Track.getByAtt(
+            lastClickedCustomTabItem,
+            when(listType) {
+                "artists" -> MediaStore.Audio.Media.ARTIST
+                "albums" -> MediaStore.Audio.Media.ALBUM
+                "genres" -> MediaStore.Audio.Media.GENRE
+                else -> MediaStore.Audio.Media.BITRATE
+            },
+            activity
+        )
     }
 
     if (customTabItemOpened) {
@@ -86,10 +84,8 @@ fun CustomTagsPage(listType: String, activity: Activity) {
             "artists" -> customTabItems = artists
             "albums" -> customTabItems = albums
             "genres" -> customTabItems = genres
-            else -> customTabItems.addAll(bitrates.map { (it / 1000).toString() })
+            else -> customTabItems.addAll(bitrates.map { it.toString() })
         }
-        println("aaaa")
-
     }
 
     AnimatedVisibility(
@@ -101,7 +97,8 @@ fun CustomTagsPage(listType: String, activity: Activity) {
         ) {
             item {
                 Text(
-                    if (customTabItemOpened) lastClickedCustomTabItem else "${listType[0].uppercase() +
+                    if (customTabItemOpened) (if (listType == "bitrates") (lastClickedCustomTabItem.toInt() / 1000).toString() else lastClickedCustomTabItem)
+                    else "${listType[0].uppercase() +
                         listType.substring(1)} (${customTabItems.count()})",
                     fontSize = 36.sp,
                     textAlign = TextAlign.Center,
@@ -126,13 +123,11 @@ fun CustomTagsPage(listType: String, activity: Activity) {
                         }
                         FilledTonalIconButton(
                             {
-                                scope.launch {
-                                    val folderTracks = getList()
-                                    folderTracks.shuffle()
-                                    playerQuery = folderTracks.toMutableStateList()
-                                    updateDisplayQuery()
-                                    setAndPlay(playerQuery.first(), false)
-                                }
+                                val folderTracks = getList()
+                                folderTracks.shuffle()
+                                playerQuery = folderTracks.toMutableStateList()
+                                updateDisplayQuery()
+                                setAndPlay(playerQuery.first(), false)
                             }
                         ) {
                             Icon(shuffle, null)
@@ -181,7 +176,7 @@ fun CustomTagsPage(listType: String, activity: Activity) {
                         val f = customTabItems.elementAt(i)
                         EasySegmentedListItem(
                             null,
-                            f,
+                            if (listType == "bitrates") (f.toInt() / 1000).toString() else f,
                             i, count,
                             Modifier.padding(horizontal = 10.dp)
                         ) {
