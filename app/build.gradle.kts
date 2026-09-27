@@ -1,4 +1,4 @@
-// 10 --------------------- This number is used for cheaking updates and must matchs versionCode
+// 11 --------------------- This number is used for cheaking updates and must matchs versionCode
 
 plugins {
     alias(libs.plugins.android.application)
