@@ -1,3 +1,5 @@
+// 10 --------------------- This number is used for cheaking updates and must matchs versionCode
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
