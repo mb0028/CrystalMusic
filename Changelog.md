@@ -1,9 +1,8 @@
-## v1.3.2 (Upcoming)
+## v1.3.2
 - Searching is now 20 times faster
-- Fixed visual glitches
+- Fix visual glitches
 
 ## v1.3.1
-
 - App can now check for updates
 - Change app font by copying any .ttf file in 0/Documents/.Crystal/UI Font.ttf
 - Add 3 new settings:
@@ -16,7 +15,6 @@
   - Using media store to load artists/albums/genres/bitrates (at least 50 times faster than before)
 
 ## v1.3.0
-
 Performance:
 - App ram usage reduced by 80%
 - Refreshing time reduced by 75%. Closed [#1](https://github.com/mb0028/CrystalMusic/issues/1)
