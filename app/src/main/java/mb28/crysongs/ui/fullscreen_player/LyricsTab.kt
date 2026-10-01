@@ -1,5 +1,6 @@
 package mb28.crysongs.ui.fullscreen_player
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -9,14 +10,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.HorizontalFloatingToolbar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,50 +33,112 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mb28.crysongs.R
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.inverseLerp
 import mb28.crysongs.duration
+import mb28.crysongs.icons.align_justify_flex_end
+import mb28.crysongs.icons.list_2
+import mb28.crysongs.icons.move_down
+import mb28.crysongs.icons.swipe_vertical
+import mb28.crysongs.isPlaying
 import mb28.crysongs.lastLrcLineI
 import mb28.crysongs.lrcParser
 import mb28.crysongs.player
+import mb28.crysongs.position
+import mb28.crysongs.shouldScrollLyrics
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun FSLyricsTab(modifier: Modifier = Modifier) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
     if (lrcParser != null) {
-        if (Settings.verticalLyrics) {
-            LazyRow(
-                modifier,
-                verticalAlignment = Alignment.CenterVertically,
-                contentPadding = PaddingValues(horizontal = 0.dp),
-                reverseLayout = true,
-                state = state
-            ) {
-                items(lrcParser?.Count ?: 0) {
-                    LyricText(it, state, scope)
-                }
-            }
-        }
-        else {
-            LazyColumn(
-                modifier.padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(vertical = 200.dp),
-                state = state
-            ) {
-                items(lrcParser?.Count ?: 0) {
-                    LyricText(it, state, scope)
-                }
+
+        if (Settings.lyricsAutoScroll && shouldScrollLyrics && !state.isScrollInProgress) {
+            scope.launch {
+                shouldScrollLyrics = false
+                state.animateScrollToItem(lrcParser!!.LineIndex(position), -500)
             }
         }
 
+        Box(
+            modifier,
+            Alignment.BottomCenter
+        ) {
+            if (Settings.verticalLyrics) {
+                LazyRow(
+                    Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    contentPadding = PaddingValues(horizontal = 0.dp),
+                    reverseLayout = true,
+                    state = state
+                ) {
+                    items(lrcParser?.Count ?: 0) {
+                        LyricText(it, state, scope)
+                    }
+                }
+            }
+            else {
+                LazyColumn(
+                    Modifier.padding(horizontal = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(vertical = 200.dp),
+                    state = state
+                ) {
+                    items(lrcParser?.Count ?: 0) {
+                        LyricText(it, state, scope)
+                    }
+                }
+            }
+            HorizontalFloatingToolbar(
+                false,
+                Modifier.navigationBarsPadding().padding(bottom = 5.dp),
+                colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+                    MaterialTheme.colorScheme.primaryContainer.copy(0.8f)
+                )
+            ) {
+                IconButton(
+                    { Settings.verticalLyrics = !Settings.verticalLyrics; Settings.save() }
+                ) {
+                    Icon(
+                        if (Settings.verticalLyrics) align_justify_flex_end else list_2,
+                        null
+                    )
+                }
+                FilledIconButton(
+                    {
+                        if (player.isPlaying) {
+                            player.pause()
+                        } else {
+                            player.play()
+                        }
+                        isPlaying = player.isPlaying
+                    },
+                ) {
+                    Icon(
+                        if (isPlaying) painterResource(R.drawable.pause)
+                        else painterResource(R.drawable.play),
+                        "Play / Pause",
+                    )
+                }
+                IconButton(
+                    { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
+                ) {
+                    Icon(
+                        if (Settings.lyricsAutoScroll) move_down else swipe_vertical,
+                        null
+                    )
+                }
+            }
+        }
     }
     else {
         Column(
@@ -112,15 +182,16 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 scope.launch {
-                    if (lrcParser!!.IsGettingLineInRealtimePossible) {
+                    if (Settings.lyricsAutoScroll && lrcParser!!.IsGettingLineInRealtimePossible) {
                         player.seekTo(
                             lerp(
                                 0, duration,
                                 inverseLerp(0f, duration / 1000f, line.TimeStomp),
-                            ).toLong()
+                            )
                         )
                         state.scrollToItem(i, -500)
                     }
+                    if (!isPlaying) { player.play() }
                 }
             },
     ) {
@@ -135,7 +206,7 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
                 }
             },
 
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            modifier = Modifier.padding(8.dp, 6.dp),
             textAlign = TextAlign.Center
         )
     }

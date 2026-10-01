@@ -1,3 +1,8 @@
+## v1.3.10
+- Lyrics are now auto-scrolls if they have timestomp
+- Audio resumes when clicking timed lyric if paused
+- Add play/pause button in lyrics panel
+
 ## v1.3.2
 - Searching is now 20 times faster
 - Fix visual glitches

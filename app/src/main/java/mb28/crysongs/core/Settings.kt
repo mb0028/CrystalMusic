@@ -54,6 +54,7 @@ object Settings {
     var showWallpaper by mutableStateOf(false)
     var paintMode by mutableStateOf(false)
     var twoRowTrackCard by mutableStateOf(false)
+    var lyricsAutoScroll by mutableStateOf(false)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -128,6 +129,7 @@ object Settings {
                     s.startsWith("[Wallpaper]") -> showWallpaper = s.removePrefix("[Wallpaper]").toBooleanStrict()
                     s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
                     s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
+                    s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
                 }
             }
         } else {
@@ -170,6 +172,7 @@ object Settings {
         data += "[Wallpaper]$showWallpaper\n"
         data += "[Paint]$paintMode\n"
         data += "[2RowTrack]$twoRowTrackCard\n"
+        data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
 
         data += "\n"
         playlists.forEach {

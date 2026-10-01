@@ -87,6 +87,7 @@ var isPlayerLoopStarted by mutableStateOf(false)
 var isReloading by mutableStateOf(false)
 var canChangeTrack by mutableStateOf(true)
 var isPlaying by mutableStateOf(false)
+var shouldScrollLyrics by mutableStateOf(false)
 var position by mutableLongStateOf(0L)
 var duration by mutableLongStateOf(0L)
 var visualizationData by mutableStateOf(VisualizerData())
@@ -187,9 +188,10 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
                 // On lyric line changes
                 if (line != lastLrcLine) {
-                    PlayerWidget().updateAll(context)
                     updateNotification(nm, context, line)
                     lastLrcLine = line
+                    shouldScrollLyrics = true
+                    PlayerWidget().updateAll(context)
                 }
             } else {
                 lastLrcLine = NO_LYRIC
