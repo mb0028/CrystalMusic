@@ -62,10 +62,10 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     if (lrcParser != null) {
 
-        if (Settings.lyricsAutoScroll && shouldScrollLyrics && !state.isScrollInProgress) {
+        if (Settings.lyricsAutoScroll && shouldScrollLyrics && lrcParser!!.IsGettingLineInRealtimePossible && !state.isScrollInProgress) {
             scope.launch {
                 shouldScrollLyrics = false
-                state.animateScrollToItem(lrcParser!!.LineIndex(position), -500)
+                state.animateScrollToItem(lrcParser!!.LineIndex(position), -400)
             }
         }
 
@@ -182,16 +182,18 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 scope.launch {
-                    if (Settings.lyricsAutoScroll && lrcParser!!.IsGettingLineInRealtimePossible) {
+                    if (lrcParser!!.IsGettingLineInRealtimePossible) {
                         player.seekTo(
                             lerp(
                                 0, duration,
                                 inverseLerp(0f, duration / 1000f, line.TimeStomp),
                             )
                         )
-                        state.scrollToItem(i, -500)
+                        if (!isPlaying) { player.play() }
+                        if (Settings.lyricsAutoScroll) {
+                            state.scrollToItem(i, -400)
+                        }
                     }
-                    if (!isPlaying) { player.play() }
                 }
             },
     ) {

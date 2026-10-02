@@ -1,4 +1,6 @@
-@file:Suppress("PropertyName", "FunctionName", "ControlFlowWithEmptyBody", "unused")
+@file:Suppress("PropertyName", "FunctionName", "ControlFlowWithEmptyBody", "unused",
+    "PrivatePropertyName"
+)
 
 package mb28.music
 
@@ -10,7 +12,7 @@ class LrcParser {
     val Duration: Float get() = LyricLines.last().TimeStomp
     var IsGettingLineInRealtimePossible = false
 
-    val Has0Timestomps: Boolean get() {
+    private val Has0Timestomps: Boolean get() {
         var noTimedLines = 0
         LyricLines.forEach {
             if (it.TimeStomp == -1f) {

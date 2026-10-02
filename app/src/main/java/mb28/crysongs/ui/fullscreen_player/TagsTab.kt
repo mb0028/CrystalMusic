@@ -44,7 +44,6 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
     if (nowPlaying != null) {
         val tag = remember { AudioFileIO.read(File(nowPlaying!!)).tag }
         val tags = remember {
-//            val txxx = tag.getFields("TXXX")
             listOf(
                 "Title: ${tag.getFirst(FieldKey.TITLE)}",
                 "Artist: ${tag.getFirst(FieldKey.ARTIST)}",
@@ -111,13 +110,6 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
                     fontSize = 20.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                if (t.isNotBlank() && i != count - 1) {
-                    HorizontalDivider(
-                        Modifier.padding(vertical = 1.dp).clip(CircleShape),
-                        1.dp
-                    )
-                }
-
             }
             item {
                 val allTags = remember {
