@@ -51,6 +51,7 @@ import mb28.crysongs.icons.swipe_vertical
 import mb28.crysongs.isPlaying
 import mb28.crysongs.lastLrcLineI
 import mb28.crysongs.lrcParser
+import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.position
 import mb28.crysongs.shouldScrollLyrics
@@ -113,6 +114,11 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
                         null
                     )
                 }
+                IconButton(
+                    { playNextOrPrevious(false) }
+                ) {
+                    Icon(painterResource(R.drawable.skip_previous_24px), null)
+                }
                 FilledIconButton(
                     {
                         if (player.isPlaying) {
@@ -128,6 +134,11 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
                         else painterResource(R.drawable.play),
                         "Play / Pause",
                     )
+                }
+                IconButton(
+                    { playNextOrPrevious() }
+                ) {
+                    Icon(painterResource(R.drawable.skip_next_24px), null)
                 }
                 IconButton(
                     { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
