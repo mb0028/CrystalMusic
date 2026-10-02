@@ -1,3 +1,7 @@
+## v1.3.11
+- UI improvements
+- Fixed [#3](https://github.com/mb0028/CrystalMusic/issues/3)
+
 ## v1.3.10
 - Lyrics are now auto-scrolls if they have timestomp
 - Audio resumes when clicking timed lyric if paused
