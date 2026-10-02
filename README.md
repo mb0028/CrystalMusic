@@ -26,7 +26,7 @@ To-Do
 
 ## Screenshots
 
-Screenshots are taken in v1.3.0
+Screenshots are synced with v1.3.10
 
 |                           | Light                          | Dark                           |
 |---------------------------|--------------------------------|--------------------------------|
