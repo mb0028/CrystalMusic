@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,7 +51,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -75,7 +75,6 @@ import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
 import mb28.crysongs.ui.other.audioBand
-import mb28.crysongs.ui.other.fadingEdge
 import mb28.crysongs.ui.other.fadingEdgeVertical
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
@@ -255,7 +254,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                     FSTagsTab(
                         Modifier
                         .fillMaxSize()
-                            .fadingEdgeVertical()
+                        .fadingEdgeVertical()
                         .padding(horizontal = 20.dp)
                     )
                 }
@@ -272,7 +271,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun Cover(modifier: Modifier = Modifier) {
+fun Cover(modifier: Modifier = Modifier) {
     val coverShape =  when(Settings.coverShapeMode) {
         -1 -> RoundedCornerShape(5.dp)
         1 -> {
@@ -309,7 +308,7 @@ private fun Cover(modifier: Modifier = Modifier) {
 
     Box(
         modifier
-            .fillMaxWidth()
+            .aspectRatio(1f)
             .scale(animScale)
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
@@ -330,7 +329,7 @@ private fun Cover(modifier: Modifier = Modifier) {
         Image(
             nowPlayingCover,
             "Track cover",
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth()
         )
     }

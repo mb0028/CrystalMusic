@@ -1,9 +1,10 @@
-## v1.3.11 (Upcoming)
-- Changed min supported android version back to 13
+## v1.4.0
+- Improve landscape mode
 - UI improvements
 - Add next & previous button in lyrics panel
+- Small bug fixes
 - Fixed [#3](https://github.com/mb0028/CrystalMusic/issues/3)
-- Some bug fixes
+- Changed min supported android version back to 13
 
 ## v1.3.10
 - Lyrics are now auto-scrolls if they have timestomp

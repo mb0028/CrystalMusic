@@ -17,17 +17,18 @@ To-Do
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Favorite folders/albums/artists
-- [ ] Better landscape support
 - [ ] Online lyric finder & downloader
+- [x] Better landscape support
 - [x] Tag editor
 
 ## Screenshots
 
-Screenshots are synced with v1.3.10
+Screenshots are synced with v1.4.0
 
 |                           | Light                          | Dark                           |
 |---------------------------|--------------------------------|--------------------------------|
 | Main                      | ![](/Images/S%20(1).png)       | ![](/Images/S%20(2).png)       |
 | Fullscreen<br/>miniplayer | ![](/Images/S%20(6).png)       | ![](/Images/S%20(3).png)       |
 | Lyrics                    | ![](/Images/S%20(4).png)       | ![](/Images/S%20(5).png)       |
+| Landscape                 | ![](/Images/LS%20(1).png)      | ![](/Images/LS%20(2).png)      |
 | Widgets                   | ![](/Images/Widgets%20(1).png) | ![](/Images/Widgets%20(2).png) |

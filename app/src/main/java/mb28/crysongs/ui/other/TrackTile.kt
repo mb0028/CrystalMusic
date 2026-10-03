@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -134,7 +135,7 @@ fun TrackTile(
                     Image(
                         cover ?: noCoverBitmap!!,
                         "Track cover",
-                        contentScale = ContentScale.FillHeight,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(if (Settings.twoRowTrackCard) 50.dp else 73.dp)
                             .clickable { showMoreOptions = true }

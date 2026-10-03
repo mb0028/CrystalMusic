@@ -3,6 +3,7 @@ package mb28.crysongs
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
@@ -56,6 +57,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
@@ -69,6 +71,7 @@ import mb28.crysongs.core.openLink
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.settings
+import mb28.crysongs.ui.LandscapePage
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.TracksList
@@ -119,6 +122,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+
+
         setContent {
             var backHeld by remember { mutableStateOf(false) }
             val animatedOpacity by animateFloatAsState(if (backHeld) 0.8f else 1f)
@@ -130,6 +135,11 @@ class MainActivity : ComponentActivity() {
             }
 
             CrySongsTheme {
+                if (LocalConfiguration.current.orientation == 2) {
+                    LandscapePage(this)
+                    return@CrySongsTheme
+                }
+
                 if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
                 val selectedIndex = rememberSaveable { mutableIntStateOf(Settings.navTabs[Settings.initTab]) }
                 val selectedSet = remember { mutableStateOf(Settings.initTab > 4) }

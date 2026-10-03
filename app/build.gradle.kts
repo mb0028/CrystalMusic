@@ -1,4 +1,4 @@
-// 13 --------------------- This number is used for cheaking updates and must matchs versionCode
+// 14 --------------------- This number is used for cheaking updates and must matchs versionCode
 
 plugins {
     alias(libs.plugins.android.application)
@@ -17,8 +17,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 33
         targetSdk = 37
-        versionCode = 13
-        versionName = "v1.3.10-2026.10.01"
+        versionCode = 14
+        versionName = "v1.4.0-2026.10.03"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
