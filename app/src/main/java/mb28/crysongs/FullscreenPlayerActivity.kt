@@ -39,7 +39,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +50,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -68,7 +68,6 @@ import androidx.graphics.shapes.star
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.Track
 import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
@@ -76,6 +75,8 @@ import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
 import mb28.crysongs.ui.other.audioBand
+import mb28.crysongs.ui.other.fadingEdge
+import mb28.crysongs.ui.other.fadingEdgeVertical
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -251,9 +252,12 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                     FSLyricsTab(Modifier.fillMaxSize())
                 }
                 0 -> {
-                    FSTagsTab(Modifier
+                    FSTagsTab(
+                        Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 20.dp))
+                            .fadingEdgeVertical()
+                        .padding(horizontal = 20.dp)
+                    )
                 }
             }
         }

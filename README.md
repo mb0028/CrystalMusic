@@ -11,7 +11,7 @@ Android music player app designed for local library, simplicity & performance.
 - 🎨 Can change app font to any .ttf font file
 - 🧱 Homescreen widgets
 - 📦 Only 7 megabytes
-- 🟢 Android 11+ and TV support
+- 🟢 Android 13+ and TV support
 
 To-Do
 - [ ] Add edge lighting effect
@@ -19,10 +19,7 @@ To-Do
 - [ ] Favorite folders/albums/artists
 - [ ] Better landscape support
 - [ ] Online lyric finder & downloader
-- [x] ~~Tag editor~~
-
-[//]: # (- [x] ~~Support for android 12 and 11~~)
-[//]: # (- [x] ~~Home widget~~)
+- [x] Tag editor
 
 ## Screenshots
 

@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "mb28.CrySongs"
-        minSdk = 31
+        minSdk = 33
         targetSdk = 37
         versionCode = 13
         versionName = "v1.3.10-2026.10.01"

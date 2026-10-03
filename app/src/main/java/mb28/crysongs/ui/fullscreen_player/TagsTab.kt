@@ -42,7 +42,7 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var showAddToPlaylist by remember { mutableStateOf(false) }
     if (nowPlaying != null) {
-        val tag = remember { AudioFileIO.read(File(nowPlaying!!)).tag }
+        val tag by remember { mutableStateOf(AudioFileIO.read(File(nowPlaying!!)).tag) }
         val tags = remember {
             listOf(
                 "Title: ${tag.getFirst(FieldKey.TITLE)}",
