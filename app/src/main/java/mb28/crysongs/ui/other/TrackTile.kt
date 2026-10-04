@@ -7,14 +7,12 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,9 +31,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -105,42 +105,40 @@ fun TrackTile(
                 defaultShape
             ),
             colors = ListItemDefaults.segmentedColors(
-                containerColor = when {
-                    Settings.gradientColoring -> Color.Transparent
-                    path == nowPlaying -> MaterialTheme.colorScheme.tertiaryContainer
-                    else -> MaterialTheme.colorScheme.surfaceContainerLowest
-                },
+                containerColor = if (path == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
+                    else MaterialTheme.colorScheme.surfaceContainerLowest,
                 contentColor = if (path == nowPlaying) MaterialTheme.colorScheme.onTertiaryContainer
                     else MaterialTheme.colorScheme.onSurface,
             ),
-            modifier = if (Settings.gradientColoring) modifier
-                    .padding(bottom = 5.dp)
-                    .padding(horizontal = 10.dp)
-                    .height(82.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                if (path == nowPlaying) MaterialTheme.colorScheme.tertiaryContainer
-                                else MaterialTheme.colorScheme.surfaceContainerLowest,
-                                MaterialTheme.colorScheme.surfaceBright,
-                            )
-                        ),
-                        shape
-                    )
-                else modifier.padding(bottom = 5.dp).padding(horizontal = 10.dp)
-                    .height(if (Settings.twoRowTrackCard) 60.dp else 82.dp),
+            modifier = modifier
+                .padding(bottom = 5.dp)
+                .padding(horizontal = 10.dp)
+                .height(if (Settings.twoRowTrackCard) 60.dp else 82.dp),
             contentPadding = PaddingValues(5.dp),
             leadingContent = {
-                Box(Modifier.clip(defaultPressedShape)) {
-                    Image(
-                        cover ?: noCoverBitmap!!,
-                        "Track cover",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(if (Settings.twoRowTrackCard) 50.dp else 73.dp)
-                            .clickable { showMoreOptions = true }
-                            .clip(defaultPressedShape)
-                    )
+                Box {
+                    if (Settings.gradientColoring) {
+                        Image(
+                            cover ?: noCoverBitmap!!,
+                            "Track cover",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .scale(4f)
+                                .blur(35.dp, BlurredEdgeTreatment.Unbounded)
+                                .alpha(0.6f)
+                        )
+                    }
+                    Box(Modifier.clip(defaultPressedShape)) {
+                        Image(
+                            cover ?: noCoverBitmap!!,
+                            "Track cover",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(if (Settings.twoRowTrackCard) 50.dp else 73.dp)
+                                .clickable { showMoreOptions = true }
+                                .clip(defaultPressedShape)
+                        )
+                    }
                 }
             },
             onClick = {
