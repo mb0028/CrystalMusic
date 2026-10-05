@@ -2,15 +2,27 @@ package mb28.crysongs.ui.popups
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import mb28.crysongs.EXTRA_PATH
 import mb28.crysongs.TagEditorActivity
 import mb28.crysongs.core.Settings
@@ -26,18 +38,23 @@ import mb28.crysongs.setAndPlay
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.updateDisplayQuery
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackMoreOptionsPopup(path: String, title: String? = null, onDismissRequired: () -> Unit) {
     val context = LocalContext.current
     var showAddToPL by remember { mutableStateOf(false) }
-    AlertDialog(
+    ModalBottomSheet(
         { onDismissRequired() },
-        { },
-        title = {
-            Text(title ?: "???", maxLines = 1)
+        dragHandle = {
+            Text(
+                title ?: "???",
+                maxLines = 1,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
+            )
         },
-        text = {
-            LazyColumn {
+        content = {
+            LazyColumn(contentPadding = PaddingValues(15.dp)) {
                 val count = 4
                 item {
                     val contains = Settings.favorites.contains(path)
