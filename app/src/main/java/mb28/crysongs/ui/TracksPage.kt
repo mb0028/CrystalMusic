@@ -33,7 +33,7 @@ import mb28.crysongs.ui.other.TrackTile
 fun TracksList() {
     val state = rememberLazyListState()
     LazyColumn(
-        contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+        contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = state,
     ) {

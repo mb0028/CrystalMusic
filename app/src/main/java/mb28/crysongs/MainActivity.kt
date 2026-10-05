@@ -82,6 +82,7 @@ import mb28.crysongs.core.checkForUpdate
 import mb28.crysongs.core.openLink
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
+import mb28.crysongs.icons.menu
 import mb28.crysongs.icons.settings
 import mb28.crysongs.ui.LandscapePage
 import mb28.crysongs.ui.MiniPlayer
@@ -204,7 +205,7 @@ class MainActivity : ComponentActivity() {
                                         {
                                             CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.open() }
                                         }
-                                    ) { Icon(settings, null) }
+                                    ) { Icon(menu, null) }
                                 }
                             }
                         }

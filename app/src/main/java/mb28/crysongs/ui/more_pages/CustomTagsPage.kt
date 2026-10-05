@@ -88,7 +88,7 @@ fun CustomTagsPage(listType: String, activity: Activity) {
         enter = pageAnimation,
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+            contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
         ) {
             item {
                 Text(

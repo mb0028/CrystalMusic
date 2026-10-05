@@ -92,7 +92,7 @@ fun PlaylistsPage() {
         enter = pageAnimation,
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(top = 130.dp, bottom = 200.dp),
+            contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
             state = stateList
         ) {
             item {

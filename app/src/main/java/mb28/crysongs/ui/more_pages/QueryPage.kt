@@ -45,7 +45,7 @@ fun QueryPage() {
         enter = pageAnimation,
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(top = 100.dp, bottom = 200.dp),
+            contentPadding = PaddingValues(top = 100.dp, bottom = 260.dp),
         ) {
             item {
                 Text(

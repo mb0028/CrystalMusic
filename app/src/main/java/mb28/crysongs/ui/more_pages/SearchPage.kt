@@ -66,7 +66,7 @@ fun SearchPage(activity: Activity) {
         enter = pageAnimation,
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(top = 120.dp, bottom = 200.dp),
+            contentPadding = PaddingValues(top = 120.dp, bottom = 260.dp),
         ) {
             item {
                 Text(

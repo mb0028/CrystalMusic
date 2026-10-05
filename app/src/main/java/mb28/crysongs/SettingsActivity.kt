@@ -20,8 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +35,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -53,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -72,6 +70,8 @@ import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.other.SettingSwitch
 import mb28.crysongs.ui.popups.FlagsPopup
 import mb28.crysongs.ui.theme.CrySongsTheme
+import mb28.crysongs.ui.theme.FSPlayerUIPreview
+import mb28.crysongs.ui.theme.UIPreview
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -136,6 +136,8 @@ private fun UISettings() {
     var lastClickedNavTab by remember { mutableIntStateOf(-1) }
     val count = 8
     Column(Modifier.padding(10.dp)) {
+        UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
+        Spacer(Modifier.height(5.dp))
         SettingSwitch(
             Settings.useCoverColor,
             "Use artwork color for ui", 0, count,
@@ -157,6 +159,10 @@ private fun UISettings() {
             "Compact track tiles", 2, count,
         ) { Settings.twoRowTrackCard = it; Settings.save() }
         SettingSwitch(
+            Settings.gradientColoring,
+            "Gradient coloring", 2, count,
+        ) { Settings.gradientColoring = it; Settings.save() }
+        SettingSwitch(
             Settings.floatingNavBar,
             "Floating navigation bar", 2, count,
             desc = "Also changes mini player style"
@@ -170,15 +176,9 @@ private fun UISettings() {
             supportingContent = {
                 Column {
                     Spacer(Modifier.height(5.dp))
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceContainer.copy(
-                            if (Settings.floatingNavBar) 0.5f else 1f),
-                        shape = if (Settings.floatingNavBar) CircleShape else RectangleShape
-                    ) {
-                        Row {
-                            for (i in 0..4)
-                                NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
-                        }
+                    Row {
+                        for (i in 0..4)
+                            NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
                     }
                     Spacer(Modifier.height(5.dp))
                     Text("Click tabs to edit them")
@@ -188,7 +188,7 @@ private fun UISettings() {
             Text("Navigation bar items")
         }
         SegmentedListItem(
-            ListItemDefaults.segmentedShapes(6, count),
+            ListItemDefaults.segmentedShapes(7, count),
             Modifier.padding(bottom = 3.dp),
             colors = ListItemDefaults.segmentedColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -223,18 +223,44 @@ private fun UISettings() {
 
 @Composable
 private fun FsSettings() {
-    val count = 2
+    val count = 1
     val blurState = rememberSliderState(
         Settings.backgroundBlurRadius.toFloat(),
         trackRange = 0f..85f
     )
     Column(Modifier.padding(10.dp)) {
-        SettingSwitch(
-            Settings.whiteText,
-            "Force white texts", 0, count
-        ) { Settings.whiteText = it; Settings.save() }
+        FSPlayerUIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
+//        SettingSwitch(
+//            Settings.whiteText,
+//            "Force white texts", 0, count
+//        ) { Settings.whiteText = it; Settings.save() }
+
+
+        Spacer(Modifier.height(10.dp))
+        Text("Style", fontSize = 28.sp)
+        Spacer(Modifier.height(5.dp))
+        Row {
+            for (i in 0..1) {
+                Column(
+                    Modifier.weight(0.5f).padding(5.dp),
+                    Arrangement.Center,
+                    Alignment.CenterHorizontally
+                ) {
+                    Text(when(i) {
+                        1 -> "Material"
+                        else -> "Crystal"
+                    })
+                    RadioButton(
+                        Settings.fsStyle == i,
+                        { Settings.fsStyle = i; Settings.save() }
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(5.dp))
         SegmentedListItem(
-            ListItemDefaults.segmentedShapes(1, count),
+            ListItemDefaults.segmentedShapes(0, count),
             Modifier.padding(bottom = 3.dp),
             colors = ListItemDefaults.segmentedColors(
                 MaterialTheme.colorScheme.surface
@@ -248,25 +274,15 @@ private fun FsSettings() {
                     },
                     onValueChangeFinished = {
                         Settings.save()
-                    }
+                    },
+                    enabled = Settings.fsStyle == 0
                 )
             },
-            trailingContent = {
-                Image(
-                    painterResource(R.drawable.null_track_cover),
-                    null,
-                    Modifier
-                        .size(80.dp)
-                        .alpha(0.5f)
-                        .blur((Settings.backgroundBlurRadius / 4f).dp)
-
-                )
-            }
         ) {
             Text("Background blur: ${Settings.backgroundBlurRadius}")
         }
 
-        Spacer(Modifier.height(15.dp))
+        Spacer(Modifier.height(10.dp))
         Text("Artwork shape", fontSize = 28.sp)
         Spacer(Modifier.height(5.dp))
         Row {
@@ -291,42 +307,6 @@ private fun FsSettings() {
                     RadioButton(
                         Settings.coverShapeMode == i,
                         { Settings.coverShapeMode = i; Settings.save() }
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(15.dp))
-        Text("Style", fontSize = 28.sp)
-        Spacer(Modifier.height(5.dp))
-        Row {
-            for (i in 0..1) {
-                Column(
-                    Modifier.weight(0.5f).padding(5.dp),
-                    Arrangement.Center,
-                    Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painterResource(when(i) {
-                            1 -> R.drawable.style_material
-                            else -> R.drawable.style_crystal
-                        }),
-                        null,
-                        Modifier.aspectRatio(9f / 18f)
-                            .clip(RoundedCornerShape(30.dp))
-                            .clickable {
-                                Settings.fsStyle = i; Settings.save()
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(when(i) {
-                        1 -> "Material"
-                        else -> "Crystal"
-                    })
-                    RadioButton(
-                        Settings.fsStyle == i,
-                        { Settings.fsStyle = i; Settings.save() }
                     )
                 }
             }

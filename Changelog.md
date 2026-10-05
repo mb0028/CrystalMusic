@@ -1,20 +1,20 @@
-## v1.4.10 (Upcoming)
-Fullscreen player now have 2 styles that can be changed in settings:
-1. Crystal (Default)
-2. Full material 3 expressive (New)
+## v1.5.0 (Latest)
 
-- Instead of two-layout navigation bar, other tabs are now accessible in the new navigation drawer
 - Massive UI improvements. some:
-  - Adjusts font size
-  - Add option to turn off floating navigation bar
+  - Instead of two-layout navigation bar, other tabs are now accessible in the new navigation drawer
+  - Fullscreen player now have 2 styles that can be changed in settings
+  - Preview in settings menu
+  - Add option to switch between default and floating navigation bar
   - Mini player improvements
-  - Add favorite button beside track tiles
   - Replaced some dialogs with bottom sheets to matches Pixel phones design
+  - Adjusts font size
+  - Add favorite button beside track tiles
   - Landscape mode improvements
+  - Moved gradient coloring out of experimental
 - Performance improvements
 - Fix app crashes when opening fullscreen player and track has no tags
 
-## v1.4.0 (Latest)
+## v1.4.0
 - Improve landscape mode
 - UI improvements
 - Add next & previous button in lyrics panel

@@ -36,12 +36,6 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                 }
                 item {
                     SettingSwitch(
-                        Settings.gradientColoring,
-                        "Gradient coloring", 0, count
-                    ) { Settings.gradientColoring = it; Settings.save() }
-                }
-                item {
-                    SettingSwitch(
                         Settings.edgeLighting,
                         "Edge lighting effect", 1, count,
                         Settings.waveformDataCapture
