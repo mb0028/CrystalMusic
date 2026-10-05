@@ -81,58 +81,57 @@ fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, acti
                 }
             }
         )
-        return
-    }
-
-    Row(
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-        Arrangement.SpaceBetween,
-        Alignment.CenterVertically
-    ) {
-        IconButton(
-            { activity.finish() }
-        ) {
-            Icon(arrow_cool_down, null)
-        }
-
+    } else {
         Row(
-            Modifier
-                .size(270.dp, 40.dp)
-                .background(
-                    MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
-                    RoundedCornerShape(35.dp)
-                ),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            Arrangement.SpaceBetween,
+            Alignment.CenterVertically
         ) {
-            tabs.forEachIndexed { i, tab ->
-                val corners by animateDpAsState(if (selectedTab.currentPage == i) 10.dp else 20.dp)
-                Surface(
-                    onClick = { selectedTab.requestScrollToPage(i) },
-                    modifier = Modifier.size(80.dp, 30.dp),
-                    color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondary
+            IconButton(
+                { activity.finish() }
+            ) {
+                Icon(arrow_cool_down, null)
+            }
+
+            Row(
+                Modifier
+                    .size(270.dp, 40.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
+                        RoundedCornerShape(35.dp)
+                    ),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                tabs.forEachIndexed { i, tab ->
+                    val corners by animateDpAsState(if (selectedTab.currentPage == i) 10.dp else 20.dp)
+                    Surface(
+                        onClick = { selectedTab.requestScrollToPage(i) },
+                        modifier = Modifier.size(80.dp, 30.dp),
+                        color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondary
                         else MaterialTheme.colorScheme.surface.copy(0.5f),
-                    shape = RoundedCornerShape(corners)
-                ) {
-                    Text(
-                        tab,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 2.dp),
-                        color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.onPrimary
+                        shape = RoundedCornerShape(corners)
+                    ) {
+                        Text(
+                            tab,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 2.dp),
+                            color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.onPrimary
                             else MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
+                        )
+                    }
                 }
             }
-        }
 
-        IconButton(
-            { showVolSheet = true }
-        ) {
-            Icon(sound_detection_loud_sound, null)
+            IconButton(
+                { showVolSheet = true }
+            ) {
+                Icon(sound_detection_loud_sound, null)
+            }
         }
     }
 
