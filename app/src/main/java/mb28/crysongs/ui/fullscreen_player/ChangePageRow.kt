@@ -3,6 +3,7 @@ package mb28.crysongs.ui.fullscreen_player
 import android.app.Activity
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +15,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,19 +30,60 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import mb28.crysongs.core.Settings
+import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.sound_detection_loud_sound
 import mb28.crysongs.player
 import kotlin.math.roundToInt
 
+private val tabs = listOf("Details", "Player", "Lyrics")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, activity: Activity) {
     var showVolSheet by rememberSaveable { mutableStateOf(false) }
-    val tabs = listOf("Details", "Player", "Lyrics")
+
+    if (Settings.fsStyle != 0) {
+        TopAppBar(
+            {
+                Row {
+                    tabs.fastForEachIndexed { i, t ->
+                        Text(t, Modifier.padding(end = 10.dp)
+                            .alpha(if ( i == selectedTab.currentPage) 1f else 0.35f )
+                            .clickable { selectedTab.requestScrollToPage(i) })
+                    }
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                Color.Transparent
+            ),
+            navigationIcon = {
+                IconButton(
+                    { activity.finish() },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        MaterialTheme.colorScheme.surfaceContainerHigh
+                    ),
+                    modifier = Modifier.padding(horizontal = 15.dp)
+                ) { Icon(arrow_back, null) }
+            },
+            actions = {
+                IconButton(
+                    { showVolSheet = true }
+                ) {
+                    Icon(sound_detection_loud_sound, null)
+                }
+            }
+        )
+        return
+    }
+
     Row(
         modifier
             .fillMaxWidth()

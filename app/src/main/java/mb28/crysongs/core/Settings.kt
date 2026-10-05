@@ -30,7 +30,7 @@ object Settings {
     var loopTrack by mutableStateOf(false)
     var verticalLyrics by mutableStateOf(false)
     var appVolume by mutableFloatStateOf(1f)
-    var coverShapeMode by mutableIntStateOf(2)
+    var coverShapeMode by mutableIntStateOf(3)
     var sortBy = 0
     var sortOrderDesc by mutableStateOf(true)
     var tagsSpacer by mutableStateOf(" • ")
@@ -57,6 +57,7 @@ object Settings {
     var twoRowTrackCard by mutableStateOf(false)
     var lyricsAutoScroll by mutableStateOf(false)
     var floatingNavBar by mutableStateOf(true)
+    var fsStyle by mutableIntStateOf(0)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -126,6 +127,7 @@ object Settings {
                     s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
                     s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
                     s.startsWith("[floatingNavBar]") -> floatingNavBar = s.removePrefix("[floatingNavBar]").toBooleanStrict()
+                    s.startsWith("[FSStyle]") -> fsStyle = s.removePrefix("[FSStyle]").toInt()
                     s.startsWith("[Favorite]") -> { // TODO: remove in 2027/01
                         val path = s.removePrefix("[Favorite]")
                         if (File(path).exists()) {
@@ -199,6 +201,7 @@ object Settings {
         data += "[2RowTrack]$twoRowTrackCard\n"
         data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
         data += "[floatingNavBar]$floatingNavBar\n"
+        data += "[FSStyle]$fsStyle\n"
 
         data += "\n"
         playlists.forEach {

@@ -8,10 +8,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -27,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
@@ -43,9 +48,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -56,6 +65,7 @@ import mb28.crysongs.core.Settings.experimental
 import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.flag
+import mb28.crysongs.ui.fullscreen_player.fullscreenCoverShape
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.EditNavigationItemPopup
 import mb28.crysongs.ui.other.NavTab
@@ -231,35 +241,98 @@ private fun FsSettings() {
             colors = ListItemDefaults.segmentedColors(
                 MaterialTheme.colorScheme.surface
             ),
-            overlineContent = {
-                Text(
-                    "Background blur: ${Settings.backgroundBlurRadius}",
-                    fontSize = 16.sp
+            supportingContent = {
+                Slider(
+                    blurState,
+                    onValueChange = {
+                        blurState.value = it
+                        Settings.backgroundBlurRadius = it.roundToInt()
+                    },
+                    onValueChangeFinished = {
+                        Settings.save()
+                    }
                 )
             },
             trailingContent = {
                 Image(
-                    painterResource(R.drawable.widget_turntable_preview),
+                    painterResource(R.drawable.null_track_cover),
                     null,
                     Modifier
                         .size(80.dp)
-                        .blur(Settings.backgroundBlurRadius.dp)
+                        .alpha(0.5f)
+                        .blur((Settings.backgroundBlurRadius / 4f).dp)
 
                 )
             }
         ) {
-            Slider(
-                blurState,
-                onValueChange = {
-                    blurState.value = it
-                    Settings.backgroundBlurRadius = it.roundToInt()
-                },
-                onValueChangeFinished = {
-                    Settings.save()
-                }
-            )
+            Text("Background blur: ${Settings.backgroundBlurRadius}")
         }
-        Text("Tip: you can switch between cover shapes by clicking the cover in fullscreen player")
+
+        Spacer(Modifier.height(15.dp))
+        Text("Artwork shape", fontSize = 28.sp)
+        Spacer(Modifier.height(5.dp))
+        Row {
+            for (i in 0..4) {
+                Column(
+                    Modifier.weight(0.15f).padding(5.dp),
+                    Arrangement.Center,
+                    Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painterResource(R.drawable.null_track_cover),
+                        null,
+                        Modifier.aspectRatio(1f)
+                            .clip(
+                                if (i == 1) RoundedCornerShape(18.dp)
+                                else fullscreenCoverShape(i)
+                            )
+                            .clickable {
+                                Settings.coverShapeMode = i; Settings.save()
+                            },
+                    )
+                    RadioButton(
+                        Settings.coverShapeMode == i,
+                        { Settings.coverShapeMode = i; Settings.save() }
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(15.dp))
+        Text("Style", fontSize = 28.sp)
+        Spacer(Modifier.height(5.dp))
+        Row {
+            for (i in 0..1) {
+                Column(
+                    Modifier.weight(0.5f).padding(5.dp),
+                    Arrangement.Center,
+                    Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painterResource(when(i) {
+                            1 -> R.drawable.style_material
+                            else -> R.drawable.style_crystal
+                        }),
+                        null,
+                        Modifier.aspectRatio(9f / 18f)
+                            .clip(RoundedCornerShape(30.dp))
+                            .clickable {
+                                Settings.fsStyle = i; Settings.save()
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(when(i) {
+                        1 -> "Material"
+                        else -> "Crystal"
+                    })
+                    RadioButton(
+                        Settings.fsStyle == i,
+                        { Settings.fsStyle = i; Settings.save() }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -351,16 +424,11 @@ private fun TopBar(activity: SettingsActivity) {
         navigationIcon = {
             IconButton(
                 { activity.finish() },
-                colors = IconButtonDefaults.iconButtonColors().copy(
+                colors = IconButtonDefaults.iconButtonColors(
                     MaterialTheme.colorScheme.surfaceContainerHigh
                 ),
                 modifier = Modifier.padding(horizontal = 15.dp)
-            ) {
-                Icon(
-                    arrow_back,
-                    contentDescription = null
-                )
-            }
+            ) { Icon(arrow_back, null) }
         },
     )
 }

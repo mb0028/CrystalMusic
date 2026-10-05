@@ -11,13 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.Icon
@@ -41,11 +38,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mb28.crysongs.Cover
 import mb28.crysongs.MainActivity
 import mb28.crysongs.SettingsActivity
 import mb28.crysongs.core.Settings
-import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.folder
 import mb28.crysongs.icons.library_music
 import mb28.crysongs.icons.music_note_2
@@ -54,6 +49,7 @@ import mb28.crysongs.icons.search
 import mb28.crysongs.icons.settings
 import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.privateNowPlayingCover
+import mb28.crysongs.ui.fullscreen_player.FSCover
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.more_pages.FoldersPage
@@ -155,7 +151,7 @@ fun LandscapePage(activity: MainActivity) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(Modifier.height(5.dp))
-                        Cover(Modifier.size(160.dp))
+                        FSCover(Modifier.size(160.dp))
                         Spacer(Modifier.height(5.dp))
                         Text(nowPlayingTags?.title ?: "Play something", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Spacer(Modifier.height(5.dp))

@@ -12,19 +12,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,13 +29,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -50,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -62,19 +55,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
-import androidx.graphics.shapes.CornerRounding
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.star
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.Settings.fsStyle
 import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
+import mb28.crysongs.ui.fullscreen_player.FSCover
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
-import mb28.crysongs.ui.other.audioBand
 import mb28.crysongs.ui.other.fadingEdgeVertical
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
@@ -195,18 +186,24 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
     val shape = RoundedCornerShape((roundness / 3.25f).dp)
 
     Box(
-        Modifier
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f)))
+        Modifier.clip(shape)
+            .background(when {
+                Settings.paintMode -> if (isSystemInDarkTheme()) Color.Black else Color.White
+                fsStyle == 0 -> MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f))
+                else -> MaterialTheme.colorScheme.surfaceContainerLow.copy(1f - (activityOffset / 1000f))
+            })
     ) {
-        Image(
-            nowPlayingCover, null,
-            contentScale = ContentScale.FillHeight,
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(Settings.backgroundBlurRadius.dp)
-                .alpha(0.5f),
-        )
+        if (fsStyle == 0) {
+            Image(
+                nowPlayingCover, null,
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(Settings.backgroundBlurRadius.dp)
+                    .alpha(0.5f),
+            )
+        }
+
         HorizontalPager(
             selectedTab
         ) { page ->
@@ -222,7 +219,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                    ) {
                        Column(Modifier.fillMaxWidth()) {
                            Spacer(Modifier.height(75.dp))
-                           Cover()
+                           FSCover()
                            Spacer(Modifier.height(15.dp))
 
                            Text(nowPlayingTags?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -265,72 +262,6 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
                 .padding(top = innerPadding.calculateTopPadding() + 10.dp)
                 .align(Alignment.TopCenter),
             selectedTab, activity
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun Cover(modifier: Modifier = Modifier) {
-    val coverShape =  when(Settings.coverShapeMode) {
-        -1 -> RoundedCornerShape(5.dp)
-        1 -> {
-            val size = 0.53f
-            RoundedPolygon.star(
-                12,
-                radius = size,
-                innerRadius = 0.43f,
-                centerX = size * 0.5f,
-                centerY = size * 0.5f,
-                rounding = CornerRounding(80f)
-            ).toShape()
-        }
-        2 -> {
-            val size = 0.55f
-            RoundedPolygon.star(
-                7,
-                radius = size,
-                innerRadius = 0.42f,
-                centerX = size * 0.5f,
-                centerY = size * 0.5f,
-                rounding = CornerRounding(80f)
-            ).toShape()
-        }
-        3 -> CircleShape
-        else -> RoundedCornerShape(40.dp)
-    }
-
-    val animScale by animateFloatAsState(
-        if (Settings.waveformDataCapture && Settings.coverParallax)
-            1f + audioBand(0.1f) else 1f,
-        animationSpec = TweenSpec(100)
-    )
-
-    Box(
-        modifier
-            .aspectRatio(1f)
-            .scale(animScale)
-            .background(
-                MaterialTheme.colorScheme.surfaceContainer,
-                coverShape
-            )
-            .clip(coverShape)
-            .clickable {
-                Settings.coverShapeMode = when(Settings.coverShapeMode) {
-                    -1 -> 0
-                    0 -> 1
-                    1 -> 2
-                    2 -> 3
-                    else -> -1
-                }
-                Settings.save()
-            }
-    ) {
-        Image(
-            nowPlayingCover,
-            "Track cover",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }

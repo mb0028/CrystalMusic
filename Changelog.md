@@ -1,4 +1,10 @@
-## v1.4.1 (Upcoming)
+## v1.5.0 (Upcoming)
+Fullscreen player now have 2 styles that can be changed in settings:
+1. Crystal (Default)
+2. Full material 3 expressive (New)
+
+Might add more later
+
 - Performance improvements
 - Massive UI improvements. some:
   - Adjusts font size
