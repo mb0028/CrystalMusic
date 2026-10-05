@@ -17,6 +17,7 @@ object Settings {
     const val appFolder = "/sdcard/Documents/.Crystal"
     const val appCacheThumbsFolder = "$appFolder/Covers"
     const val settingsFile = "$appFolder/Songs Settings.txt"
+    const val favoritesFile = "$appFolder/Songs Favorites.txt"
 
     var loadFont by mutableStateOf(false)
     var updateState by mutableIntStateOf(0)
@@ -55,6 +56,7 @@ object Settings {
     var paintMode by mutableStateOf(false)
     var twoRowTrackCard by mutableStateOf(false)
     var lyricsAutoScroll by mutableStateOf(false)
+    var floatingNavBar by mutableStateOf(true)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -69,7 +71,7 @@ object Settings {
         } else {
             favorites.add(path)
         }
-        save()
+        saveFavorites()
     }
 
     fun load() {
@@ -84,15 +86,8 @@ object Settings {
 
         val file = File(settingsFile)
         if (file.exists()) {
-            val data = file.readLines()
-            data.forEach { s ->
+            file.readLines().forEach { s ->
                 when {
-                    s.startsWith("[Favorite]") -> {
-                        val path = s.removePrefix("[Favorite]")
-                        if (File(path).exists()) {
-                            favorites.add(path)
-                        }
-                    }
                     s.startsWith("[crym3u]") -> {
                         val path = s.removePrefix("[crym3u]")
                         if (File(path).exists()) {
@@ -130,12 +125,32 @@ object Settings {
                     s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
                     s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
                     s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
+                    s.startsWith("[floatingNavBar]") -> floatingNavBar = s.removePrefix("[floatingNavBar]").toBooleanStrict()
+                    s.startsWith("[Favorite]") -> { // TODO: remove in 2027/01
+                        val path = s.removePrefix("[Favorite]")
+                        if (File(path).exists()) {
+                            favorites.add(path)
+                        }
+                    }
                 }
             }
         } else {
             file.createNewFile()
             save()
         }
+
+        val favFile = File(favoritesFile)
+        if (favFile.exists()) {
+            favFile.readLines().forEach { path ->
+                if (File(path).exists()) {
+                    favorites.add(path)
+                }
+            }
+        } else {
+            favFile.createNewFile()
+            saveFavorites()
+        }
+
         if (navTabs.count() != 10) {
             for (i in 0..9)
                 navTabs.add(i)
@@ -143,6 +158,15 @@ object Settings {
         if (File("${Environment.getExternalStorageDirectory().path}/Documents/.Crystal/UI Font.ttf").exists()) {
             loadFont = true
         }
+    }
+
+    fun saveFavorites() {
+        var favData = ""
+        favorites.forEach {
+            favData += "$it\n"
+        }
+        val favFile = File(favoritesFile)
+        favFile.writeText(favData)
     }
 
     fun save() {
@@ -173,15 +197,11 @@ object Settings {
         data += "[Paint]$paintMode\n"
         data += "[2RowTrack]$twoRowTrackCard\n"
         data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
+        data += "[floatingNavBar]$floatingNavBar\n"
 
         data += "\n"
         playlists.forEach {
             data += "[crym3u]$it\n"
-        }
-
-        data += "\n"
-        favorites.forEach {
-            data += "[Favorite]$it\n"
         }
 
         data += "[InitTab]$initTab\n"
