@@ -188,7 +188,7 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
                 scaleY = s
             }
             .background(
-                MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = lineAnim.value),
+                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = lineAnim.value),
                 RoundedCornerShape(20.dp)
             )
             .clip(RoundedCornerShape(20.dp))
