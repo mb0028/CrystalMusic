@@ -190,7 +190,7 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
             .background(when {
                 Settings.paintMode -> if (isSystemInDarkTheme()) Color.Black else Color.White
                 fsStyle == 0 -> MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f))
-                else -> MaterialTheme.colorScheme.surfaceContainerLow.copy(1f - (activityOffset / 1000f))
+                else -> MaterialTheme.colorScheme.surfaceContainerLow.copy((1f - (activityOffset / 1000f)).coerceAtLeast(0.7f))
             })
     ) {
         if (fsStyle == 0) {

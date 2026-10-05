@@ -62,19 +62,21 @@ import mb28.crysongs.ui.other.fadingEdgeVertical
 fun FSLyricsTab(modifier: Modifier = Modifier) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    if (lrcParser != null) {
 
-        if (Settings.lyricsAutoScroll && shouldScrollLyrics && lrcParser!!.IsGettingLineInRealtimePossible && !state.isScrollInProgress) {
-            scope.launch {
-                shouldScrollLyrics = false
-                state.animateScrollToItem(lrcParser!!.LineIndex(position), -400)
+    Box(
+        modifier,
+        Alignment.BottomCenter
+    ) {
+        if (lrcParser != null) {
+
+            if (Settings.lyricsAutoScroll && shouldScrollLyrics && lrcParser!!.IsGettingLineInRealtimePossible && !state.isScrollInProgress) {
+                scope.launch {
+                    shouldScrollLyrics = false
+                    state.animateScrollToItem(lrcParser!!.LineIndex(position), -400)
+                }
             }
-        }
 
-        Box(
-            modifier,
-            Alignment.BottomCenter
-        ) {
+
             if (Settings.verticalLyrics) {
                 LazyRow(
                     Modifier.fillMaxSize(),
@@ -87,8 +89,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
                         LyricText(it, state, scope)
                     }
                 }
-            }
-            else {
+            } else {
                 LazyColumn(
                     Modifier.fadingEdgeVertical().padding(horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,74 +101,75 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
                     }
                 }
             }
-            HorizontalFloatingToolbar(
-                false,
-                Modifier.navigationBarsPadding().padding(bottom = 5.dp),
-                colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.8f)
-                )
+        } else {
+            Column(
+                modifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                IconButton(
-                    { Settings.verticalLyrics = !Settings.verticalLyrics; Settings.save() }
-                ) {
-                    Icon(
-                        if (Settings.verticalLyrics) align_justify_flex_end else list_2,
-                        null
-                    )
-                }
-                IconButton(
-                    { playNextOrPrevious(false) }
-                ) {
-                    Icon(painterResource(R.drawable.skip_previous_24px), null)
-                }
-                FilledIconButton(
-                    {
-                        if (player.isPlaying) {
-                            player.pause()
-                        } else {
-                            player.play()
-                        }
-                        isPlaying = player.isPlaying
-                    },
-                ) {
-                    Icon(
-                        if (isPlaying) painterResource(R.drawable.pause)
-                        else painterResource(R.drawable.play),
-                        "Play / Pause",
-                    )
-                }
-                IconButton(
-                    { playNextOrPrevious() }
-                ) {
-                    Icon(painterResource(R.drawable.skip_next_24px), null)
-                }
-                IconButton(
-                    { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
-                ) {
-                    Icon(
-                        if (Settings.lyricsAutoScroll) move_down else swipe_vertical,
-                        null
-                    )
-                }
+                Text(
+                    "(。﹏。*)", fontSize = 40.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(15.dp))
+                Text(
+                    "No Lyrics...",
+                    fontSize = 16.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
-    }
-    else {
-        Column(
-            modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+
+        HorizontalFloatingToolbar(
+            false,
+            Modifier.navigationBarsPadding().padding(bottom = 5.dp),
+            colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+                MaterialTheme.colorScheme.primaryContainer.copy(
+                    if (Settings.fsStyle == 0) 0.8f else 1f)
+            )
         ) {
-            Text(
-                "(。﹏。*)", fontSize = 40.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(15.dp))
-            Text(
-                "No Lyrics...",
-                fontSize = 16.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            IconButton(
+                { Settings.verticalLyrics = !Settings.verticalLyrics; Settings.save() }
+            ) {
+                Icon(
+                    if (Settings.verticalLyrics) align_justify_flex_end else list_2,
+                    null
+                )
+            }
+            IconButton(
+                { playNextOrPrevious(false) }
+            ) {
+                Icon(painterResource(R.drawable.skip_previous_24px), null)
+            }
+            FilledIconButton(
+                {
+                    if (player.isPlaying) {
+                        player.pause()
+                    } else {
+                        player.play()
+                    }
+                    isPlaying = player.isPlaying
+                },
+            ) {
+                Icon(
+                    if (isPlaying) painterResource(R.drawable.pause)
+                    else painterResource(R.drawable.play),
+                    "Play / Pause",
+                )
+            }
+            IconButton(
+                { playNextOrPrevious() }
+            ) {
+                Icon(painterResource(R.drawable.skip_next_24px), null)
+            }
+            IconButton(
+                { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
+            ) {
+                Icon(
+                    if (Settings.lyricsAutoScroll) move_down else swipe_vertical,
+                    null
+                )
+            }
         }
     }
 }
