@@ -11,11 +11,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -27,6 +30,7 @@ import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -41,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -119,7 +124,7 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 private fun UISettings() {
     var lastClickedNavTab by remember { mutableIntStateOf(-1) }
-    val count = 7
+    val count = 8
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.useCoverColor,
@@ -141,6 +146,10 @@ private fun UISettings() {
             Settings.twoRowTrackCard,
             "Compact track tiles", 2, count,
         ) { Settings.twoRowTrackCard = it; Settings.save() }
+        SettingSwitch(
+            Settings.floatingNavBar,
+            "Floating navigation bar", 2, count,
+        ) { Settings.floatingNavBar = it; Settings.save() }
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),
             Modifier.padding(bottom = 3.dp),
@@ -149,9 +158,16 @@ private fun UISettings() {
             ),
             supportingContent = {
                 Column {
-                    Row {
-                        for (i in 0..4)
-                            NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
+                    Spacer(Modifier.height(5.dp))
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceContainer.copy(
+                            if (Settings.floatingNavBar) 0.5f else 1f),
+                        shape = if (Settings.floatingNavBar) CircleShape else RectangleShape
+                    ) {
+                        Row {
+                            for (i in 0..4)
+                                NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
+                        }
                     }
                     Row {
                         for (i in 5..9)

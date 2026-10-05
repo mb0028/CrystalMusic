@@ -37,6 +37,7 @@ import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -242,18 +243,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
-    HorizontalFloatingToolbar(
-        expanded = true,
-        contentPadding = PaddingValues(horizontal = 10.dp),
-        modifier = Modifier
-            .navigationBarsPadding()
-            .padding(horizontal = 15.dp)
-            .padding(bottom = 2.dp)
-            .height(65.dp),
-        colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
-            toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(0.95f)
-        ),
-    ) {
+    @Composable
+    fun navBarItems() {
         if (!secondSet.value) {
             val state = remember { MutableTransitionState(false).apply { targetState = true } }
             AnimatedVisibility(
@@ -262,11 +253,13 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
             ) {
                 Row {
                     for (i in 0..4)
-                        NavTab(i, selectedIndex.intValue == Settings.navTabs[i]) { selectedIndex.intValue = it }
+                        NavTab(
+                            i,
+                            selectedIndex.intValue == Settings.navTabs[i]
+                        ) { selectedIndex.intValue = it }
                 }
             }
-        }
-        else {
+        } else {
             val state = remember { MutableTransitionState(false).apply { targetState = true } }
             AnimatedVisibility(
                 state,
@@ -274,9 +267,34 @@ fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
             ) {
                 Row {
                     for (i in 5..9)
-                        NavTab(i, selectedIndex.intValue == Settings.navTabs[i]) { selectedIndex.intValue = it }
+                        NavTab(
+                            i,
+                            selectedIndex.intValue == Settings.navTabs[i]
+                        ) { selectedIndex.intValue = it }
                 }
             }
+        }
+    }
+
+    if (Settings.floatingNavBar) {
+        HorizontalFloatingToolbar(
+            expanded = true,
+            contentPadding = PaddingValues(horizontal = 10.dp),
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 2.dp)
+                .height(65.dp),
+            colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
+                toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(0.95f)
+            ),
+        ) {
+            navBarItems()
+        }
+    }
+    else {
+        NavigationBar {
+            navBarItems()
         }
     }
 }
