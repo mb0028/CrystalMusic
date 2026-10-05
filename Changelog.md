@@ -5,8 +5,9 @@
   - Add option to turn off floating navigation bar
   - Add favorite button beside track tiles
   - Replaced some dialogs with bottom sheets to matches Pixel phones design
+  - Landscape mode improvements
 
-## v1.4.0
+## v1.4.0 (Latest)
 - Improve landscape mode
 - UI improvements
 - Add next & previous button in lyrics panel

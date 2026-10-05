@@ -1,5 +1,6 @@
 package mb28.crysongs.ui
 
+import android.content.Intent
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,12 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mb28.crysongs.Cover
 import mb28.crysongs.MainActivity
+import mb28.crysongs.SettingsActivity
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.folder
 import mb28.crysongs.icons.library_music
 import mb28.crysongs.icons.music_note_2
 import mb28.crysongs.icons.queue_music
 import mb28.crysongs.icons.search
+import mb28.crysongs.icons.settings
 import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.privateNowPlayingCover
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
@@ -84,7 +91,15 @@ fun LandscapePage(activity: MainActivity) {
                     modifier = Modifier.width(65.dp),
                     colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
                         MaterialTheme.colorScheme.surfaceBright.copy(0.5f)
-                    )
+                    ),
+                    leadingContent = {
+                        FilledTonalIconButton(
+                            {
+                                activity.startActivity(Intent(activity,
+                                    SettingsActivity::class.java))
+                            }
+                        ) { Icon(settings, null) }
+                    }
                 ) {
                     Spacer(Modifier.height(5.dp))
                     NavigationRailItem(
@@ -120,7 +135,7 @@ fun LandscapePage(activity: MainActivity) {
                     Spacer(Modifier.height(5.dp))
                 }
 
-                Box(Modifier.fillMaxWidth(0.55f)) {
+                Box(Modifier.weight(0.48f)) {
                     when(selectedTab) {
                         0 -> TracksList()
                         1 -> QueryPage()
@@ -132,15 +147,15 @@ fun LandscapePage(activity: MainActivity) {
                 }
 
                 Column(
+                    Modifier.weight(0.52f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(
-                        Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(Modifier.height(5.dp))
-                        Cover(Modifier.size(180.dp))
+                        Cover(Modifier.size(160.dp))
                         Spacer(Modifier.height(5.dp))
                         Text(nowPlayingTags?.title ?: "Play something", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Spacer(Modifier.height(5.dp))
