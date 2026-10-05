@@ -42,28 +42,30 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var showAddToPlaylist by remember { mutableStateOf(false) }
     if (nowPlaying != null) {
-        val tag by remember { mutableStateOf(AudioFileIO.read(File(nowPlaying!!)).tag) }
+        val tag by remember { mutableStateOf(
+            try { AudioFileIO.read(File(nowPlaying!!)).tag }
+            catch (_: Exception) { null }) }
         val tags = remember {
             listOf(
-                "Title: ${tag.getFirst(FieldKey.TITLE)}",
-                "Artist: ${tag.getFirst(FieldKey.ARTIST)}",
-                "Album: ${tag.getFirst(FieldKey.ALBUM)}",
-                "Composer: ${tag.getFirst(FieldKey.COMPOSER)}",
-                "Genre: ${tag.getFirst(FieldKey.GENRE)}",
+                "Title: ${tag?.getFirst(FieldKey.TITLE)}",
+                "Artist: ${tag?.getFirst(FieldKey.ARTIST)}",
+                "Album: ${tag?.getFirst(FieldKey.ALBUM)}",
+                "Composer: ${tag?.getFirst(FieldKey.COMPOSER)}",
+                "Genre: ${tag?.getFirst(FieldKey.GENRE)}",
                 " ",
                 "Duration: ${nowPlayingTags!!.duration.milliseconds}",
                 "Bitrate: ${(nowPlayingTags!!.bitrate / 1000f).roundToInt()} kbps",
-                "Year: ${tag.getFirst(FieldKey.YEAR)}",
+                "Year: ${tag?.getFirst(FieldKey.YEAR)}",
                 " ",
-                "Mood: ${tag.getFirst(FieldKey.MOOD)}",
-                "Album artist: ${tag.getFirst(FieldKey.ALBUM_ARTIST)}",
-                "Remixer: ${tag.getFirst(FieldKey.REMIXER)}",
-                "Lyricist: ${tag.getFirst(FieldKey.LYRICIST)}",
-                "Record label: ${tag.getFirst(FieldKey.RECORD_LABEL)}",
-                "Language: ${tag.getFirst(FieldKey.LANGUAGE)}",
-                "Tags: ${tag.getFirst(FieldKey.TAGS)}",
-                "Rating: ${tag.getFirst(FieldKey.RATING)}",
-                "Comment: ${tag.getFirst(FieldKey.COMMENT)}",
+                "Mood: ${tag?.getFirst(FieldKey.MOOD)}",
+                "Album artist: ${tag?.getFirst(FieldKey.ALBUM_ARTIST)}",
+                "Remixer: ${tag?.getFirst(FieldKey.REMIXER)}",
+                "Lyricist: ${tag?.getFirst(FieldKey.LYRICIST)}",
+                "Record label: ${tag?.getFirst(FieldKey.RECORD_LABEL)}",
+                "Language: ${tag?.getFirst(FieldKey.LANGUAGE)}",
+                "Tags: ${tag?.getFirst(FieldKey.TAGS)}",
+                "Rating: ${tag?.getFirst(FieldKey.RATING)}",
+                "Comment: ${tag?.getFirst(FieldKey.COMMENT)}",
                 " ",
                 "Path:\n${nowPlaying!!.removePrefix("/storage/emulated/")}" + if (Track.hasLRC(nowPlaying!!)) " (+ lrc)" else "",
 //                "URL: ${txxx.getSpecial("purl")}",
@@ -113,7 +115,7 @@ fun FSTagsTab(modifier: Modifier = Modifier) {
             item {
                 val allTags = remember {
                     var att = ""
-                    tag.fields.iterator().forEach {
+                    tag?.fields?.iterator()?.forEach {
                         att += "${it.id}: $it\n"
                     }
                     att
