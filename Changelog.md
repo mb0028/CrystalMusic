@@ -1,3 +1,11 @@
+## v1.4.1 (Upcoming)
+- Performance improvements
+- Massive UI improvements. some:
+  - Adjusts font size
+  - Add option to turn off floating navigation bar
+  - Add favorite button beside track tiles
+  - Replaced some dialogs with bottom sheets to matches Pixel phones design
+
 ## v1.4.0
 - Improve landscape mode
 - UI improvements
