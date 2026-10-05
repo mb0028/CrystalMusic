@@ -54,7 +54,7 @@ fun TrackMoreOptionsPopup(path: String, title: String? = null, onDismissRequired
             )
         },
         content = {
-            LazyColumn(contentPadding = PaddingValues(15.dp)) {
+            LazyColumn(contentPadding = PaddingValues(15.dp, 0.dp, 15.dp, 15.dp)) {
                 val count = 4
                 item {
                     val contains = Settings.favorites.contains(path)

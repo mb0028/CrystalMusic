@@ -159,6 +159,7 @@ private fun UISettings() {
         SettingSwitch(
             Settings.floatingNavBar,
             "Floating navigation bar", 2, count,
+            desc = "Also changes mini player style"
         ) { Settings.floatingNavBar = it; Settings.save() }
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),
@@ -179,11 +180,8 @@ private fun UISettings() {
                                 NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
                         }
                     }
-                    Row {
-                        for (i in 5..9)
-                            NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
-                    }
-                    Text("Click to edit items")
+                    Spacer(Modifier.height(5.dp))
+                    Text("Click tabs to edit them")
                 }
             }
         ) {

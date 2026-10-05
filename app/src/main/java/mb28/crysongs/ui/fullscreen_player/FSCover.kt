@@ -55,7 +55,7 @@ fun fullscreenCoverShape(shape: Int) = when(shape) {
         ).toShape()
     }
     4 -> CircleShape
-    else -> throw Exception("Invalid shape")
+    else -> CircleShape
 }
 
 @Composable

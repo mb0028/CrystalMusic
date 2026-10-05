@@ -38,13 +38,11 @@ const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
 suspend fun checkForUpdate(context: Context) = withContext(Dispatchers.IO) {
     Log.d("Crystal Songs Updater", "Checking for updates...")
     try {
-        val web = Jsoup.connect("https://raw.githubusercontent.com/mb0028/CrystalMusic/refs/heads/main/app/build.gradle.kts").get().text()
-
-        val ver = web.substring(3, 10)
-        val verInt = ver.substring(0, ver.indexOf(' ')).toLongOrNull()
+        val web = Jsoup.connect("https://raw.githubusercontent.com/mb0028/CrystalMusic/refs/heads/main/Version.txt").get().text()
+        val ver = web.toLongOrNull()
 
         val crystalSongs: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        if (verInt!= null && verInt > crystalSongs.versionCode) {
+        if (ver!= null && ver > crystalSongs.versionCode) {
             Settings.updateState = 1
         }
     } catch (e: Exception) {

@@ -29,21 +29,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,11 +67,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
@@ -80,8 +92,10 @@ import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
 import mb28.crysongs.ui.more_pages.SearchPage
+import mb28.crysongs.ui.other.CrystalDrawerItem
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.NavTab
+import mb28.crysongs.ui.other.getCurrentNavItemName
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
@@ -122,8 +136,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
-
         setContent {
             var backHeld by remember { mutableStateOf(false) }
             val animatedOpacity by animateFloatAsState(if (backHeld) 0.8f else 1f)
@@ -142,82 +154,64 @@ class MainActivity : ComponentActivity() {
 
                 if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
                 val selectedIndex = rememberSaveable { mutableIntStateOf(Settings.navTabs[Settings.initTab]) }
-                val selectedSet = remember { mutableStateOf(Settings.initTab > 4) }
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                        .scale(animatedOpacity).alpha(animatedOpacity),
-                    containerColor = when {
-                        Settings.showWallpaper -> androidx.compose.ui.graphics.Color.Transparent
-                        Settings.paintMode && isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.Black
-                        Settings.paintMode && !isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.White
-                        else -> MaterialTheme.colorScheme.surfaceContainerLow
-                    } ,
-                    bottomBar = {
-                        Column {
-                            MiniPlayer(selectedSet, this@MainActivity)
-                            Spacer(Modifier.height(3.dp))
-                            NavBar(selectedIndex, selectedSet)
-                        }
-                    },
-                    topBar = {
-                        Row(
-                            Modifier.fillMaxWidth().statusBarsPadding().padding(5.dp),
-                            Arrangement.End
+                val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        ModalDrawerSheet(
+                            Modifier
+                                .widthIn(Dp.Unspecified, 250.dp)
+                                .padding(5.dp),
+                            RoundedCornerShape(30.dp)
                         ) {
-                            if (Settings.updateState == 1) {
-                                FilledTonalButton(
-                                    { openLink(this@MainActivity,
-                                        "https://github.com/mb0028/CrystalMusic/releases/latest")
-                                    }
-                                ) { Text("Update available")}
-                                Spacer(Modifier.width(5.dp))
-                            }
-                            FilledTonalIconButton(
-                                {
-                                    startActivity(Intent(this@MainActivity,
-                                        SettingsActivity::class.java))
-                                }
-                            ) { Icon(settings, null) }
+                            Drawer(selectedIndex, drawerState)
                         }
                     }
                 ) {
-                    Box {
-                        when (selectedIndex.intValue) {
-                            0 -> {
-                                var refreshing by remember { mutableStateOf(false) }
-                                PullToRefreshBox(
-                                    refreshing,
-                                    {
-                                        lifecycleScope.launch {
-                                            refreshing = true
-                                            isReloading = true
-                                            delay(100.milliseconds)
-                                            refreshTracksList(this@MainActivity)
-                                            refreshing = false
-                                            isReloading = false
-                                        }
-                                    }
-                                ) {
-                                    TracksList()
-                                }
+                    Scaffold(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .scale(animatedOpacity)
+                            .alpha(animatedOpacity),
+                        containerColor = when {
+                            Settings.showWallpaper -> androidx.compose.ui.graphics.Color.Transparent
+                            Settings.paintMode && isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.Black
+                            Settings.paintMode && !isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.White
+                            else -> MaterialTheme.colorScheme.surfaceContainerLow
+                        },
+                        bottomBar = {
+                            Column {
+                                MiniPlayer(this@MainActivity)
+                                Spacer(Modifier.height(3.dp))
+                                NavBar(selectedIndex)
                             }
-                            1 -> QueryPage()
-                            2 -> PlaylistsPage()
-                            3 -> FoldersPage()
-                            4 -> SearchPage(this@MainActivity)
-                            5 -> CustomTagsPage("artists", this@MainActivity)
-                            6 -> CustomTagsPage("albums", this@MainActivity)
-                            7 -> CustomTagsPage("genres", this@MainActivity)
-                            8 -> CustomTagsPage("bitrates", this@MainActivity)
-                            else -> {
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    Text("Coming soon!")
+                        },
+                        topBar = {
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .statusBarsPadding()
+                                    .padding(5.dp),
+                                Arrangement.Start
+                            ) {
+                                BadgedBox({
+                                    if (Settings.updateState == 1) {
+                                        Badge { Text("Update available")
+                                    } }
+                                }) {
+                                    FilledTonalIconButton(
+                                        {
+                                            CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.open() }
+                                        }
+                                    ) { Icon(settings, null) }
                                 }
                             }
                         }
+                    ) {
+                        MainContent(selectedIndex)
+                        EdgeLightingEffect(this)
                     }
-
-                    EdgeLightingEffect(this)
                 }
             }
         }
@@ -239,39 +233,95 @@ class MainActivity : ComponentActivity() {
             window.decorView.setBackgroundColor(Color.BLACK)
         }
     }
+
+    @Composable
+    fun MainContent(selectedIndex: MutableIntState) {
+        when (selectedIndex.intValue) {
+            0 -> {
+                var refreshing by remember { mutableStateOf(false) }
+                PullToRefreshBox(
+                    refreshing,
+                    {
+                        lifecycleScope.launch {
+                            refreshing = true
+                            isReloading = true
+                            delay(100.milliseconds)
+                            refreshTracksList(this@MainActivity)
+                            refreshing = false
+                            isReloading = false
+                        }
+                    }
+                ) {
+                    TracksList()
+                }
+            }
+            1 -> QueryPage()
+            2 -> PlaylistsPage()
+            3 -> FoldersPage()
+            4 -> SearchPage(this@MainActivity)
+            5 -> CustomTagsPage("artists", this@MainActivity)
+            6 -> CustomTagsPage("albums", this@MainActivity)
+            7 -> CustomTagsPage("genres", this@MainActivity)
+            8 -> CustomTagsPage("bitrates", this@MainActivity)
+            else -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Coming soon!")
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Drawer(selectedIndex: MutableIntState, drawerState: DrawerState) {
+        Text("Crystal Songs", Modifier.padding(16.dp), fontSize = 26.sp)
+        HorizontalDivider(Modifier.padding(vertical = 10.dp))
+
+        if (Settings.updateState == 1) {
+            CrystalDrawerItem(
+                "Click to update",
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ) {
+                openLink(
+                    this@MainActivity,
+                    "https://github.com/mb0028/CrystalMusic/releases/latest"
+                )
+            }
+        }
+        CrystalDrawerItem("Settings", icon = settings) {
+            startActivity(Intent(this@MainActivity,
+                SettingsActivity::class.java))
+        }
+        HorizontalDivider(Modifier.padding(vertical = 10.dp))
+
+        LazyColumn {
+           items(10) { i ->
+               CrystalDrawerItem(
+                   getCurrentNavItemName(i),
+                   selected = i == selectedIndex.intValue
+               ) {
+                   selectedIndex.intValue = i
+                   CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
+               }
+           }
+       }
+    }
 }
 
 @Composable
-fun NavBar(selectedIndex: MutableIntState, secondSet: MutableState<Boolean>) {
+private fun NavBar(selectedIndex: MutableIntState) {
     @Composable
     fun navBarItems() {
-        if (!secondSet.value) {
-            val state = remember { MutableTransitionState(false).apply { targetState = true } }
-            AnimatedVisibility(
-                state,
-                enter = slideInHorizontally { -100 }
-            ) {
-                Row {
-                    for (i in 0..4)
-                        NavTab(
-                            i,
-                            selectedIndex.intValue == Settings.navTabs[i]
-                        ) { selectedIndex.intValue = it }
-                }
-            }
-        } else {
-            val state = remember { MutableTransitionState(false).apply { targetState = true } }
-            AnimatedVisibility(
-                state,
-                enter = slideInHorizontally { 100 }
-            ) {
-                Row {
-                    for (i in 5..9)
-                        NavTab(
-                            i,
-                            selectedIndex.intValue == Settings.navTabs[i]
-                        ) { selectedIndex.intValue = it }
-                }
+        val state = remember { MutableTransitionState(false).apply { targetState = true } }
+        AnimatedVisibility(
+            state,
+            enter = slideInHorizontally { -100 }
+        ) {
+            Row {
+                for (i in 0..4)
+                    NavTab(
+                        i,
+                        selectedIndex.intValue == Settings.navTabs[i]
+                    ) { selectedIndex.intValue = it }
             }
         }
     }

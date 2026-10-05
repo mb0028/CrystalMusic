@@ -40,7 +40,7 @@ fun AddToPlaylistPopup(path: String, onDismissRequired: () -> Unit) {
             )
         },
         content = {
-            LazyColumn(contentPadding = PaddingValues(15.dp)) {
+            LazyColumn(contentPadding = PaddingValues(15.dp, 0.dp, 15.dp, 15.dp)) {
                 val count = Settings.playlists.count()
                 items(count) { i ->
                     val playlistItem by remember { mutableStateOf("Music -> $path") }

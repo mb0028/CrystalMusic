@@ -56,7 +56,7 @@ object Settings {
     var paintMode by mutableStateOf(false)
     var twoRowTrackCard by mutableStateOf(false)
     var lyricsAutoScroll by mutableStateOf(false)
-    var floatingNavBar by mutableStateOf(true)
+    var floatingNavBar by mutableStateOf(false)
     var fsStyle by mutableIntStateOf(0)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"

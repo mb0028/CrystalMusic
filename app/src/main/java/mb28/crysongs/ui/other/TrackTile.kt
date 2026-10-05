@@ -157,7 +157,8 @@ fun TrackTile(
                 ) {
                     Icon(
                         if (Settings.favorites.contains(path)) favorite else heart_plus,
-                        null
+                        null,
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

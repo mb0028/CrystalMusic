@@ -24,7 +24,6 @@ import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.music_note_2
 import mb28.crysongs.icons.queue_music
 import mb28.crysongs.icons.search
-import mb28.crysongs.icons.stylus_brush
 import mb28.crysongs.icons.theater_comedy
 
 @Composable
@@ -53,7 +52,7 @@ fun RowScope.NavTab(navIndex: Int, selected: Boolean, onClick: (Int) -> Unit) {
             )
         },
         label = {
-            Text(getName(i))
+            Text(getCurrentNavItemName(i))
         }
     )
 }
@@ -92,7 +91,7 @@ fun EditNavigationItemPopup(navIndex: Int, onDismissRequired: () -> Unit) {
                 items(10) {
                     EasySegmentedListItem(
                        null,
-                       getName(it),
+                       getCurrentNavItemName(it),
                        it, 10,
                        Modifier.padding(horizontal = 15.dp)
                     ) {
@@ -106,7 +105,7 @@ fun EditNavigationItemPopup(navIndex: Int, onDismissRequired: () -> Unit) {
     )
 }
 
-private fun getName(i: Int) : String =
+fun getCurrentNavItemName(i: Int) : String =
     when(i) {
         0 -> "Tracks"
         1 -> "Query"
@@ -117,6 +116,6 @@ private fun getName(i: Int) : String =
         6 -> "Albums"
         7 -> "Genres"
         8 -> "Bitrates"
-        9 -> "Other"
+        9 -> "Tools"
         else -> throw Exception()
     }

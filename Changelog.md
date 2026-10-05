@@ -3,15 +3,16 @@ Fullscreen player now have 2 styles that can be changed in settings:
 1. Crystal (Default)
 2. Full material 3 expressive (New)
 
-Might add more later
-
-- Performance improvements
+- Instead of two-layout navigation bar, other tabs are now accessible in the new navigation drawer
 - Massive UI improvements. some:
   - Adjusts font size
   - Add option to turn off floating navigation bar
+  - Mini player improvements
   - Add favorite button beside track tiles
   - Replaced some dialogs with bottom sheets to matches Pixel phones design
   - Landscape mode improvements
+- Performance improvements
+- Fix app crashes when opening fullscreen player and track has no tags
 
 ## v1.4.0 (Latest)
 - Improve landscape mode
