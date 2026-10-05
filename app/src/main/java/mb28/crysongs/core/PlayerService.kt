@@ -123,7 +123,7 @@ private class FavoriteMSC : MediaSession.Callback {
                     Settings.favorites.add(nowPlaying!!)
                     mediaSession?.setMediaButtonPreferences(listOf(favoriteRemoveButton, nextButton, aaa, previousButton))
                 }
-                Settings.save()
+                Settings.saveFavorites()
             }
             PLAY_NEXT -> { playNextOrPrevious() }
             PLAY_PREVIOUS -> { playNextOrPrevious(false) }
