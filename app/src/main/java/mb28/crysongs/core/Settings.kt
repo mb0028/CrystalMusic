@@ -149,6 +149,7 @@ object Settings {
         } else {
             favFile.createNewFile()
             saveFavorites()
+            save()
         }
 
         if (navTabs.count() != 10) {
