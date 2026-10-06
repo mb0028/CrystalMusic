@@ -65,13 +65,12 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
@@ -82,12 +81,27 @@
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".TagEditorActivity"
             android:exported="false"
             android:label="@string/title_activity_tag_editor"
             android:theme="@style/Theme.CrySongs"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".SoundPickerActivity"
+            android:exported="true"
+            android:label="@string/soundpickeractivity"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter android:label="Sound Picker">
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name=".glance.PlayerWidgetReceiver"

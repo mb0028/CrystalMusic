@@ -46,7 +46,7 @@ data class Track(
         }
 
 
-        private fun getUri(path: String, context: Context): Uri? {
+        fun getUri(path: String, context: Context): Uri? {
             context.contentResolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 arrayOf(MediaStore.Audio.Media._ID),
