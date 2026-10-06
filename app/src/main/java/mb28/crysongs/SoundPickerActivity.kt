@@ -72,7 +72,7 @@ class SoundPickerActivity : ComponentActivity() {
                     Modifier.fillMaxSize(),
                     topBar = {
                         TopAppBar(
-                            { Text("Choose File") },
+                            { Text(intent.getStringExtra(Intent.EXTRA_TITLE) ?: "Choose File") },
                             navigationIcon = {
                                 IconButton(
                                     {

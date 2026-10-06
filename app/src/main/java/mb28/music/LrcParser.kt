@@ -22,6 +22,12 @@ class LrcParser {
         return noTimedLines == Count
     }
 
+    constructor(text: String, boolean: Boolean) {
+        text.split('\n').forEach {
+            LyricLines.add(LyricLine(0f, it))
+        }
+    }
+
     // This is a bit funky but it works
     constructor(path: String) {
         val linesWithTime = mutableMapOf<Float, MutableList<String>>()

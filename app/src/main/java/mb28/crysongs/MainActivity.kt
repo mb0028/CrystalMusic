@@ -93,6 +93,7 @@ import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
 import mb28.crysongs.ui.more_pages.SearchPage
+import mb28.crysongs.ui.more_pages.ToolsPage
 import mb28.crysongs.ui.other.CrystalDrawerItem
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.NavTab
@@ -264,6 +265,7 @@ class MainActivity : ComponentActivity() {
             6 -> CustomTagsPage("albums", this@MainActivity)
             7 -> CustomTagsPage("genres", this@MainActivity)
             8 -> CustomTagsPage("bitrates", this@MainActivity)
+            9 -> ToolsPage(this@MainActivity)
             else -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Coming soon!")

@@ -97,11 +97,19 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter android:label="Sound Picker">
                 <action android:name="android.intent.action.PICK" />
+                <action android:name="android.intent.action.CHOOSER" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".LrcMakerActivity"
+            android:exported="false"
+            android:label="@string/lrcMakerActivity"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize" />
 
         <receiver
             android:name=".glance.PlayerWidgetReceiver"
