@@ -25,7 +25,11 @@ class LrcParser {
 
     constructor(text: String, boolean: Boolean) {
         text.split('\n').forEach {
-            LyricLines.add(LyricLine.FromString(it))
+            if (it.IsTimedSection()) {
+                LyricLines.add(LyricLine.FromString(it))
+            } else {
+                LyricLines.add(LyricLine(0f, it))
+            }
         }
     }
 
