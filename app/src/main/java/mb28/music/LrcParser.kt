@@ -4,8 +4,9 @@
 
 package mb28.music
 
-import androidx.compose.ui.util.fastRoundToInt
 import java.io.File
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 class LrcParser {
     val LyricLines = mutableListOf<LyricLine>()
@@ -111,20 +112,22 @@ class LrcParser {
         var lrc = ""
         val count = Count
         LyricLines.forEachIndexed { i, ll ->
-            val timeInt = ll.TimeStomp.fastRoundToInt()
-            val t = (timeInt / 60).coerceAtLeast(0).toString().padStart(2, '0') +
-                ":" + timeInt.rem(60).toString().padStart(2, '0') +
-                "." + (ll.TimeStomp * 1000).fastRoundToInt().rem(1000).toString().padStart(3, '0').substring(0, 2)
-            lrc += "[$t]${ll.Lyric}"
-            if (i != count - 1) {
-                lrc += "\n"
+            (ll.TimeStomp * 1000f).roundToInt().milliseconds.toComponents { minutes, seconds, nanoseconds ->
+                lrc += "[${minutes.toString().padStart(2, '0')}" +
+                        ":${seconds.toString().padStart(2, '0')}" +
+                        ".${nanoseconds.toString().padStart(3, '0').substring(0, 2)}]" +
+                        ll.Lyric
+                if (i != count - 1) {
+                    lrc += "\n"
+                }
             }
+
         }
         return lrc
     }
 }
 
-data class LyricLine(val TimeStomp: Float, val Lyric: String) {
+data class LyricLine(var TimeStomp: Float, var Lyric: String) {
     var Lyric2: String? = null
     var Lyric3: String? = null
     companion object {

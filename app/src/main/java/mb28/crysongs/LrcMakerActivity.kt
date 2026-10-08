@@ -44,7 +44,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DefaultMonotonicFrameClock
-import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +51,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
@@ -60,9 +58,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastCoerceAtMost
-import androidx.compose.ui.util.fastRoundToInt
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +69,6 @@ import kotlinx.coroutines.withContext
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.formatDurationMs
 import mb28.crysongs.icons.arrow_back
-import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.note_alt
 import mb28.crysongs.icons.save
 import mb28.crysongs.icons.timer_arrow_down
@@ -285,7 +280,12 @@ class LrcMakerActivity : ComponentActivity() {
                         var line by remember { mutableStateOf(it.LyricLines[i]) }
                         OutlinedCard(
                             {
-
+                                editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
+                                if (!editorPlayer.isPlaying) {
+                                    editorPlayer.start()
+                                    isPlaying = true
+                                }
+                                selectedLine = i
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -304,44 +304,27 @@ class LrcMakerActivity : ComponentActivity() {
                                 Text(
                                     line.Lyric,
                                     Modifier
-                                        .fillMaxWidth(0.8f)
+                                        .fillMaxWidth()
                                         .align(Alignment.TopStart),
                                     maxLines = 3,
                                     overflow = TextOverflow.Ellipsis
                                 )
-                                val timeInt = line.TimeStomp.fastRoundToInt()
-                                Text(
-                                    (timeInt / 60).fastCoerceAtLeast(0).toString().padStart(2, '0') +
-                                    ":" + timeInt.rem(60).toString().padStart(2, '0') +
-                                    ":" + (line.TimeStomp * 1000).fastRoundToInt().rem(1000).toString().padStart(3, '0'),
-                                    Modifier.align(Alignment.BottomStart)
-                                )
-                                FilledIconButton(
-                                    {
-                                        editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
-                                        if (!editorPlayer.isPlaying) {
-                                            editorPlayer.start()
-                                            isPlaying = true
-                                        }
-                                        selectedLine = i
-                                    },
-                                    shape = RoundedCornerShape(15.dp),
-                                    modifier = Modifier
-                                        .size(45.dp)
-                                        .align(Alignment.TopEnd)
-                                ) {
-                                    Icon(
-                                        painterResource(R.drawable.play_arrow_24px),
-                                        null
+                                (line.TimeStomp * 1000f).roundToInt().milliseconds.toComponents { minutes, seconds, nanoseconds ->
+                                    Text(
+                                        minutes.toString().padStart(2, '0') +
+                                            ":${seconds.toString().padStart(2, '0')}" +
+                                            ".${nanoseconds.toString().padStart(3, '0').substring(0, 3)}",
+                                        Modifier.align(Alignment.BottomStart)
                                     )
                                 }
+
                                 Row(
                                     Modifier.align(Alignment.BottomEnd),
                                     verticalAlignment = Alignment.Bottom
                                 ) {
                                     OutlinedButton(
                                         {
-                                            lrcParser?.LyricLines[i] = line.copy(TimeStomp = line.TimeStomp - 0.1f)
+                                            lrcParser!!.LyricLines[i].TimeStomp -= 0.1f
                                             line = lrcParser!!.LyricLines[i]
                                             editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
                                             selectedLine = i
@@ -352,7 +335,7 @@ class LrcMakerActivity : ComponentActivity() {
                                     Spacer(Modifier.width(5.dp))
                                     OutlinedButton(
                                         {
-                                            lrcParser?.LyricLines[i] = line.copy(TimeStomp = line.TimeStomp + 0.1f)
+                                            lrcParser!!.LyricLines[i].TimeStomp += 0.1f
                                             line = lrcParser!!.LyricLines[i]
                                             editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
                                             selectedLine = i
