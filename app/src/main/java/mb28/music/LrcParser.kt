@@ -4,6 +4,7 @@
 
 package mb28.music
 
+import androidx.compose.ui.util.fastRoundToInt
 import java.io.File
 
 class LrcParser {
@@ -24,7 +25,7 @@ class LrcParser {
 
     constructor(text: String, boolean: Boolean) {
         text.split('\n').forEach {
-            LyricLines.add(LyricLine(0f, it))
+            LyricLines.add(LyricLine.FromString(it))
         }
     }
 
@@ -100,6 +101,22 @@ class LrcParser {
             return LyricLines.indexOf(LyricLines.find { audioPosInSeconds <= it.TimeStomp }) - 1
         }
         return -1
+    }
+
+    override fun toString(): String {
+        var lrc = ""
+        val count = Count
+        LyricLines.forEachIndexed { i, ll ->
+            val timeInt = ll.TimeStomp.fastRoundToInt()
+            val t = (timeInt / 60).coerceAtLeast(0).toString().padStart(2, '0') +
+                ":" + timeInt.rem(60).toString().padStart(2, '0') +
+                "." + (ll.TimeStomp * 1000).fastRoundToInt().rem(1000).toString().padStart(3, '0').substring(0, 2)
+            lrc += "[$t]${ll.Lyric}"
+            if (i != count - 1) {
+                lrc += "\n"
+            }
+        }
+        return lrc
     }
 }
 
