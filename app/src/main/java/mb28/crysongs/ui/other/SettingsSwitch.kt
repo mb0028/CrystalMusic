@@ -28,16 +28,11 @@ fun SettingSwitch(checked: Boolean, label: String, i: Int, count: Int,
             if (desc.isNotEmpty()) {
                 Text(desc, fontSize = 14.sp)
             }
-        }
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            Arrangement.SpaceBetween,
-            Alignment.CenterVertically
-        ) {
-            Text(label)
+        },
+        trailingContent = {
             Switch(checked, onChanged, enabled = enable)
         }
-
+    ) {
+        Text(label)
     }
 }

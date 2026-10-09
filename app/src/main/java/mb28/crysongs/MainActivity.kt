@@ -194,7 +194,7 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .fillMaxWidth()
                                     .statusBarsPadding()
-                                    .padding(5.dp),
+                                    .padding(start = 15.dp),
                                 Arrangement.Start
                             ) {
                                 BadgedBox({

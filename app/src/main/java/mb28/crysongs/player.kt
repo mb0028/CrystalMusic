@@ -24,6 +24,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.util.fastForEach
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.glance.appwidget.updateAll
@@ -274,7 +275,7 @@ suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
     val projection = arrayOf(
         MediaStore.MediaColumns.DATA, MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.GENRE,
-        MediaStore.Audio.Media.BITRATE
+        MediaStore.Audio.Media.BITRATE, MediaStore.Audio.Media.DURATION
     )
 
     context.contentResolver.query(
@@ -293,9 +294,18 @@ suspend fun refreshTracksList(context: Context) = withContext(Dispatchers.IO) {
         val albumC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
         val genreC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
         val bitrateC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.BITRATE)
+        val dC = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+        val durationFilter = Settings.minDuration * 1000
 
-        while (cursor.moveToNext()) {
+        loop@ while (cursor.moveToNext()) {
             val path = cursor.getString(pc)
+            Settings.libraryExclude.fastForEach {
+                if (path.startsWith(it))
+                    continue@loop
+            }
+            if (cursor.getLong(dC) < durationFilter)
+                continue@loop
+
             val album = cursor.getString(albumC) ?: "???"
             val artist = cursor.getString(artistC) ?: "???"
             val genre = cursor.getString(genreC) ?: "???"

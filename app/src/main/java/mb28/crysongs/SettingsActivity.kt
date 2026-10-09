@@ -19,13 +19,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -49,10 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -62,16 +60,21 @@ import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.experimental
 import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.arrow_back
+import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.flag
+import mb28.crysongs.icons.library_add
 import mb28.crysongs.ui.fullscreen_player.fullscreenCoverShape
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.EditNavigationItemPopup
 import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.other.SettingSwitch
+import mb28.crysongs.ui.popups.AddPathPopup
 import mb28.crysongs.ui.popups.FlagsPopup
 import mb28.crysongs.ui.theme.CrySongsTheme
 import mb28.crysongs.ui.theme.FSPlayerUIPreview
 import mb28.crysongs.ui.theme.UIPreview
+import mb28.monoP.icons.add_2
+import mb28.monoP.icons.delete_forever
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -316,12 +319,80 @@ private fun FsSettings() {
 
 @Composable
 private fun IndexingSettings() {
-    val count = 1
+    val count = 2
+    var showPathPicker by remember { mutableStateOf(false) }
+    val minduState = rememberSliderState(
+        Settings.minDuration.toFloat(),
+        trackRange = 0f..120f
+    )
     Column(Modifier.padding(10.dp)) {
         SettingSwitch(
             Settings.sortOrderDesc,
             "Descending sort order", 0, count
         ) { Settings.sortOrderDesc = it; Settings.save() }
+        SegmentedListItem(
+            ListItemDefaults.segmentedShapes(1, count),
+            Modifier.padding(bottom = 3.dp),
+            colors = ListItemDefaults.segmentedColors(
+                MaterialTheme.colorScheme.surface
+            ),
+            supportingContent = {
+                Slider(
+                    minduState,
+                    onValueChange = {
+                        minduState.value = it
+                        Settings.minDuration = it.roundToInt()
+                    },
+                    onValueChangeFinished = {
+                        Settings.save()
+                    },
+                )
+            },
+        ) {
+            Text("Min track duration: ${Settings.minDuration}")
+        }
+        Spacer(Modifier.height(10.dp))
+        ListItem(
+            trailingContent = {
+                FilledIconButton({
+                    showPathPicker = true
+                }) { Icon(add_2, null) }
+            },
+            supportingContent = {
+                Text("Includes subfolders too")
+            },
+            modifier = Modifier.clip(RoundedCornerShape(15.dp))
+                .padding(bottom = 3.dp)
+        ) { Text("Library exclude:") }
+
+        Settings.libraryExclude.forEach {
+            ListItem(
+                trailingContent = {
+                    FilledIconButton(
+                        {
+                            Settings.libraryExclude.remove(it)
+                            Settings.save()
+                        },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            MaterialTheme.colorScheme.error,
+                            MaterialTheme.colorScheme.onError
+                        )
+                    ) { Icon(delete_forever, null) }
+                },
+                modifier = Modifier.clip(RoundedCornerShape(25.dp))
+                    .padding(bottom = 3.dp)
+            ) { Text(it, fontSize = 12.sp) }
+        }
+    }
+
+    if (showPathPicker) {
+        AddPathPopup {
+            showPathPicker = false
+            if (it != null) {
+                Settings.libraryExclude.add(it)
+                Settings.save()
+            }
+        }
     }
 }
 

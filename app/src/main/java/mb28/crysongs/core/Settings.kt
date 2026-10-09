@@ -24,6 +24,8 @@ object Settings {
 
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()
+    val libraryInclude = mutableStateListOf<String>()
+    val libraryExclude = mutableStateListOf<String>()
     val navTabs = mutableStateListOf<Int>()
     var initTab by mutableIntStateOf(0)
 
@@ -58,6 +60,7 @@ object Settings {
     var lyricsAutoScroll by mutableStateOf(false)
     var floatingNavBar by mutableStateOf(false)
     var fsStyle by mutableIntStateOf(0)
+    var minDuration by mutableIntStateOf(30)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -79,6 +82,8 @@ object Settings {
         favorites.clear()
         playlists.clear()
         navTabs.clear()
+        libraryInclude.clear()
+        libraryExclude.clear()
         val a = File(appFolder)
         val atc = File(appCacheThumbsFolder)
         if (!a.exists() || !atc.exists()) {
@@ -96,6 +101,8 @@ object Settings {
                         }
                     }
                     s.startsWith("[Nav]") -> navTabs.add(s.removePrefix("[Nav]").toInt())
+                    s.startsWith("[LibI]") -> libraryInclude.add(s.removePrefix("[LibI]"))
+                    s.startsWith("[LibX]") -> libraryExclude.add(s.removePrefix("[LibX]"))
                     s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
                     s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
                     s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
@@ -128,6 +135,7 @@ object Settings {
                     s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
                     s.startsWith("[floatingNavBar]") -> floatingNavBar = s.removePrefix("[floatingNavBar]").toBooleanStrict()
                     s.startsWith("[FSStyle]") -> fsStyle = s.removePrefix("[FSStyle]").toInt()
+                    s.startsWith("[MinDuration]") -> minDuration = s.removePrefix("[MinDuration]").toInt()
                     s.startsWith("[Favorite]") -> { // TODO: remove in 2027/01
                         val path = s.removePrefix("[Favorite]")
                         if (File(path).exists()) {
@@ -137,6 +145,8 @@ object Settings {
                 }
             }
         } else {
+            val ex = Environment.getExternalStorageDirectory().path
+            libraryExclude.addAll(arrayOf("$ex/Alarms", "$ex/Notifications", "$ex/Ringtones"))
             file.createNewFile()
             save()
         }
@@ -202,10 +212,21 @@ object Settings {
         data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
         data += "[floatingNavBar]$floatingNavBar\n"
         data += "[FSStyle]$fsStyle\n"
+        data += "[MinDuration]$minDuration\n"
 
         data += "\n"
         playlists.forEach {
             data += "[crym3u]$it\n"
+        }
+
+        data += "\n"
+        libraryInclude.forEach {
+            data += "[LibI]$it\n"
+        }
+
+        data += "\n"
+        libraryExclude.forEach {
+            data += "[LibX]$it\n"
         }
 
         data += "[InitTab]$initTab\n"

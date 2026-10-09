@@ -1,3 +1,10 @@
+## v1.5.1 (Upcoming)
+- Add LRC Maker. can be found in tools tab
+- Add sound picker
+- Add option to filter tracks by duration
+- Add option to exclude folders
+- Small improvements
+
 ## v1.5.0 (Latest)
 
 - Massive UI improvements. some:
