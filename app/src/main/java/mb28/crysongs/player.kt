@@ -94,7 +94,7 @@ var duration by mutableLongStateOf(0L)
 var visualizationData by mutableStateOf(VisualizerData())
 
 private const val NO_LYRIC = "No lyrics..."
-private val playerLoopDelay = 150.milliseconds
+private val playerLoopDelay = 100.milliseconds
 private var hasLrc = false
 private var lastNowPlaying: String? = null
 private val scope = CoroutineScope(Dispatchers.Main)
@@ -226,7 +226,11 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                         }
                         return@withContext
                     }
-                } else privateNowPlayingCover = null
+                } else {
+                    privateNowPlayingCover = null
+                    notificationColor = null
+                    trackCoverPrimary = null
+                }
 
                 hasLrc = Track.hasLRC(nowPlaying!!)
                 lrcParser = if (hasLrc) { LrcParser(Track.lrcPath(nowPlaying!!)) } else { null }
