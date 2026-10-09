@@ -324,8 +324,8 @@ class LrcMakerActivity : ComponentActivity() {
                                 ) {
                                     OutlinedButton(
                                         {
-                                            lrcParser!!.LyricLines[i].TimeStomp -= 0.1f
-                                            line = lrcParser!!.LyricLines[i]
+                                            lrcParser!!.LyricLines[i] = line.copy(TimeStomp = line.TimeStomp - 0.1f)
+                                            line = lrcParser!!.LyricLines[i].copy()
                                             editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
                                             selectedLine = i
                                         }
@@ -335,8 +335,8 @@ class LrcMakerActivity : ComponentActivity() {
                                     Spacer(Modifier.width(5.dp))
                                     OutlinedButton(
                                         {
-                                            lrcParser!!.LyricLines[i].TimeStomp += 0.1f
-                                            line = lrcParser!!.LyricLines[i]
+                                            lrcParser!!.LyricLines[i] = line.copy(TimeStomp = line.TimeStomp + 0.1f)
+                                            line = lrcParser!!.LyricLines[i].copy()
                                             editorPlayer.seekTo((line.TimeStomp * 1000).roundToInt())
                                             selectedLine = i
                                         }
@@ -346,7 +346,7 @@ class LrcMakerActivity : ComponentActivity() {
                                     Spacer(Modifier.width(5.dp))
                                     FilledIconButton(
                                         {
-                                            lrcParser?.LyricLines[i] = line.copy(TimeStomp = (editorPlayer.currentPosition / 1000f))
+                                            lrcParser!!.LyricLines[i] = line.copy(TimeStomp = (editorPlayer.currentPosition / 1000f) - 0.1f)
                                             selectedLine = (i + 1).fastCoerceAtMost(lrcParser!!.Count)
                                             line = lrcParser!!.LyricLines[i]
                                             lifecycleScope.launch { withContext(DefaultMonotonicFrameClock) {
