@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -55,8 +57,14 @@ import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.playerQuery
 import mb28.crysongs.position
+import mb28.crysongs.requestBlur
 import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.time.Duration.Companion.milliseconds
+
+const val REQUEST_CODE_FS_PLAYER = 42
+const val FS_RESULT_OPEN_ARTIST = 43
+const val FS_RESULT_OPEN_ALBUM = 44
+const val EXTRA_ARTIST_ALBUM = "EXTRA_ARTIST_ALBUM"
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -85,8 +93,10 @@ fun MiniPlayer(context: Activity) {
                 shape = shape
             )
             .clickable {
+                requestBlur = true
                 val intent = Intent(context, FullscreenPlayerActivity::class.java)
-                context.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
+                context.startActivityForResult(intent, REQUEST_CODE_FS_PLAYER,
+                    ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
             },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -96,8 +106,20 @@ fun MiniPlayer(context: Activity) {
             "Track cover",
             contentScale = ContentScale.FillHeight,
             modifier = Modifier.aspectRatio(1f).padding(3.dp).clip(coverShape)
-                .clickable { if (nowPlaying != null) showMoreOptions = true }
+                .clickable {
+                    if (nowPlaying != null) {
+                        showMoreOptions = true; requestBlur = true
+                    }
+                }
         )
+        Box {
+            DropdownMenuPopup(
+                nowPlaying != null && showMoreOptions,
+                { showMoreOptions = false; requestBlur = false }
+            ) {
+                TrackMoreOptionsPopup(nowPlaying!!, nowPlayingTags?.title)
+            }
+        }
 
         Column(
             Modifier
@@ -153,12 +175,6 @@ fun MiniPlayer(context: Activity) {
                 painterResource(if (isPlaying) R.drawable.pause_24px else R.drawable.play_arrow_24px),
                 null
             )
-        }
-    }
-
-    if (showMoreOptions) {
-        TrackMoreOptionsPopup(nowPlaying!!, nowPlayingTags?.title) {
-            showMoreOptions = false
         }
     }
 }

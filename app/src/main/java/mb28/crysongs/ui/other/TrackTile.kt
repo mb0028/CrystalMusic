@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -56,6 +57,7 @@ import mb28.crysongs.icons.favorite
 import mb28.crysongs.icons.heart_plus
 import mb28.crysongs.noCoverBitmap
 import mb28.crysongs.nowPlaying
+import mb28.crysongs.requestBlur
 import mb28.crysongs.setAndPlay
 import mb28.crysongs.ui.popups.TrackMoreOptionsPopup
 import kotlin.math.roundToInt
@@ -126,6 +128,12 @@ fun TrackTile(
             },
             contentPadding = PaddingValues(5.dp),
             leadingContent = {
+                DropdownMenuPopup(
+                    showMoreOptions,
+                    { showMoreOptions = false; requestBlur = false }
+                ) {
+                    TrackMoreOptionsPopup(path, t?.title)
+                }
                 Box {
                     if (Settings.gradientColoring) {
                         Image(
@@ -145,7 +153,7 @@ fun TrackTile(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .aspectRatio(1f)
-                                .clickable { showMoreOptions = true }
+                                .clickable { showMoreOptions = true; requestBlur = true }
                                 .clip(defaultPressedShape)
                         )
                     }
@@ -209,12 +217,6 @@ fun TrackTile(
                     )
                 }
             }
-        }
-    }
-
-    if (showMoreOptions) {
-        TrackMoreOptionsPopup(path, t?.title) {
-            showMoreOptions = false
         }
     }
 }

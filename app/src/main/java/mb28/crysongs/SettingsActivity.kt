@@ -166,9 +166,13 @@ private fun UISettings() {
             "Gradient coloring", 2, count,
         ) { Settings.gradientColoring = it; Settings.save() }
         SettingSwitch(
+            Settings.hideNavBar,
+            "Hide navigation bar", 2, count,
+        ) { Settings.hideNavBar = it; Settings.save() }
+        SettingSwitch(
             Settings.floatingNavBar,
-            "Floating navigation bar", 2, count,
-            desc = "Also changes mini player style"
+            if (Settings.hideNavBar) "Rounded mini player" else "Floating navigation bar", 2, count,
+            desc = if (Settings.hideNavBar) "" else "Also changes mini player style",
         ) { Settings.floatingNavBar = it; Settings.save() }
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),

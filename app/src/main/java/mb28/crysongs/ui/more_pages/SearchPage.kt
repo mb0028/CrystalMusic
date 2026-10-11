@@ -50,14 +50,16 @@ fun SearchPage(activity: Activity) {
     val scope = rememberCoroutineScope { Dispatchers.IO }
 
     fun research(input: String) {
-        scope.launch {
-            researching = true
-            delay(50.milliseconds)
-            if (searchPageSearchText.isNotBlank()) {
-                searchResult = Track.search(input, activity).toMutableStateList()
+        if (!researching) {
+            scope.launch {
+                researching = true
+                delay(40.milliseconds)
+                if (searchPageSearchText.isNotBlank()) {
+                    searchResult = Track.search(input, activity).toMutableStateList()
+                }
+                else searchResult.clear()
+                researching = false
             }
-            else searchResult.clear()
-            researching = false
         }
     }
 

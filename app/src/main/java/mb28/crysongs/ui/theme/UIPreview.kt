@@ -104,25 +104,30 @@ fun UIPreview(modifier: Modifier = Modifier) {
                         if (Settings.floatingNavBar) CircleShape else RoundedCornerShape(10.dp)
                     )
                 )
-                if (Settings.floatingNavBar) {
-                    Row(
-                        Modifier
-                            .padding(10.dp, 0.dp, 10.dp, 10.dp)
-                            .fillMaxWidth().height(45.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.95f)),
-                        Arrangement.SpaceEvenly,
-                        Alignment.CenterVertically
-                    ) {
-                        NavItems()
+                when {
+                    Settings.hideNavBar -> { }
+                    Settings.floatingNavBar -> {
+                        Row(
+                            Modifier
+                                .padding(10.dp, 0.dp, 10.dp, 10.dp)
+                                .fillMaxWidth().height(45.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.95f)),
+                            Arrangement.SpaceEvenly,
+                            Alignment.CenterVertically
+                        ) {
+                            NavItems()
+                        }
                     }
-                } else {
-                    Row(
-                        Modifier.fillMaxWidth().height(45.dp).background(MaterialTheme.colorScheme.surfaceContainerHigh),
-                        Arrangement.SpaceEvenly,
-                        Alignment.CenterVertically
-                    ) {
-                        NavItems()
+                    else -> {
+                        Row(
+                            Modifier.fillMaxWidth().height(45.dp)
+                                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                            Arrangement.SpaceEvenly,
+                            Alignment.CenterVertically
+                        ) {
+                            NavItems()
+                        }
                     }
                 }
             }

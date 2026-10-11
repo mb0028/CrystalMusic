@@ -61,6 +61,8 @@ object Settings {
     var floatingNavBar by mutableStateOf(false)
     var fsStyle by mutableIntStateOf(0)
     var minDuration by mutableIntStateOf(30)
+    var hideNavBar by mutableStateOf(false)
+    var enableBlur by mutableStateOf(false)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -136,6 +138,9 @@ object Settings {
                     s.startsWith("[floatingNavBar]") -> floatingNavBar = s.removePrefix("[floatingNavBar]").toBooleanStrict()
                     s.startsWith("[FSStyle]") -> fsStyle = s.removePrefix("[FSStyle]").toInt()
                     s.startsWith("[MinDuration]") -> minDuration = s.removePrefix("[MinDuration]").toInt()
+                    s.startsWith("[hideNavBar]") -> hideNavBar = s.removePrefix("[hideNavBar]").toBooleanStrict()
+                    s.startsWith("[UIBlur]") -> enableBlur = s.removePrefix("[UIBlur]").toBooleanStrict()
+
                     s.startsWith("[Favorite]") -> { // TODO: remove in 2027/01
                         val path = s.removePrefix("[Favorite]")
                         if (File(path).exists()) {
@@ -213,6 +218,8 @@ object Settings {
         data += "[floatingNavBar]$floatingNavBar\n"
         data += "[FSStyle]$fsStyle\n"
         data += "[MinDuration]$minDuration\n"
+        data += "[hideNavBar]$hideNavBar\n"
+        data += "[UIBlur]$enableBlur\n"
 
         data += "\n"
         playlists.forEach {

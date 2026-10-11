@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.album
@@ -34,22 +35,7 @@ fun RowScope.NavTab(navIndex: Int, selected: Boolean, onClick: (Int) -> Unit) {
         selected,
         { onClick(i) },
         icon = {
-            Icon(
-                when(i) {
-                    0 -> music_note_2
-                    1 -> queue_music
-                    2 -> library_music
-                    3 -> folder
-                    4 -> search
-                    5 -> artist
-                    6 -> album
-                    7 -> theater_comedy
-                    8 -> fps30_select
-                    9 -> list_2
-                    else -> throw Exception()
-                },
-                null
-            )
+            Icon(getCurrentNavItemIcon(i), null)
         },
         label = {
             Text(getCurrentNavItemName(i))
@@ -117,5 +103,20 @@ fun getCurrentNavItemName(i: Int) : String =
         7 -> "Genres"
         8 -> "Bitrates"
         9 -> "Tools"
+        else -> throw Exception()
+    }
+
+fun getCurrentNavItemIcon(i: Int) : ImageVector =
+    when(i) {
+        0 -> music_note_2
+        1 -> queue_music
+        2 -> library_music
+        3 -> folder
+        4 -> search
+        5 -> artist
+        6 -> album
+        7 -> theater_comedy
+        8 -> fps30_select
+        9 -> list_2
         else -> throw Exception()
     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
@@ -48,6 +49,8 @@ import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 
+var customTabHighlightedItem by mutableStateOf<String?>(null)
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CustomTagsPage(listType: String, activity: Activity) {
@@ -58,6 +61,7 @@ fun CustomTagsPage(listType: String, activity: Activity) {
 
     var loading by remember { mutableStateOf(false) }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val scrollState = rememberLazyListState()
 
     fun getList() : MutableList<String> {
         return Track.getByAtt(
@@ -70,6 +74,17 @@ fun CustomTagsPage(listType: String, activity: Activity) {
             },
             activity
         )
+    }
+
+    LaunchedEffect(customTabHighlightedItem) {
+        try {
+            if (customTabHighlightedItem != null) {
+                customTabOpenedItems.clear()
+                lastClickedCustomTabItem = customTabHighlightedItem!!
+                customTabItemOpened = true
+                customTabHighlightedItem = null
+            }
+        } catch (e: Exception) { println(e) }
     }
 
     if (customTabItemOpened) {
@@ -88,6 +103,7 @@ fun CustomTagsPage(listType: String, activity: Activity) {
         enter = pageAnimation,
     ) {
         LazyColumn(
+            state = scrollState,
             contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
         ) {
             item {

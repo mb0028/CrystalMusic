@@ -1,12 +1,14 @@
-## v1.5.1 (Upcoming)
+## v1.5.10 (Latest)
 - Add LRC Maker. can be found in tools tab
 - Add sound picker
 - Add option to filter tracks by duration
 - Add option to exclude folders
-- Small improvements
+- Add option hide navigation bar
+- Clicking on artist/album in fullscreen player opens it
+- Other improvements
+- Fix app crashes when searching too fast
 
-## v1.5.0 (Latest)
-
+## v1.5.0
 - Massive UI improvements. some:
   - Instead of two-layout navigation bar, other tabs are now accessible in the new navigation drawer
   - Fullscreen player now have 2 styles that can be changed in settings

@@ -6,20 +6,26 @@ Android music player app designed for local library, simplicity & performance.
 
 - 🪶 Simple UI, easy to navigate
 - ✨ Play any audio format
-- 📃 Live notification that shows lyrics if LRC file for music is available
 - 🍃 Material 3 expressive
 - 🎨 Can change app font to any .ttf font file
 - 🧱 Homescreen widgets
 - 📦 Only 7 megabytes
 - 🟢 Android 13+ and TV support
+- 📃 Live notification that shows lyrics if LRC file for music is available
+
+[//]: # (Other features:)
+[//]: # (- Tag editor &#40;Experimental&#41;)
+[//]: # (- LRC maker)
+[//]: # (- Sound picker for other apps to use)
 
 To-Do
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Favorite folders/albums/artists
 - [ ] Online lyric finder & downloader
-- [x] Better landscape support
-- [x] Tag editor
+
+[//]: # (- [x] Better landscape support)
+[//]: # (- [x] Tag editor)
 
 ## Screenshots
 

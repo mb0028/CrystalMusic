@@ -1,6 +1,7 @@
 package mb28.crysongs
 
 import android.annotation.SuppressLint
+import android.app.ComponentCaller
 import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.Color
@@ -14,6 +15,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -36,6 +40,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingToolbarDefaults
@@ -52,16 +57,17 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DefaultMonotonicFrameClock
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -84,9 +90,13 @@ import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.menu
 import mb28.crysongs.icons.settings
+import mb28.crysongs.ui.EXTRA_ARTIST_ALBUM
+import mb28.crysongs.ui.FS_RESULT_OPEN_ALBUM
+import mb28.crysongs.ui.FS_RESULT_OPEN_ARTIST
 import mb28.crysongs.ui.LandscapePage
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
+import mb28.crysongs.ui.REQUEST_CODE_FS_PLAYER
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
@@ -94,9 +104,11 @@ import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
 import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.more_pages.ToolsPage
+import mb28.crysongs.ui.more_pages.customTabHighlightedItem
 import mb28.crysongs.ui.other.CrystalDrawerItem
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.NavTab
+import mb28.crysongs.ui.other.getCurrentNavItemIcon
 import mb28.crysongs.ui.other.getCurrentNavItemName
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
@@ -104,10 +116,13 @@ import kotlin.time.Duration.Companion.milliseconds
 
 var noCoverBitmap: ImageBitmap? = null
 var notificationColor: Int? = null
+var requestBlur by mutableStateOf(false)
 
 class MainActivity : ComponentActivity() {
+    val selectedIndex = mutableIntStateOf(0)
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
@@ -122,6 +137,7 @@ class MainActivity : ComponentActivity() {
         }
 
         Settings.load()
+        selectedIndex.intValue = Settings.navTabs[Settings.initTab]
         setupPermissions()
         setupPlayer()
         super.onCreate(savedInstanceState)
@@ -155,7 +171,6 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
-                val selectedIndex = rememberSaveable { mutableIntStateOf(Settings.navTabs[Settings.initTab]) }
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
 
                 ModalNavigationDrawer(
@@ -167,15 +182,23 @@ class MainActivity : ComponentActivity() {
                                 .padding(5.dp),
                             RoundedCornerShape(30.dp)
                         ) {
-                            Drawer(selectedIndex, drawerState)
+                            Drawer(drawerState)
                         }
                     }
                 ) {
-                    Scaffold(
+                    val blur by animateDpAsState(
+                        if (Settings.enableBlur && requestBlur) 15.dp else 0.dp,
+                        animationSpec = SpringSpec(
+                            Spring.DampingRatioMediumBouncy,
+                            Spring.StiffnessMediumLow
+                        )
+                    )
+                    Scaffold( //BottomSheetScaffold
                         modifier = Modifier
                             .fillMaxSize()
                             .scale(animatedOpacity)
-                            .alpha(animatedOpacity),
+                            .alpha(animatedOpacity)
+                            .blur(blur),
                         containerColor = when {
                             Settings.showWallpaper -> androidx.compose.ui.graphics.Color.Transparent
                             Settings.paintMode && isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.Black
@@ -186,9 +209,20 @@ class MainActivity : ComponentActivity() {
                             Column {
                                 MiniPlayer(this@MainActivity)
                                 Spacer(Modifier.height(3.dp))
-                                NavBar(selectedIndex)
+                                if (Settings.hideNavBar) {
+                                    Spacer(Modifier.navigationBarsPadding())
+                                } else {
+                                    NavBar(selectedIndex)
+                                }
                             }
                         },
+//                        sheetContent = {
+//                            MiniPlayer(this@MainActivity)
+//                        },
+//                        sheetSwipeEnabled = false,
+//                        sheetPeekHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 60.dp,
+//                        sheetContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+//                        sheetDragHandle = { },
                         topBar = {
                             Row(
                                 Modifier
@@ -204,6 +238,7 @@ class MainActivity : ComponentActivity() {
                                 }) {
                                     FilledTonalIconButton(
                                         {
+                                            requestBlur = true
                                             CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.open() }
                                         }
                                     ) { Icon(menu, null) }
@@ -211,7 +246,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        MainContent(selectedIndex)
+                        MainContent()
                         EdgeLightingEffect(this)
                     }
                 }
@@ -236,8 +271,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
+                                  caller: ComponentCaller) {
+        super.onActivityResult(requestCode, resultCode, data, caller)
+        requestBlur = false
+        if (requestCode == REQUEST_CODE_FS_PLAYER) when(resultCode) {
+            FS_RESULT_OPEN_ARTIST -> {
+                customTabHighlightedItem = data?.getStringExtra(EXTRA_ARTIST_ALBUM)
+                selectedIndex.intValue = 5
+            }
+            FS_RESULT_OPEN_ALBUM -> {
+                customTabHighlightedItem = data?.getStringExtra(EXTRA_ARTIST_ALBUM)
+                selectedIndex.intValue = 6
+            }
+        }
+    }
+
     @Composable
-    fun MainContent(selectedIndex: MutableIntState) {
+    fun MainContent() {
         when (selectedIndex.intValue) {
             0 -> {
                 var refreshing by remember { mutableStateOf(false) }
@@ -275,7 +326,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Drawer(selectedIndex: MutableIntState, drawerState: DrawerState) {
+    fun Drawer(drawerState: DrawerState) {
         Text("Crystal Songs", Modifier.padding(16.dp), fontSize = 26.sp)
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
@@ -285,13 +336,13 @@ class MainActivity : ComponentActivity() {
                 containerColor = MaterialTheme.colorScheme.errorContainer
             ) {
                 openLink(
-                    this@MainActivity,
+                    this,
                     "https://github.com/mb0028/CrystalMusic/releases/latest"
                 )
             }
         }
         CrystalDrawerItem("Settings", icon = settings) {
-            startActivity(Intent(this@MainActivity,
+            startActivity(Intent(this,
                 SettingsActivity::class.java))
         }
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
@@ -300,8 +351,10 @@ class MainActivity : ComponentActivity() {
            items(10) { i ->
                CrystalDrawerItem(
                    getCurrentNavItemName(i),
+                   icon = getCurrentNavItemIcon(i),
                    selected = i == selectedIndex.intValue
                ) {
+                   requestBlur = false
                    selectedIndex.intValue = i
                    CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
                }
@@ -338,7 +391,7 @@ private fun NavBar(selectedIndex: MutableIntState) {
                 .padding(horizontal = 15.dp)
                 .padding(bottom = 2.dp)
                 .height(65.dp),
-            colors = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
+            colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
                 toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(0.95f)
             ),
         ) {

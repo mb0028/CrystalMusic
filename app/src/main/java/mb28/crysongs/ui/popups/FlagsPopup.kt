@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSliderState
@@ -29,10 +30,21 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
         },
         text = {
             LazyColumn {
-                val count = 4
+                val count = 3
                 item {
                     Text("This features are experimental and might not work as expected.")
                     Spacer(Modifier.height(10.dp))
+                }
+                item {
+                    ListItem({ Settings.resetFirstTimeTips() }) {
+                        Text("Reset one-time-only tips")
+                    }
+                }
+                item {
+                    SettingSwitch(
+                        Settings.enableBlur,
+                        "Enable live blur", 0, count,
+                    ) { Settings.enableBlur = it; Settings.save() }
                 }
                 item {
                     SettingSwitch(
@@ -44,14 +56,14 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                 item {
                     SettingSwitch(
                         Settings.coverParallax,
-                        "Cover parallax", 2, count,
+                        "Cover parallax", 1, count,
                         Settings.waveformDataCapture
                     ) { Settings.coverParallax = it; Settings.save() }
                 }
                 item {
                     SettingSwitch(
                         Settings.windEffect,
-                        "Wind effect", 3, count,
+                        "Wind effect", 2, count,
                         Settings.waveformDataCapture
                     ) { Settings.windEffect = it; Settings.save() }
                 }

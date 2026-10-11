@@ -1,6 +1,7 @@
 package mb28.crysongs
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -15,6 +16,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -59,7 +61,11 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.fsStyle
+import mb28.crysongs.ui.EXTRA_ARTIST_ALBUM
+import mb28.crysongs.ui.FS_RESULT_OPEN_ALBUM
+import mb28.crysongs.ui.FS_RESULT_OPEN_ARTIST
 import mb28.crysongs.ui.PermissionsPage
+import mb28.crysongs.ui.REQUEST_CODE_FS_PLAYER
 import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
 import mb28.crysongs.ui.fullscreen_player.FSCover
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
@@ -179,7 +185,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffset: Int) {
+private fun Pager(innerPadding: PaddingValues, activity: FullscreenPlayerActivity, activityOffset: Int) {
     val roundness = activity.window.decorView.rootWindowInsets?.getRoundedCorner(
         RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
     val selectedTab = rememberPagerState(1) { 3 }
@@ -224,8 +230,22 @@ private fun Pager(innerPadding: PaddingValues, activity: Activity, activityOffse
 
                            Text(nowPlayingTags?.title ?: "", fontSize = 24.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                            Spacer(Modifier.height(10.dp))
-                           Text(nowPlayingTags?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                           Text(nowPlayingTags?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                           Text(
+                               nowPlayingTags?.artist ?: "", fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                               modifier = Modifier.clickable {
+                                   activity.setResult(FS_RESULT_OPEN_ARTIST, Intent()
+                                       .putExtra(EXTRA_ARTIST_ALBUM, nowPlayingTags?.artist))
+                                   activity.finish()
+                               }
+                           )
+                           Text(
+                               nowPlayingTags?.album ?: "", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                               modifier = Modifier.clickable {
+                                   activity.setResult(FS_RESULT_OPEN_ALBUM, Intent()
+                                       .putExtra(EXTRA_ARTIST_ALBUM, nowPlayingTags?.album))
+                                   activity.finish()
+                               }
+                           )
                        }
 
                        Column(
