@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
@@ -38,9 +40,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +56,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mb28.crysongs.core.Settings.tagsSpacer
 import mb28.crysongs.core.Track
@@ -98,18 +105,54 @@ class SoundPickerActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun Picker(padding: PaddingValues, activity: ComponentActivity) {
-    val count = tracks.count()
+    var searchText by remember { mutableStateOf("") }
+    val searchResult = remember { mutableStateListOf<String>() }
+    var researching by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope { Dispatchers.IO }
 
     LaunchedEffect(Unit) {
+        researching = true
         refreshTracksList(activity)
+        searchResult.clear()
+        searchResult.addAll(tracks.toMutableStateList())
+        researching = false
     }
 
-    LazyColumn(
-        contentPadding = padding
-    ) {
-        if (count != 0 && !isReloading) {
+    LazyColumn(contentPadding = padding) {
+        item {
+            OutlinedTextField(
+                searchText,
+                {
+                    searchText = it
+                    if (!researching && !isReloading) {
+                        scope.launch {
+                            researching = true
+                            searchResult.clear()
+                            delay(40.milliseconds)
+                            searchResult.addAll(if (searchText.isNotBlank()) {
+                                Track.search(searchText, activity)
+                            } else tracks)
+                            researching = false
+                        }
+                    }
+                },
+                label = {
+                    Text("Search title, artist or album (case insensitive)")
+                },
+                keyboardOptions = KeyboardOptions(
+                    showKeyboardOnFocus = true
+                ),
+                shape = RoundedCornerShape(35.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 5.dp)
+            )
+        }
+
+        val count = searchResult.count()
+        if (count != 0 && !researching) {
             items(count) { i ->
-                val path = tracks[i]
+                val path = searchResult[i]
                 val state = remember { MutableTransitionState(false).apply { targetState = true }}
                 var t: Track? by remember { mutableStateOf(null) }
                 var cover: ImageBitmap? by remember { mutableStateOf(null) }
@@ -147,17 +190,15 @@ private fun Picker(padding: PaddingValues, activity: ComponentActivity) {
                         },
                         contentPadding = PaddingValues(5.dp),
                         leadingContent = {
-                            Box {
-                                Box(Modifier.clip(RoundedCornerShape(10.dp))) {
-                                    Image(
-                                        cover ?: noCoverBitmap!!,
-                                        "Track cover",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .aspectRatio(1f)
-                                            .clip(RoundedCornerShape(10.dp))
-                                    )
-                                }
+                            Box(Modifier.clip(RoundedCornerShape(10.dp))) {
+                                Image(
+                                    cover ?: noCoverBitmap!!,
+                                    "Track cover",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(10.dp))
+                                )
                             }
                         },
                     ) {
