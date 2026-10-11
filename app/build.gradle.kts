@@ -31,6 +31,10 @@ android {
             optimization {
                 enable = true
             }
+            ndk {
+                abiFilters.clear()
+                abiFilters.add("arm64-v8a")
+            }
             proguardFiles.add(File("src/main/keepRules/rules.keep"))
         }
     }
