@@ -17,8 +17,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 33
         targetSdk = 37
-        versionCode = 15 // Reminder: Don't forget to change Version.txt
-        versionName = "v1.5.0-2026.10.05"
+        versionCode = 16 // Reminder: Don't forget to change Version.txt
+        versionName = "v1.5.10-2026.10.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,7 +29,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             optimization {
-                enable = false
+                enable = true
             }
             proguardFiles.add(File("src/main/keepRules/rules.keep"))
         }
