@@ -188,9 +188,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val blur by animateDpAsState(
                         if (Settings.enableBlur && requestBlur) 15.dp else 0.dp,
-                        animationSpec = SpringSpec(
-                            Spring.DampingRatioMediumBouncy,
-                            Spring.StiffnessMediumLow
+                        animationSpec = TweenSpec(
+                            300,
+                            easing = EaseOutCubic
                         )
                     )
                     Scaffold( //BottomSheetScaffold

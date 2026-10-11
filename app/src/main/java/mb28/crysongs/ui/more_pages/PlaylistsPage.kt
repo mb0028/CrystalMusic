@@ -45,6 +45,7 @@ import mb28.crysongs.icons.shuffle
 import mb28.crysongs.icons.swipe_down_alt
 import mb28.crysongs.icons.swipe_up_alt
 import mb28.crysongs.playerQuery
+import mb28.crysongs.requestBlur
 import mb28.crysongs.setAndPlay
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
@@ -121,7 +122,7 @@ fun PlaylistsPage() {
                         }
                         if (lastClickedPlPath != "#fav") {
                             FilledTonalIconButton(
-                                { showRenamePopup = true }
+                                { showRenamePopup = true; requestBlur = true }
                             ) {
                                 Icon(edit_note, null)
                             }
@@ -143,12 +144,12 @@ fun PlaylistsPage() {
                         }
                     } else {
                         FilledTonalIconButton(
-                            { showImportPopup = true }
+                            { showImportPopup = true; requestBlur = true }
                         ) {
                             Icon(download, null)
                         }
                         FilledTonalIconButton(
-                            { showNewPlaylistPopup = true }
+                            { showNewPlaylistPopup = true; requestBlur = true }
                         ) {
                             Icon(library_add, null)
                         }
@@ -264,13 +265,13 @@ fun PlaylistsPage() {
 
     if (showNewPlaylistPopup) {
         CreatePlaylistPopup {
-            showNewPlaylistPopup = false
+            showNewPlaylistPopup = false; requestBlur = false
         }
     }
 
     if (showRenamePopup) {
         RenamePlaylistPopup(plName) { newName, saved ->
-            showRenamePopup = false
+            showRenamePopup = false; requestBlur = false
             if (saved) {
                 save(newName)
             }
@@ -279,7 +280,7 @@ fun PlaylistsPage() {
 
     if (showImportPopup) {
         ImportPlaylistPopup {
-            showImportPopup = false
+            showImportPopup = false; requestBlur = false
         }
     }
 
