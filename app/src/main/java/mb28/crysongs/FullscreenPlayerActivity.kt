@@ -1,12 +1,12 @@
 package mb28.crysongs
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.transition.Slide
+import android.util.Log
 import android.view.RoundedCorner
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -57,15 +57,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.fsStyle
 import mb28.crysongs.ui.EXTRA_ARTIST_ALBUM
 import mb28.crysongs.ui.FS_RESULT_OPEN_ALBUM
 import mb28.crysongs.ui.FS_RESULT_OPEN_ARTIST
 import mb28.crysongs.ui.PermissionsPage
-import mb28.crysongs.ui.REQUEST_CODE_FS_PLAYER
 import mb28.crysongs.ui.fullscreen_player.FSChangePageRow
 import mb28.crysongs.ui.fullscreen_player.FSCover
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
@@ -102,6 +99,11 @@ class FullscreenPlayerActivity : ComponentActivity() {
 
         if (intent.getBooleanExtra(EXTRA_LOAD_FROM_OTHER_APPS, false)) {
             val path = intent.getStringExtra(EXTRA_PATH)
+            if (path == null) {
+                Log.wtf("Crystal Music", "App crashes because intent.getStringExtra(EXTRA_PATH) is null. " +
+                        "Normally this should never happens. open an issue on app's github page if you see this error")
+                throw UnsupportedOperationException()
+            }
             if (!Environment.isExternalStorageManager() ||
                 !getSystemService<PowerManager>()!!.isIgnoringBatteryOptimizations(packageName)) {
                 super.onCreate(savedInstanceState)
@@ -111,19 +113,9 @@ class FullscreenPlayerActivity : ComponentActivity() {
             Settings.load()
 
             setupPlayer {
-                lifecycleScope.launch {
-                    refreshTracksList(this@FullscreenPlayerActivity)
-                    var track: String? = null
-                    tracks.forEach {
-                        if (it.startsWith(path!!)) {
-                            track = it
-                        }
-                    }
-                    if (track == null) {
-                        finish()
-                    }
-                    setAndPlay(track!!, false)
-                }
+                playerQuery.clear()
+                playerQuery.add(path)
+                setAndPlay(playerQuery.first(), false)
             }
         }
 
