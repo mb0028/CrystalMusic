@@ -14,9 +14,9 @@ import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
@@ -27,9 +27,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -57,7 +61,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DefaultMonotonicFrameClock
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -74,6 +77,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
@@ -165,11 +169,7 @@ class MainActivity : ComponentActivity() {
             }
 
             CrySongsTheme {
-                if (LocalConfiguration.current.orientation == 2) {
-                    LandscapePage(this)
-                    return@CrySongsTheme
-                }
-
+                val isLandscape = LocalConfiguration.current.orientation == 2
                 if (notificationColor == null) { notificationColor = MaterialTheme.colorScheme.primary.toArgb() }
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -177,6 +177,7 @@ class MainActivity : ComponentActivity() {
                     drawerState = drawerState,
                     drawerContent = {
                         ModalDrawerSheet(
+                            drawerState,
                             Modifier
                                 .widthIn(Dp.Unspecified, 250.dp)
                                 .padding(5.dp),
@@ -206,7 +207,19 @@ class MainActivity : ComponentActivity() {
                             else -> MaterialTheme.colorScheme.surfaceContainerLow
                         },
                         bottomBar = {
-                            Column {
+                            if (isLandscape) {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(bottom = 10.dp, start = 15.dp)
+                                        .padding(end = WindowInsets.navigationBars.asPaddingValues()
+                                            .calculateEndPadding(LayoutDirection.Ltr)),
+                                    Arrangement.End
+                                ) {
+                                    Box(Modifier.fillMaxWidth(0.5f)) {
+                                        MiniPlayer(this@MainActivity)
+                                    }
+                                }
+                            }
+                            else Column {
                                 MiniPlayer(this@MainActivity)
                                 Spacer(Modifier.height(3.dp))
                                 if (Settings.hideNavBar) {
@@ -246,7 +259,12 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        MainContent()
+                        if (isLandscape) {
+                            LandscapePage(it, this)
+                        } else {
+                            MainContent()
+                        }
+
                         EdgeLightingEffect(this)
                     }
                 }
@@ -288,44 +306,6 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainContent() {
-        when (selectedIndex.intValue) {
-            0 -> {
-                var refreshing by remember { mutableStateOf(false) }
-                PullToRefreshBox(
-                    refreshing,
-                    {
-                        lifecycleScope.launch {
-                            refreshing = true
-                            isReloading = true
-                            delay(100.milliseconds)
-                            refreshTracksList(this@MainActivity)
-                            refreshing = false
-                            isReloading = false
-                        }
-                    }
-                ) {
-                    TracksList()
-                }
-            }
-            1 -> QueryPage()
-            2 -> PlaylistsPage()
-            3 -> FoldersPage()
-            4 -> SearchPage(this@MainActivity)
-            5 -> CustomTagsPage("artists", this@MainActivity)
-            6 -> CustomTagsPage("albums", this@MainActivity)
-            7 -> CustomTagsPage("genres", this@MainActivity)
-            8 -> CustomTagsPage("bitrates", this@MainActivity)
-            9 -> ToolsPage(this@MainActivity)
-            else -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Coming soon!")
-                }
-            }
-        }
-    }
-
-    @Composable
     fun Drawer(drawerState: DrawerState) {
         Text("Crystal Songs", Modifier.padding(16.dp), fontSize = 26.sp)
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
@@ -348,18 +328,56 @@ class MainActivity : ComponentActivity() {
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
         LazyColumn {
-           items(10) { i ->
-               CrystalDrawerItem(
-                   getCurrentNavItemName(i),
-                   icon = getCurrentNavItemIcon(i),
-                   selected = i == selectedIndex.intValue
-               ) {
-                   requestBlur = false
-                   selectedIndex.intValue = i
-                   CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
-               }
-           }
-       }
+            items(10) { i ->
+                CrystalDrawerItem(
+                    getCurrentNavItemName(i),
+                    icon = getCurrentNavItemIcon(i),
+                    selected = i == selectedIndex.intValue
+                ) {
+                    requestBlur = false
+                    selectedIndex.intValue = i
+                    CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MainActivity.MainContent() {
+    when (selectedIndex.intValue) {
+        0 -> {
+            var refreshing by remember { mutableStateOf(false) }
+            PullToRefreshBox(
+                refreshing,
+                {
+                    lifecycleScope.launch {
+                        refreshing = true
+                        isReloading = true
+                        delay(100.milliseconds)
+                        refreshTracksList(this@MainContent)
+                        refreshing = false
+                        isReloading = false
+                    }
+                }
+            ) {
+                TracksList()
+            }
+        }
+        1 -> QueryPage()
+        2 -> PlaylistsPage()
+        3 -> FoldersPage()
+        4 -> SearchPage(this@MainContent)
+        5 -> CustomTagsPage("artists", this@MainContent)
+        6 -> CustomTagsPage("albums", this@MainContent)
+        7 -> CustomTagsPage("genres", this@MainContent)
+        8 -> CustomTagsPage("bitrates", this@MainContent)
+        9 -> ToolsPage(this@MainContent)
+        else -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Coming soon!")
+            }
+        }
     }
 }
 

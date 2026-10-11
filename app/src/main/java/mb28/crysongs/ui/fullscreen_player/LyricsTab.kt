@@ -59,7 +59,7 @@ import mb28.crysongs.ui.other.fadingEdgeVertical
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun FSLyricsTab(modifier: Modifier = Modifier) {
+fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -120,55 +120,57 @@ fun FSLyricsTab(modifier: Modifier = Modifier) {
             }
         }
 
-        HorizontalFloatingToolbar(
-            false,
-            Modifier.navigationBarsPadding().padding(bottom = 5.dp),
-            colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
-                MaterialTheme.colorScheme.primaryContainer.copy(
-                    if (Settings.fsStyle == 0) 0.8f else 1f)
-            )
-        ) {
-            IconButton(
-                { Settings.verticalLyrics = !Settings.verticalLyrics; Settings.save() }
-            ) {
-                Icon(
-                    if (Settings.verticalLyrics) align_justify_flex_end else list_2,
-                    null
+        if (showButtons) {
+            HorizontalFloatingToolbar(
+                false,
+                Modifier.navigationBarsPadding().padding(bottom = 5.dp),
+                colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+                    MaterialTheme.colorScheme.primaryContainer.copy(
+                        if (Settings.fsStyle == 0) 0.8f else 1f)
                 )
-            }
-            IconButton(
-                { playNextOrPrevious(false) }
             ) {
-                Icon(painterResource(R.drawable.skip_previous_24px), null)
-            }
-            FilledIconButton(
-                {
-                    if (player.isPlaying) {
-                        player.pause()
-                    } else {
-                        player.play()
-                    }
-                    isPlaying = player.isPlaying
-                },
-            ) {
-                Icon(
-                    if (isPlaying) painterResource(R.drawable.pause)
-                    else painterResource(R.drawable.play),
-                    "Play / Pause",
-                )
-            }
-            IconButton(
-                { playNextOrPrevious() }
-            ) {
-                Icon(painterResource(R.drawable.skip_next_24px), null)
-            }
-            IconButton(
-                { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
-            ) {
-                Icon(
-                    if (Settings.lyricsAutoScroll) move_down else swipe_vertical,
-                    null
-                )
+                IconButton(
+                    { Settings.verticalLyrics = !Settings.verticalLyrics; Settings.save() }
+                ) {
+                    Icon(
+                        if (Settings.verticalLyrics) align_justify_flex_end else list_2,
+                        null
+                    )
+                }
+                IconButton(
+                    { playNextOrPrevious(false) }
+                ) {
+                    Icon(painterResource(R.drawable.skip_previous_24px), null)
+                }
+                FilledIconButton(
+                    {
+                        if (player.isPlaying) {
+                            player.pause()
+                        } else {
+                            player.play()
+                        }
+                        isPlaying = player.isPlaying
+                    },
+                ) {
+                    Icon(
+                        if (isPlaying) painterResource(R.drawable.pause)
+                        else painterResource(R.drawable.play),
+                        "Play / Pause",
+                    )
+                }
+                IconButton(
+                    { playNextOrPrevious() }
+                ) {
+                    Icon(painterResource(R.drawable.skip_next_24px), null)
+                }
+                IconButton(
+                    { Settings.lyricsAutoScroll = !Settings.lyricsAutoScroll; Settings.save() }
+                ) {
+                    Icon(
+                        if (Settings.lyricsAutoScroll) move_down else swipe_vertical,
+                        null
+                    )
+                }
             }
         }
     }
