@@ -35,7 +35,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
+import mb28.crysongs.isReloading
 import mb28.crysongs.playerQuery
+import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 import kotlin.time.Duration.Companion.milliseconds
@@ -45,7 +47,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun SearchPage(activity: Activity) {
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
     var searchPageSearchText by remember { mutableStateOf("") }
-    var searchResult = remember { mutableStateListOf<String>() }
+    val searchResult = remember { mutableStateListOf<String>() }
     var researching by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope { Dispatchers.IO }
 
@@ -53,11 +55,11 @@ fun SearchPage(activity: Activity) {
         if (!researching) {
             scope.launch {
                 researching = true
+                searchResult.clear()
                 delay(40.milliseconds)
-                if (searchPageSearchText.isNotBlank()) {
-                    searchResult = Track.search(input, activity).toMutableStateList()
-                }
-                else searchResult.clear()
+                searchResult.addAll(if (input.isNotBlank()) {
+                    Track.search(input, activity)
+                } else tracks)
                 researching = false
             }
         }
