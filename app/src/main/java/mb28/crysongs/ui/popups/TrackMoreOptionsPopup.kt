@@ -82,22 +82,17 @@ fun TrackMoreOptionsPopup(path: String, title: String? = null) {
                 "Play next",
                 count - 1, 4,
             ) {
-                when {
-                    playerQuery.isEmpty() -> {
-                        playerQuery.add(path)
-                        setAndPlay(path, false)
+                if (playerQuery.isEmpty()) {
+                    playerQuery.add(path)
+                    setAndPlay(path, false)
+                } else if (nowPlaying == path) {
+                    Toast.makeText(context, "Already playing!", Toast.LENGTH_SHORT).show()
+                } else if (playerQuery.contains(path)) {
+                    playerQuery.run {
+                        add(nowPlayingI + 1, removeAt(indexOf(path)))
                     }
-                    nowPlaying == path -> {
-                        Toast.makeText(context, "Already playing!", Toast.LENGTH_SHORT).show()
-                    }
-                    playerQuery.contains(path) -> {
-                        playerQuery.run {
-                            add(nowPlayingI + 1, removeAt(indexOf(path)))
-                        }
-                    }
-                    else -> {
-                        playerQuery.add(nowPlayingI + 1, path)
-                    }
+                } else {
+                    playerQuery.add(nowPlayingI + 1, path)
                 }
                 updateDisplayQuery()
             }
