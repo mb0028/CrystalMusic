@@ -20,7 +20,6 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,6 +114,7 @@ import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.other.getCurrentNavItemIcon
 import mb28.crysongs.ui.other.getCurrentNavItemName
 import mb28.crysongs.ui.theme.CrySongsTheme
+import mb28.crysongs.ui.theme.wallpaperIB
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -188,7 +188,7 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     val blur by animateDpAsState(
-                        if (Settings.enableBlur && requestBlur) 15.dp else 0.dp,
+                        if (Settings.enableBlur && requestBlur) 8.dp else 0.dp,
                         animationSpec = TweenSpec(
                             300,
                             easing = EaseOutCubic
@@ -200,12 +200,8 @@ class MainActivity : ComponentActivity() {
                             .scale(animatedOpacity)
                             .alpha(animatedOpacity)
                             .blur(blur),
-                        containerColor = when {
-                            Settings.showWallpaper -> androidx.compose.ui.graphics.Color.Transparent
-                            Settings.paintMode && isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.Black
-                            Settings.paintMode && !isSystemInDarkTheme() -> androidx.compose.ui.graphics.Color.White
-                            else -> MaterialTheme.colorScheme.surfaceContainerLow
-                        },
+                        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                         bottomBar = {
                             if (isLandscape) {
                                 Row(
@@ -281,12 +277,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (Settings.showWallpaper) {
-            window.decorView.background = getSystemService<WallpaperManager>()?.drawable
-        } else {
-            window.decorView.background = null
-            window.decorView.setBackgroundColor(Color.BLACK)
-        }
+        wallpaperIB = if (Settings.mica) {
+            getSystemService<WallpaperManager>()?.drawable?.toBitmap()?.asImageBitmap()
+        } else null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,

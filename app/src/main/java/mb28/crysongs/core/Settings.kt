@@ -54,7 +54,7 @@ object Settings {
     var hierarchyView by mutableStateOf(false)
     var hideSystemSounds by mutableStateOf(false)
     var tips_cacheThumbs by mutableStateOf(true)
-    var showWallpaper by mutableStateOf(false)
+    var mica by mutableStateOf(false)
     var paintMode by mutableStateOf(false)
     var twoRowTrackCard by mutableStateOf(false)
     var lyricsAutoScroll by mutableStateOf(false)
@@ -131,7 +131,7 @@ object Settings {
                     s.startsWith("[TipsCacheCovers]") -> tips_cacheThumbs = s.removePrefix("[TipsCacheCovers]").toBooleanStrict()
                     s.startsWith("[InitTab]") -> initTab = s.removePrefix("[InitTab]").toInt()
                     s.startsWith("[HierarchyCompact]") -> hideSystemSounds = s.removePrefix("[HierarchyCompact]").toBooleanStrict()
-                    s.startsWith("[Wallpaper]") -> showWallpaper = s.removePrefix("[Wallpaper]").toBooleanStrict()
+                    s.startsWith("[Wallpaper]") -> mica = s.removePrefix("[Wallpaper]").toBooleanStrict()
                     s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
                     s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
                     s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
@@ -211,7 +211,7 @@ object Settings {
         data += "[Hierarchy]$hierarchyView\n"
         data += "[HierarchyCompact]$hideSystemSounds\n"
         data += "[TipsCacheCovers]$tips_cacheThumbs\n"
-        data += "[Wallpaper]$showWallpaper\n"
+        data += "[Wallpaper]$mica\n"
         data += "[Paint]$paintMode\n"
         data += "[2RowTrack]$twoRowTrackCard\n"
         data += "[lyricsAutoScroll]$lyricsAutoScroll\n"

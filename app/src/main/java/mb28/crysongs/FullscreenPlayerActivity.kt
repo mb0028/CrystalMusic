@@ -15,10 +15,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -129,7 +127,13 @@ class FullscreenPlayerActivity : ComponentActivity() {
             var backHeld by remember { mutableStateOf(false) }
             var activityOffset by remember { mutableIntStateOf(0) }
             val animateOffset by animateIntAsState(if (backHeld) 800 else 0)
-            CrySongsTheme {
+            val roundness = window.decorView.rootWindowInsets?.getRoundedCorner(
+                RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
+            val shape = RoundedCornerShape((roundness / 3.25f).dp)
+            CrySongsTheme(
+                Modifier.offset { IntOffset(0, activityOffset + animateOffset) },
+                Modifier.clip(shape)
+            ) {
                 PredictiveBackHandler { progress ->
                     backHeld = true
                     try { progress.collect { }; finish() }
@@ -138,7 +142,6 @@ class FullscreenPlayerActivity : ComponentActivity() {
                 Scaffold(
                     Modifier
                         .fillMaxSize()
-                        .offset { IntOffset(0, activityOffset + animateOffset) }
                         .pointerInput(Unit) {
                             fun onRelease() {
                                 if (activityOffset > 200) {
@@ -156,10 +159,10 @@ class FullscreenPlayerActivity : ComponentActivity() {
                             }
 
                         },
-                    containerColor = Color.Transparent,
+                    containerColor = if (fsStyle == 0) MaterialTheme.colorScheme.background else Color.Transparent,
                     contentColor = if (Settings.whiteText) Color.White else MaterialTheme.colorScheme.onSurface
                 ) { innerPadding ->
-                    Pager(innerPadding, this, activityOffset + animateOffset)
+                    Pager(innerPadding, this)
                 }
             }
         }
@@ -177,20 +180,10 @@ class FullscreenPlayerActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Pager(innerPadding: PaddingValues, activity: FullscreenPlayerActivity, activityOffset: Int) {
-    val roundness = activity.window.decorView.rootWindowInsets?.getRoundedCorner(
-        RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
+private fun Pager(innerPadding: PaddingValues, activity: FullscreenPlayerActivity) {
     val selectedTab = rememberPagerState(1) { 3 }
-    val shape = RoundedCornerShape((roundness / 3.25f).dp)
 
-    Box(
-        Modifier.clip(shape)
-            .background(when {
-                Settings.paintMode -> if (isSystemInDarkTheme()) Color.Black else Color.White
-                fsStyle == 0 -> MaterialTheme.colorScheme.surfaceBright.copy(1f - (activityOffset / 1000f))
-                else -> MaterialTheme.colorScheme.surfaceContainerLow.copy((1f - (activityOffset / 1000f)).coerceAtLeast(0.7f))
-            })
-    ) {
+    Box {
         if (fsStyle == 0) {
             Image(
                 nowPlayingCover, null,

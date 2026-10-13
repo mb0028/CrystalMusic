@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
@@ -67,7 +68,11 @@ class CacheCoversActivity : ComponentActivity() {
 
         setContent {
             CrySongsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
+                Scaffold(
+                    Modifier.fillMaxSize(),
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ) {
                     Column(
                         Modifier.fillMaxSize(),
                         Arrangement.Center,

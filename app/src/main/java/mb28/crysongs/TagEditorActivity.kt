@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -48,10 +47,10 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,12 +97,7 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
         ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             val stream = activity.contentResolver.openInputStream(uri)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                coverBytes = stream?.readAllBytes()
-            } else {
-                Toast.makeText(activity, "Cannot change cover on android <13",
-                    Toast.LENGTH_SHORT).show()
-            }
+            coverBytes = stream?.readAllBytes()
             stream?.close()
             coverChanged = true
         }
@@ -132,6 +126,8 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
 
     Scaffold(
         Modifier.fillMaxSize(),
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         topBar = {
             TopAppBar(
                 { Text("Tag Editor (Experimental)") },

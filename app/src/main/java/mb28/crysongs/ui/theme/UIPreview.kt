@@ -1,6 +1,5 @@
 package mb28.crysongs.ui.theme
 
-import android.app.WallpaperManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,15 +26,12 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
-import androidx.core.content.getSystemService
-import androidx.core.graphics.drawable.toBitmap
 import mb28.crysongs.R
 import mb28.crysongs.core.Settings
 import mb28.crysongs.ui.fullscreen_player.fullscreenCoverShape
@@ -48,22 +42,11 @@ fun UIPreview(modifier: Modifier = Modifier) {
     Box(
         modifier.aspectRatio(9f / 16f).clip(RoundedCornerShape(30.dp))
     ) {
-        if (Settings.showWallpaper) {
-            val wall = remember { context.getSystemService<WallpaperManager>()?.drawable?.toBitmap()?.asImageBitmap() }
-            if (wall != null) {
-                Image(
-                    wall, null,
-                    Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-
         Column(
             modifier.fillMaxSize()
                 .background(
                     when {
-                        Settings.showWallpaper -> Color.Transparent
+                        Settings.mica -> Color.Transparent
                         Settings.paintMode && isSystemInDarkTheme() -> Color.Black
                         Settings.paintMode && !isSystemInDarkTheme() -> Color.White
                         else -> MaterialTheme.colorScheme.surfaceContainer
@@ -136,7 +119,7 @@ fun UIPreview(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun RowScope.NavItems() {
+private fun NavItems() {
     for (i in 1..5) {
         Box(Modifier.size(30.dp, 22.dp)
             .background(Color.White.copy(0.6f), CircleShape))
@@ -160,7 +143,7 @@ fun FSPlayerUIPreview(modifier: Modifier = Modifier) {
             modifier.fillMaxSize()
                 .background(
                     when {
-                        Settings.fsStyle == 0 -> Color.Transparent
+                        Settings.fsStyle == 0 || Settings.mica -> Color.Transparent
                         Settings.paintMode && isSystemInDarkTheme() -> Color.Black
                         Settings.paintMode && !isSystemInDarkTheme() -> Color.White
                         else -> MaterialTheme.colorScheme.surfaceContainer

@@ -51,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -60,9 +61,7 @@ import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Settings.experimental
 import mb28.crysongs.core.openLink
 import mb28.crysongs.icons.arrow_back
-import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.flag
-import mb28.crysongs.icons.library_add
 import mb28.crysongs.ui.fullscreen_player.fullscreenCoverShape
 import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.EditNavigationItemPopup
@@ -92,7 +91,8 @@ class SettingsActivity : ComponentActivity() {
                 var selectedTab by remember { mutableIntStateOf(0) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     topBar = {
                         Column {
                             TopBar(this@SettingsActivity)
@@ -139,27 +139,31 @@ private fun UISettings() {
     var lastClickedNavTab by remember { mutableIntStateOf(-1) }
     val count = 8
     Column(Modifier.padding(10.dp)) {
-        UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
-        Spacer(Modifier.height(5.dp))
         SettingSwitch(
             Settings.useCoverColor,
             "Use artwork color for ui", 0, count,
         ) { Settings.useCoverColor = it; Settings.save() }
         SettingSwitch(
-            Settings.showWallpaper,
-            "Draw wallpaper", 1, count,
-            desc = "Shows system wallpaper behind app",
+            Settings.mica,
+            "Mica background", 1, count,
             enable = !Settings.paintMode
-        ) { Settings.showWallpaper = it; Settings.save() }
+        ) { Settings.mica = it; Settings.save() }
         SettingSwitch(
             Settings.paintMode,
-            "Contrast background", 2, count,
+            "High contrast background", count - 1, count,
             desc = "Makes app background fully black on dark mode or fully white on light mode",
-            enable = !Settings.showWallpaper
+            enable = !Settings.mica
         ) { Settings.paintMode = it; Settings.save() }
+        Text("To change app font, copy any .ttf file in:\n0/Documents/.Crystal/UI Font.ttf")
+
+
+        Spacer(Modifier.height(5.dp))
+        UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
+        Spacer(Modifier.height(5.dp))
+
         SettingSwitch(
             Settings.twoRowTrackCard,
-            "Compact track tiles", 2, count,
+            "Compact track tiles", 0, count,
         ) { Settings.twoRowTrackCard = it; Settings.save() }
         SettingSwitch(
             Settings.gradientColoring,
@@ -217,7 +221,6 @@ private fun UISettings() {
                 }
             )
         }
-        Text("To change app font, copy and rename any .ttf file into 0/Documents/.Crystal/UI Font.ttf")
     }
 
     if (lastClickedNavTab != -1) {

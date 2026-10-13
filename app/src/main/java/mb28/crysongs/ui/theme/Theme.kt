@@ -1,6 +1,8 @@
 package mb28.crysongs.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.darkColorScheme
@@ -11,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.materialkolor.PaletteStyle
@@ -29,6 +32,8 @@ private fun coverColorScheme(darkTheme: Boolean) : ColorScheme {
 
 @Composable
 fun CrySongsTheme(
+    modifier: Modifier = Modifier,
+    bgModifier: Modifier = Modifier,
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -48,6 +53,11 @@ fun CrySongsTheme(
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = {
+            Box(modifier.fillMaxSize()) {
+                MicaBG(bgModifier)
+                content()
+            }
+        }
     )
 }

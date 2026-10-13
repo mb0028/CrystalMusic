@@ -131,6 +131,8 @@ class LrcMakerActivity : ComponentActivity() {
                 }
                 Scaffold(
                     Modifier.fillMaxSize(),
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     topBar = {
                         TopAppBar(
                             { Text("LRC Maker") },
