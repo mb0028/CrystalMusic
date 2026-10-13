@@ -1,3 +1,9 @@
+## v1.5.20 (Upcoming)
+- Add Mica background (turned off by default)
+- Background changes now applies to all activities (except Sound Picker)
+- App now only supports arm64-v8a.
+  - Around 99% android 13+ devices are support arm64-v8a
+
 ## v1.5.10 (Latest)
 - Add LRC Maker. can be found in tools tab
 - Add sound picker
