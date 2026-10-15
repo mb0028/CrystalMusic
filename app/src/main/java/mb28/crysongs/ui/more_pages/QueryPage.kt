@@ -3,26 +3,21 @@ package mb28.crysongs.ui.more_pages
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mb28.crysongs.canChangeTrack
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.displayQuery
 import mb28.crysongs.displayQueryMA
@@ -34,11 +29,7 @@ import mb28.crysongs.ui.other.TrackTile
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun QueryPage() {
-    val state = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
-        }
-    }
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
 
     AnimatedVisibility(
         visibleState = state,
@@ -71,13 +62,7 @@ fun QueryPage() {
                 }
             }
 
-            if (isReloading || !canChangeTrack) {
-                item {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        ContainedLoadingIndicator()
-                    }
-                }
-            } else if (displayQuery.isNotEmpty() && !isReloading) {
+            if (displayQuery.isNotEmpty() && !isReloading) {
                 val count = displayQuery.count()
                 item {
                     Text(

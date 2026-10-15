@@ -29,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -37,9 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.folders
@@ -53,8 +49,6 @@ import mb28.crysongs.ui.other.EasySegmentedListItem
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
 import java.io.File
-import kotlin.time.Duration.Companion.milliseconds
-
 
 @SuppressLint("SdCardPath")
 
@@ -69,27 +63,18 @@ private fun isAudioFile(path: String) : Boolean {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@SuppressLint("SdCardPath")
 @Composable
 fun FoldersPage() {
     var folderView by remember { mutableStateOf(false) }
     var clickedFolderPath by remember { mutableStateOf("") }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
-    val scope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
     val lastTrunk = tree.last()
 
     if (folderView) {
         BackHandler { folderView = false }
     } else if (tree.count() > 1) {
-        BackHandler {
-            scope.launch {
-                refreshing = true
-                tree.remove(lastTrunk)
-                delay(50.milliseconds)
-                refreshing = false
-            }
-        }
+        BackHandler { tree.remove(lastTrunk) }
     }
 
     AnimatedVisibility(
@@ -158,12 +143,7 @@ fun FoldersPage() {
                             Spacer(Modifier.width(5.dp))
                             FilledTonalIconButton(
                                 {
-                                    scope.launch {
-                                        refreshing = true
-                                        tree.remove(lastTrunk)
-                                        delay(50.milliseconds)
-                                        refreshing = false
-                                    }
+                                    tree.remove(lastTrunk)
                                 }
                             ) {
                                 Icon(arrow_back, null)
@@ -200,12 +180,7 @@ fun FoldersPage() {
                                     it, count,
                                     Modifier.padding(horizontal = 10.dp)
                                 ) {
-                                    scope.launch {
-                                        refreshing = true
-                                        tree.add(fPath)
-                                        delay(50.milliseconds)
-                                        refreshing = false
-                                    }
+                                    tree.add(fPath)
                                 }
                             }
                             else if (isAudioFile(fPath)) {

@@ -59,7 +59,6 @@ fun CustomTagsPage(listType: String, activity: Activity) {
     var customTabItemOpened by remember { mutableStateOf(false) }
     var lastClickedCustomTabItem by remember { mutableStateOf("") }
 
-    var loading by remember { mutableStateOf(false) }
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
     val scrollState = rememberLazyListState()
 
@@ -148,13 +147,6 @@ fun CustomTagsPage(listType: String, activity: Activity) {
             }
 
             when {
-                loading -> {
-                    item {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            ContainedLoadingIndicator()
-                        }
-                    }
-                }
                 customTabItemOpened -> {
                     val count = customTabOpenedItems.count()
                     if (count == 0) {

@@ -31,16 +31,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Track
 import mb28.crysongs.core.pageAnimation
-import mb28.crysongs.isReloading
 import mb28.crysongs.playerQuery
 import mb28.crysongs.tracks
 import mb28.crysongs.ui.other.TrackTile
 import mb28.crysongs.updateDisplayQuery
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -56,7 +53,6 @@ fun SearchPage(activity: Activity) {
             scope.launch {
                 researching = true
                 searchResult.clear()
-                delay(40.milliseconds)
                 searchResult.addAll(if (input.isNotBlank()) {
                     Track.search(input, activity)
                 } else tracks)

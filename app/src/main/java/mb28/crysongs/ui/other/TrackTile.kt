@@ -93,7 +93,7 @@ fun TrackTile(
         else -> defaultShape
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(path) {
         t = Track.getTags(path, context)
         withContext(Dispatchers.IO) {
             val coverPath = Track.createOrGetThumbnail(path)
