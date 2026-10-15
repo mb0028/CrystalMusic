@@ -1,10 +1,15 @@
-## v1.5.20 (Upcoming)
-- Add Mica background (turned off by default)
+## v1.5.20 (Latest)
+- Fix: ui doesn't update when reordering playlist songs
+- Add Mica background
 - Background changes now applies to all activities (except Sound Picker)
-- App now only supports arm64-v8a.
-  - Around 99% android 13+ devices are support arm64-v8a
 
-## v1.5.10 (Latest)
+Other:
+- Landscape mode improvements
+- Other ui improvements & bug fixes
+- App now only supports arm64-v8a.
+  - Around 99% of android 13+ devices are support arm64-v8a
+
+## v1.5.10
 - Add LRC Maker. can be found in tools tab
 - Add sound picker
 - Add option to filter tracks by duration

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
-import androidx.glance.appwidget.RadioButton
 import mb28.crysongs.core.Settings
 import mb28.crysongs.ui.other.EdgeLightingEffect
 import mb28.crysongs.ui.other.SettingSwitch

@@ -2,9 +2,7 @@ package mb28.crysongs
 
 import android.annotation.SuppressLint
 import android.app.ComponentCaller
-import android.app.WallpaperManager
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
@@ -114,7 +112,6 @@ import mb28.crysongs.ui.other.NavTab
 import mb28.crysongs.ui.other.getCurrentNavItemIcon
 import mb28.crysongs.ui.other.getCurrentNavItemName
 import mb28.crysongs.ui.theme.CrySongsTheme
-import mb28.crysongs.ui.theme.wallpaperIB
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 

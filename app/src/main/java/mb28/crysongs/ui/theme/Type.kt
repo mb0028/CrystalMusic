@@ -2,15 +2,8 @@ package mb28.crysongs.ui.theme
 
 import android.os.Environment
 import androidx.compose.material3.Typography
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import mb28.crysongs.core.Settings
 import java.io.File
 
