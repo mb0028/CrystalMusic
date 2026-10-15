@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,19 +20,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import mb28.crysongs.MainActivity
 import mb28.crysongs.MainContent
 import mb28.crysongs.core.Settings
-import mb28.crysongs.nowPlayingTags
 import mb28.crysongs.privateNowPlayingCover
-import mb28.crysongs.ui.fullscreen_player.FSCover
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
-import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
-import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 
 @Composable
 fun LandscapePage(paddingValues: PaddingValues, activity: MainActivity) {
@@ -70,7 +60,7 @@ fun LandscapePage(paddingValues: PaddingValues, activity: MainActivity) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                FSLyricsTab(Modifier.fillMaxSize(), false)
+                FSLyricsTab(Modifier.fillMaxSize(), false, 100)
             }
         }
     }

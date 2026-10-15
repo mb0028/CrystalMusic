@@ -59,7 +59,7 @@ import mb28.crysongs.ui.other.fadingEdgeVertical
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
+fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true, scrollOffset: Int = -400) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -72,7 +72,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
             if (Settings.lyricsAutoScroll && shouldScrollLyrics && lrcParser!!.IsGettingLineInRealtimePossible && !state.isScrollInProgress) {
                 scope.launch {
                     shouldScrollLyrics = false
-                    state.animateScrollToItem(lrcParser!!.LineIndex(position), -400)
+                    state.animateScrollToItem(lrcParser!!.LineIndex(position), scrollOffset)
                 }
             }
 
@@ -86,7 +86,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
                     state = state
                 ) {
                     items(lrcParser?.Count ?: 0) {
-                        LyricText(it, state, scope)
+                        LyricText(it, state, scope, scrollOffset)
                     }
                 }
             } else {
@@ -97,7 +97,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
                     state = state
                 ) {
                     items(lrcParser?.Count ?: 0) {
-                        LyricText(it, state, scope)
+                        LyricText(it, state, scope, scrollOffset)
                     }
                 }
             }
@@ -177,7 +177,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true) {
 }
 
 @Composable
-private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
+private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope, scrollOffset: Int) {
     val lineAnim = animateFloatAsState(
         if (i == lastLrcLineI) 0.5f else 0f,
         TweenSpec(400)
@@ -207,7 +207,7 @@ private fun LyricText(i: Int, state: LazyListState, scope: CoroutineScope) {
                         )
                         if (!isPlaying) { player.play() }
                         if (Settings.lyricsAutoScroll) {
-                            state.scrollToItem(i, -400)
+                            state.scrollToItem(i, scrollOffset)
                         }
                     }
                 }

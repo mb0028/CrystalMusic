@@ -122,6 +122,9 @@ class FullscreenPlayerActivity : ComponentActivity() {
         }
         super.onCreate(savedInstanceState)
 
+        if (resources.configuration.orientation == 2) {
+            finish()
+        }
 
         setContent {
             var backHeld by remember { mutableStateOf(false) }
@@ -129,10 +132,10 @@ class FullscreenPlayerActivity : ComponentActivity() {
             val animateOffset by animateIntAsState(if (backHeld) 800 else 0)
             val roundness = window.decorView.rootWindowInsets?.getRoundedCorner(
                 RoundedCorner.POSITION_TOP_LEFT)?.radius ?: 0
-            val shape = RoundedCornerShape((roundness / 3.25f).dp)
+            val deviceCornersShape = RoundedCornerShape((roundness / 3.25f).dp)
             CrySongsTheme(
                 Modifier.offset { IntOffset(0, activityOffset + animateOffset) },
-                Modifier.clip(shape)
+                Modifier.clip(deviceCornersShape)
             ) {
                 PredictiveBackHandler { progress ->
                     backHeld = true
@@ -141,7 +144,7 @@ class FullscreenPlayerActivity : ComponentActivity() {
                 }
                 Scaffold(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().clip(deviceCornersShape)
                         .pointerInput(Unit) {
                             fun onRelease() {
                                 if (activityOffset > 200) {

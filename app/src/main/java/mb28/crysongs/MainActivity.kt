@@ -275,13 +275,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        wallpaperIB = if (Settings.mica) {
-            getSystemService<WallpaperManager>()?.drawable?.toBitmap()?.asImageBitmap()
-        } else null
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
                                   caller: ComponentCaller) {
         super.onActivityResult(requestCode, resultCode, data, caller)

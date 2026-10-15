@@ -72,7 +72,7 @@ fun MiniPlayer(context: Activity) {
     var showMoreOptions by remember { mutableStateOf(false) }
     val size = 0.52f
     val coverShape = RoundedPolygon.star(
-        12,
+        8,
         radius = size,
         innerRadius = 0.42f,
         centerX = size * 0.5f,
