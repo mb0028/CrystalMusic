@@ -82,7 +82,14 @@ fun FoldersPage() {
     if (folderView) {
         BackHandler { folderView = false }
     } else if (tree.count() > 1) {
-        BackHandler { tree.remove(lastTrunk) }
+        BackHandler {
+            scope.launch {
+                refreshing = true
+                tree.remove(lastTrunk)
+                delay(50.milliseconds)
+                refreshing = false
+            }
+        }
     }
 
     AnimatedVisibility(
