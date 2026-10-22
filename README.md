@@ -20,6 +20,7 @@ Other features:
 - Sound picker for other apps to use
 
 To-Do
+- [ ] Sleep timer
 - [ ] Add edge lighting effect
 - [ ] Widget settings
 - [ ] Favorite folders/albums/artists
