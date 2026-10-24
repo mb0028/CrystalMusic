@@ -25,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,9 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.graphics.shapes.CornerRounding
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.star
 import mb28.crysongs.FullscreenPlayerActivity
 import mb28.crysongs.R
 import mb28.crysongs.canChangeTrack
@@ -70,15 +66,6 @@ const val EXTRA_ARTIST_ALBUM = "EXTRA_ARTIST_ALBUM"
 @Composable
 fun MiniPlayer(context: Activity) {
     var showMoreOptions by remember { mutableStateOf(false) }
-    val size = 0.52f
-    val coverShape = RoundedPolygon.star(
-        8,
-        radius = size,
-        innerRadius = 0.42f,
-        centerX = size * 0.5f,
-        centerY = size * 0.5f,
-        rounding = CornerRounding(80f)
-    ).toShape()
     val shape = if (Settings.floatingNavBar) CircleShape else RoundedCornerShape(15.dp)
 
     Row(
@@ -93,7 +80,6 @@ fun MiniPlayer(context: Activity) {
                 shape = shape
             )
             .clickable {
-                requestBlur = true
                 val intent = Intent(context, FullscreenPlayerActivity::class.java)
                 context.startActivityForResult(intent, REQUEST_CODE_FS_PLAYER,
                     ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
@@ -104,8 +90,8 @@ fun MiniPlayer(context: Activity) {
         Image(
             nowPlayingCover,
             "Track cover",
-            contentScale = ContentScale.FillHeight,
-            modifier = Modifier.aspectRatio(1f).padding(3.dp).clip(coverShape)
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.aspectRatio(1f).padding(5.dp).clip(shape)
                 .clickable {
                     if (nowPlaying != null) {
                         showMoreOptions = true; requestBlur = true
