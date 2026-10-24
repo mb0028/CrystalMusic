@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -154,8 +155,6 @@ private fun UISettings() {
             desc = "Makes app background fully black on dark mode or fully white on light mode",
             enable = !Settings.mica
         ) { Settings.paintMode = it; Settings.save() }
-        Text("To change app font, copy any .ttf file in:\n0/Documents/.Crystal/UI Font.ttf")
-
 
         Spacer(Modifier.height(5.dp))
         UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
@@ -221,6 +220,8 @@ private fun UISettings() {
                 }
             )
         }
+
+        Text("To change app font, copy any .ttf file in:\n0/Documents/.Crystal/UI Font.ttf")
     }
 
     if (lastClickedNavTab != -1) {
@@ -240,11 +241,11 @@ private fun FsSettings() {
     )
     Column(Modifier.padding(10.dp)) {
         FSPlayerUIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
+
 //        SettingSwitch(
 //            Settings.whiteText,
 //            "Force white texts", 0, count
 //        ) { Settings.whiteText = it; Settings.save() }
-
 
         Spacer(Modifier.height(10.dp))
         Text("Style", fontSize = 28.sp)
@@ -328,7 +329,7 @@ private fun FsSettings() {
 private fun IndexingSettings() {
     val count = 2
     var showPathPicker by remember { mutableStateOf(false) }
-    val minduState = rememberSliderState(
+    val minDurationState = rememberSliderState(
         Settings.minDuration.toFloat(),
         trackRange = 0f..120f
     )
@@ -345,9 +346,9 @@ private fun IndexingSettings() {
             ),
             supportingContent = {
                 Slider(
-                    minduState,
+                    minDurationState,
                     onValueChange = {
-                        minduState.value = it
+                        minDurationState.value = it
                         Settings.minDuration = it.roundToInt()
                     },
                     onValueChangeFinished = {
@@ -356,7 +357,7 @@ private fun IndexingSettings() {
                 )
             },
         ) {
-            Text("Min track duration: ${Settings.minDuration}")
+            Text("Min track duration: ${Settings.minDuration}s")
         }
         Spacer(Modifier.height(10.dp))
         ListItem(
@@ -366,11 +367,11 @@ private fun IndexingSettings() {
                 }) { Icon(add_2, null) }
             },
             supportingContent = {
-                Text("Includes subfolders too")
+
             },
             modifier = Modifier.clip(RoundedCornerShape(15.dp))
-                .padding(bottom = 3.dp)
         ) { Text("Library exclude:") }
+        Spacer(Modifier.height(6.dp))
 
         Settings.libraryExclude.forEach {
             ListItem(
@@ -386,10 +387,13 @@ private fun IndexingSettings() {
                         )
                     ) { Icon(delete_forever, null) }
                 },
-                modifier = Modifier.clip(RoundedCornerShape(25.dp))
-                    .padding(bottom = 3.dp)
+                modifier = Modifier.clip(CircleShape)
             ) { Text(it, fontSize = 12.sp) }
+            Spacer(Modifier.height(3.dp))
         }
+
+        Spacer(Modifier.height(5.dp))
+//        Text("Subfolders also will be excluded")
     }
 
     if (showPathPicker) {
