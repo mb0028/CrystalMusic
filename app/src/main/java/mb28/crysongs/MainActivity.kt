@@ -17,6 +17,8 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -244,7 +246,6 @@ class MainActivity : ComponentActivity() {
                                 }) {
                                     FilledTonalIconButton(
                                         {
-                                            requestBlur = true
                                             CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.open() }
                                         }
                                     ) { Icon(menu, null) }
@@ -317,7 +318,6 @@ class MainActivity : ComponentActivity() {
                     icon = getCurrentNavItemIcon(i),
                     selected = i == selectedIndex.intValue
                 ) {
-                    requestBlur = false
                     selectedIndex.intValue = i
                     CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
                 }
@@ -371,7 +371,7 @@ private fun NavBar(selectedIndex: MutableIntState) {
         val state = remember { MutableTransitionState(false).apply { targetState = true } }
         AnimatedVisibility(
             state,
-            enter = slideInHorizontally { -100 }
+            enter = scaleIn() + fadeIn()
         ) {
             Row {
                 for (i in 0..4)
