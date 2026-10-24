@@ -19,7 +19,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -389,7 +388,7 @@ private fun NavBar(selectedIndex: MutableIntState) {
             contentPadding = PaddingValues(horizontal = 10.dp),
             modifier = Modifier
                 .navigationBarsPadding()
-                .padding(horizontal = 15.dp)
+                .padding(horizontal = 10.dp)
                 .padding(bottom = 2.dp)
                 .height(65.dp),
             colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
