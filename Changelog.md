@@ -1,3 +1,6 @@
+## v1.5.21 (Upcoming)
+- UI improvements
+
 ## v1.5.20 (Latest)
 - Fix: ui doesn't update when reordering playlist songs
 - Add Mica background
