@@ -146,7 +146,7 @@ fun TrackTile(
                                 .alpha(0.6f)
                         )
                     }
-                    Box(Modifier.clip(shape)) {
+                    Box(Modifier.clip(defaultPressedShape)) {
                         Image(
                             cover ?: noCoverBitmap!!,
                             "Track cover",
