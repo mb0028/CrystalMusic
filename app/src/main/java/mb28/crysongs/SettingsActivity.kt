@@ -145,16 +145,20 @@ private fun UISettings() {
             "Use artwork color for ui", 0, count,
         ) { Settings.useCoverColor = it; Settings.save() }
         SettingSwitch(
+            Settings.paintMode,
+            "High contrast background", 1, count,
+            desc = "Makes app background fully black on dark mode or fully white on light mode",
+            enable = !Settings.mica
+        ) { Settings.paintMode = it; Settings.save() }
+        SettingSwitch(
             Settings.mica,
             "Mica background", 1, count,
             enable = !Settings.paintMode
         ) { Settings.mica = it; Settings.save() }
         SettingSwitch(
-            Settings.paintMode,
-            "High contrast background", count - 1, count,
-            desc = "Makes app background fully black on dark mode or fully white on light mode",
-            enable = !Settings.mica
-        ) { Settings.paintMode = it; Settings.save() }
+            Settings.enableBlur,
+            "Background blur", count - 1, count,
+        ) { Settings.enableBlur = it; Settings.save() }
 
         Spacer(Modifier.height(5.dp))
         UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))

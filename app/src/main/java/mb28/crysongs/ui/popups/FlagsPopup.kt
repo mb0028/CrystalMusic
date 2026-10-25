@@ -41,12 +41,6 @@ fun FlagsPopup(onDismissRequired: () -> Unit) {
                 }
                 item {
                     SettingSwitch(
-                        Settings.enableBlur,
-                        "Enable live blur", 0, count,
-                    ) { Settings.enableBlur = it; Settings.save() }
-                }
-                item {
-                    SettingSwitch(
                         Settings.edgeLighting,
                         "Edge lighting effect", 1, count,
                         Settings.waveformDataCapture
