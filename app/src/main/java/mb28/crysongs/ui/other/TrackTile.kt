@@ -120,7 +120,7 @@ fun TrackTile(
                     else MaterialTheme.colorScheme.onSurface,
             ),
             modifier = modifier
-                .padding(bottom = 3.dp, start = 5.dp, end = 5.dp)
+                .padding(bottom = 3.dp, start = 8.dp, end = 8.dp)
                 .height(if (Settings.twoRowTrackCard) 60.dp else 80.dp),
             onClick = {
                 onBeforeClick()
