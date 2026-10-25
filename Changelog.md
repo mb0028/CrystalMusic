@@ -1,7 +1,7 @@
-## v1.5.21 (Upcoming)
-- Lot of UI improvements
+## v1.5.21 (Latest)
+- UI improvements
 
-## v1.5.20 (Latest)
+## v1.5.20
 - Fix: ui doesn't update when reordering playlist songs
 - Add Mica background
 - Background changes now applies to all activities (except Sound Picker)
