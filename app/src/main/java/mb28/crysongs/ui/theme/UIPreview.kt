@@ -78,11 +78,16 @@ fun UIPreview(modifier: Modifier = Modifier) {
             }
 
             Column {
+                val color = if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
+                    else MaterialTheme.colorScheme.surfaceContainerHigh
                 Box(Modifier.fillMaxWidth().height(50.dp).padding(
                     if (Settings.floatingNavBar) 10.dp else 5.dp, 5.dp)
                     .background(
-                        if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
-                            else MaterialTheme.colorScheme.surfaceContainerHigh,
+                        Brush.horizontalGradient(
+                            0f to if (Settings.gradientColoring)
+                                MaterialTheme.colorScheme.secondaryContainer else color,
+                            1f to color
+                        ),
                         if (Settings.floatingNavBar) CircleShape else RoundedCornerShape(10.dp)
                     )
                 )

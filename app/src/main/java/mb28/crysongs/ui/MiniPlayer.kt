@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,6 +68,8 @@ const val EXTRA_ARTIST_ALBUM = "EXTRA_ARTIST_ALBUM"
 fun MiniPlayer(context: Activity) {
     var showMoreOptions by remember { mutableStateOf(false) }
     val shape = if (Settings.floatingNavBar) CircleShape else RoundedCornerShape(15.dp)
+    val color = if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
+    else MaterialTheme.colorScheme.surfaceContainerHigh
 
     Row(
         Modifier
@@ -75,8 +78,11 @@ fun MiniPlayer(context: Activity) {
             .padding(horizontal = 10.dp)
             .clip(shape)
             .background(
-                if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
-                    else MaterialTheme.colorScheme.surfaceContainerHigh,
+                Brush.horizontalGradient(
+                    0f to if (Settings.gradientColoring)
+                        MaterialTheme.colorScheme.secondaryContainer else color,
+                    1f to color
+                ),
                 shape = shape
             )
             .clickable {

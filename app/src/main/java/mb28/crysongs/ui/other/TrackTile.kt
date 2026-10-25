@@ -104,7 +104,7 @@ fun TrackTile(
 
     AnimatedVisibility(
         visibleState = state,
-        enter = scaleIn(initialScale = 0.75f) + fadeIn(initialAlpha = 0.1f),
+        enter = scaleIn(initialScale = 0.8f) + fadeIn(initialAlpha = 0.1f),
     ) {
         SegmentedListItem(
             verticalAlignment = Alignment.CenterVertically,
@@ -143,7 +143,7 @@ fun TrackTile(
                                 .size(50.dp)
                                 .scale(4f)
                                 .blur(35.dp, BlurredEdgeTreatment.Unbounded)
-                                .alpha(0.6f)
+                                .alpha(0.4f)
                         )
                     }
                     Box(Modifier.clip(defaultPressedShape)) {

@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import mb28.crysongs.core.Settings
 
 @Composable
 fun CrystalDrawerItem(
@@ -34,7 +36,11 @@ fun CrystalDrawerItem(
     Row(
         modifier.fillMaxWidth().padding(8.dp, 3.dp)
             .background(
-                if (selected) selectedContainerColor else containerColor,
+                Brush.horizontalGradient(
+                    0f to if (selected) selectedContainerColor else containerColor,
+                    1f to if (Settings.gradientColoring) MaterialTheme.colorScheme.surfaceContainerHigh
+                        else if (selected) selectedContainerColor else containerColor
+                ),
                 shape
             )
             .clip(shape)
