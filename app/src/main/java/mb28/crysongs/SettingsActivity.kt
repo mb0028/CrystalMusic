@@ -157,7 +157,7 @@ private fun UISettings() {
         ) { Settings.mica = it; Settings.save() }
         SettingSwitch(
             Settings.enableBlur,
-            "Background blur", count - 1, count,
+            "UI Blur", count - 1, count,
         ) { Settings.enableBlur = it; Settings.save() }
 
         Spacer(Modifier.height(5.dp))

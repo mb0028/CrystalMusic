@@ -1,6 +1,7 @@
 package mb28.crysongs.ui.theme
 
 import android.app.WallpaperManager
+import android.os.Environment
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -39,7 +41,7 @@ fun MicaBG(modifier: Modifier = Modifier) {
         val wm = LocalContext.current.getSystemService<WallpaperManager>()
 
         LaunchedEffect(Unit) {
-            if (wallpaperIB == null) {
+            if (wallpaperIB == null && Environment.isExternalStorageManager()) {
                 wallpaperIB = wm?.drawable?.toBitmap()?.asImageBitmap()
             }
         }
