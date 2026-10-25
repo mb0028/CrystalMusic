@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +37,6 @@ import mb28.crysongs.ui.fullscreen_player.fullscreenCoverShape
 
 @Composable
 fun UIPreview(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     Box(
         modifier.aspectRatio(9f / 16f).clip(RoundedCornerShape(30.dp))
     ) {
@@ -80,7 +78,8 @@ fun UIPreview(modifier: Modifier = Modifier) {
             }
 
             Column {
-                Box(Modifier.fillMaxWidth().height(50.dp).padding( 5.dp)
+                Box(Modifier.fillMaxWidth().height(50.dp).padding(
+                    if (Settings.floatingNavBar) 10.dp else 5.dp, 5.dp)
                     .background(
                         if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
                             else MaterialTheme.colorScheme.surfaceContainerHigh,
