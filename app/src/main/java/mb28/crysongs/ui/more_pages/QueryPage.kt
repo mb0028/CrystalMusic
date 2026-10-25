@@ -55,7 +55,7 @@ fun QueryPage() {
             item {
                 Row(
                     Modifier.fillMaxWidth()
-                        .padding(top = 40.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                        .padding(top = 40.dp, bottom = 10.dp, start = 15.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     ShuffleButtonQuery()
