@@ -23,8 +23,8 @@ fun Modifier.fadingEdgeVertical() = this
         drawRect(
             brush = Brush.verticalGradient(
                 0f to Color.Transparent,
-                0.15f to Color.White,
-                0.85f to Color.White,
+                0.05f to Color.White,
+                0.95f to Color.White,
                 1f to Color.Transparent
             ),
             blendMode = BlendMode.DstIn
