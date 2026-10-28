@@ -17,8 +17,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 33
         targetSdk = 37
-        versionCode = 18 // Reminder: Don't forget to change Version.txt
-        versionName = "v1.5.21-2026.10.25"
+        versionCode = 19 // Reminder: Don't forget to change Version.txt
+        versionName = "v1.5.22-2026.10.28"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,11 +57,15 @@ dependencies {
 
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
+
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
 
     implementation(libs.material.kolor)
     implementation(libs.androidx.graphics.shapes)
+
+//    implementation(libs.haze)
+//    implementation(libs.haze.blur)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

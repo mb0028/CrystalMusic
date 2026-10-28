@@ -1,4 +1,8 @@
-## v1.5.21 (Latest)
+## v1.5.22 (Latest)
+- Add search button beside navigation drawer button
+- UI improvements
+
+## v1.5.21
 - UI improvements
 
 ## v1.5.20
