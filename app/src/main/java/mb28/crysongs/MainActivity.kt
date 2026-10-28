@@ -91,6 +91,7 @@ import mb28.crysongs.core.openLink
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
 import mb28.crysongs.icons.menu
+import mb28.crysongs.icons.search
 import mb28.crysongs.icons.settings
 import mb28.crysongs.ui.EXTRA_ARTIST_ALBUM
 import mb28.crysongs.ui.FS_RESULT_OPEN_ALBUM
@@ -249,6 +250,11 @@ class MainActivity : ComponentActivity() {
                                         }
                                     ) { Icon(menu, null) }
                                 }
+                                FilledTonalIconButton(
+                                    {
+                                        selectedIndex.intValue = 4
+                                    }
+                                ) { Icon(search, null) }
                             }
                         }
                     ) {
