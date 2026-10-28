@@ -270,6 +270,7 @@ class MainActivity : ComponentActivity() {
         if (!hasFocus && !isPlaying) {
             NotificationManagerCompat.from(this).cancel(0)
         }
+        if (hasFocus) requestBlur = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
