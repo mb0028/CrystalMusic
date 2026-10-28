@@ -55,7 +55,6 @@ import mb28.crysongs.playNextOrPrevious
 import mb28.crysongs.player
 import mb28.crysongs.position
 import mb28.crysongs.shouldScrollLyrics
-import mb28.crysongs.ui.other.fadingEdgeVertical
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -91,7 +90,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true, scro
                 }
             } else {
                 LazyColumn(
-                    Modifier.fadingEdgeVertical().padding(horizontal = 20.dp),
+                    Modifier.padding(horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(vertical = 200.dp),
                     state = state

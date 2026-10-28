@@ -259,7 +259,7 @@ private fun Pager(innerPadding: PaddingValues, activity: FullscreenPlayerActivit
                     FSTagsTab(
                         Modifier
                         .fillMaxSize()
-                        .fadingEdgeVertical()
+//                        .fadingEdgeVertical()
                         .padding(horizontal = 20.dp)
                     )
                 }
