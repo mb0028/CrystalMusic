@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.album
 import mb28.crysongs.icons.artist
+import mb28.crysongs.icons.cottage
 import mb28.crysongs.icons.folder
 import mb28.crysongs.icons.fps30_select
 import mb28.crysongs.icons.library_music
@@ -114,7 +115,7 @@ fun getCurrentNavItemIcon(i: Int) : ImageVector =
         1 -> queue_music
         2 -> library_music
         3 -> folder
-        4 -> search
+        4 -> cottage
         5 -> artist
         6 -> album
         7 -> theater_comedy
