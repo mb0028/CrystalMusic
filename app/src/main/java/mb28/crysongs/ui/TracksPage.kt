@@ -41,20 +41,14 @@ fun TracksList() {
         item {
             if (Settings.tips_cacheThumbs) {
                 CacheCoversCard(
-                    Modifier.fillMaxWidth().padding(horizontal = 15.dp)
+                    Modifier.fillMaxWidth().padding(15.dp)
                 )
             }
             Text(
                 "All Tracks (${count})", fontSize = 36.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (Settings.experimental) {
-                Spacer(Modifier.height(10.dp))
-                Text("experimental features are on\njvm memory usage: ${memUsage / 1024 / 1024}mb",
-                    textAlign = TextAlign.Center, fontSize = 13.sp)
-            } else {
-                Spacer(Modifier.height(33.dp))
-            }
+            Spacer(Modifier.height(33.dp))
         }
 
         item {

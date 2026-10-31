@@ -41,8 +41,7 @@ fun TrackMoreOptionsPopup(path: String, title: String? = null) {
     val count = remember { 3 }
 
     Card(
-        Modifier.padding(horizontal = 15.dp)
-            .alpha(if (Settings.enableBlur) 0.85f else 1f),
+        Modifier.padding(horizontal = 15.dp).alpha(0.85f),
         shape = RoundedCornerShape(30.dp)
     ) {
         Text(

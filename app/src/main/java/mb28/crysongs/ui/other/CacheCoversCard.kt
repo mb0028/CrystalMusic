@@ -4,8 +4,8 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mb28.crysongs.CacheCoversActivity
 import mb28.crysongs.core.Settings
 import mb28.crysongs.icons.arrow_back
@@ -31,10 +33,10 @@ fun CacheCoversCard(modifier: Modifier = Modifier) {
             ),
             supportingContent = {
                 Column {
-                    Text("Caching all artworks makes app x10 faster\n" +
-                        "Might take a few minutes to complete.")
+                    Text("Caching all artworks makes app x10 faster.\n" +
+                        "Might takes a few minutes to complete.")
                     Spacer(Modifier.height(5.dp))
-                    FilledTonalButton({
+                    Button({
                         context.startActivity(Intent(context, CacheCoversActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     }) {
@@ -51,7 +53,11 @@ fun CacheCoversCard(modifier: Modifier = Modifier) {
                 }
             },
         ) {
-           Text("Cache all artworks?")
+            Text(
+                "Cache all artworks?",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

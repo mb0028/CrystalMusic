@@ -61,7 +61,7 @@ fun UIPreview(modifier: Modifier = Modifier) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
                 for (i in 1..5) {
                     Box(Modifier.fillMaxWidth()
-                        .height(if (Settings.twoRowTrackCard) 30.dp else 45.dp)
+                        .height(if (Settings.twoRowTrackCard) 35.dp else 45.dp)
                         .padding(bottom = 3.dp)
                             .background(
                                 if (Settings.gradientColoring) Brush.horizontalGradient(
@@ -78,43 +78,29 @@ fun UIPreview(modifier: Modifier = Modifier) {
             }
 
             Column {
-                val color = if (Settings.floatingNavBar) MaterialTheme.colorScheme.inversePrimary.copy(0.9f)
-                    else MaterialTheme.colorScheme.surfaceContainerHigh
-                Box(Modifier.fillMaxWidth().height(50.dp).padding(
-                    if (Settings.floatingNavBar) 10.dp else 5.dp, 5.dp)
+                val color = MaterialTheme.colorScheme.surfaceContainerHigh
+                val bgShape = if (Settings.hideNavBar) RoundedCornerShape(15.dp) else
+                    RoundedCornerShape(15.dp, 15.dp ,0.dp, 0.dp)
+                Box(
+                    Modifier.fillMaxWidth().height(40.dp)
+                    .padding(horizontal = if (Settings.hideNavBar) 10.dp else 0.dp)
                     .background(
                         Brush.horizontalGradient(
                             0f to if (Settings.gradientColoring)
                                 MaterialTheme.colorScheme.secondaryContainer else color,
                             1f to color
                         ),
-                        if (Settings.floatingNavBar) CircleShape else RoundedCornerShape(10.dp)
+                        bgShape
                     )
                 )
-                when {
-                    Settings.hideNavBar -> { }
-                    Settings.floatingNavBar -> {
-                        Row(
-                            Modifier
-                                .padding(10.dp, 0.dp, 10.dp, 10.dp)
-                                .fillMaxWidth().height(45.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.95f)),
-                            Arrangement.SpaceEvenly,
-                            Alignment.CenterVertically
-                        ) {
-                            NavItems()
-                        }
-                    }
-                    else -> {
-                        Row(
-                            Modifier.fillMaxWidth().height(45.dp)
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-                            Arrangement.SpaceEvenly,
-                            Alignment.CenterVertically
-                        ) {
-                            NavItems()
-                        }
+                if (!Settings.hideNavBar) {
+                    Row(
+                        Modifier.fillMaxWidth().height(45.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                        Arrangement.SpaceEvenly,
+                        Alignment.CenterVertically
+                    ) {
+                        NavItems()
                     }
                 }
             }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
@@ -152,13 +153,9 @@ private fun UISettings() {
         ) { Settings.paintMode = it; Settings.save() }
         SettingSwitch(
             Settings.mica,
-            "Mica background", 1, count,
+            "Mica background", 7, count,
             enable = !Settings.paintMode
         ) { Settings.mica = it; Settings.save() }
-        SettingSwitch(
-            Settings.enableBlur,
-            "UI Blur", count - 1, count,
-        ) { Settings.enableBlur = it; Settings.save() }
 
         Spacer(Modifier.height(5.dp))
         UIPreview(Modifier.width(220.dp).align(Alignment.CenterHorizontally))
@@ -176,11 +173,6 @@ private fun UISettings() {
             Settings.hideNavBar,
             "Hide navigation bar", 2, count,
         ) { Settings.hideNavBar = it; Settings.save() }
-        SettingSwitch(
-            Settings.floatingNavBar,
-            if (Settings.hideNavBar) "Rounded mini player" else "Floating navigation bar", 2, count,
-            desc = if (Settings.hideNavBar) "" else "Also changes mini player style",
-        ) { Settings.floatingNavBar = it; Settings.save() }
         SegmentedListItem(
             ListItemDefaults.segmentedShapes(1, count),
             Modifier.padding(bottom = 3.dp),
@@ -190,7 +182,10 @@ private fun UISettings() {
             supportingContent = {
                 Column {
                     Spacer(Modifier.height(5.dp))
-                    Row {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        Arrangement.SpaceEvenly
+                    ) {
                         for (i in 0..4)
                             NavTab(i, Settings.initTab == i) { lastClickedNavTab = i }
                     }

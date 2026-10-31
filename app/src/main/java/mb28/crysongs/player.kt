@@ -101,7 +101,7 @@ private val scope = CoroutineScope(Dispatchers.Main)
 private var visualizer: Visualizer? = null
 private var lastWaveFormDataCapture: Long? = null
 
-fun setAndPlay(path: String, resetQuery: Boolean) {
+fun setAndPlay(path: String, resetQuery: Boolean, play: Boolean = true) {
     try {
         isReloading = true
         if (playerQuery.isEmpty() || resetQuery) {
@@ -113,7 +113,17 @@ fun setAndPlay(path: String, resetQuery: Boolean) {
             }
             setMediaItem(MediaItem.fromUri(path))
             prepare()
-            play()
+        }
+        if (play) {
+            player.play()
+        } else {
+            CoroutineScope(Dispatchers.Main).launch {
+                // playerLoop needs is playing is sets to true to update ui
+                // so for one moment setting...
+                isPlaying = true // ...will update ui
+                delay(500.milliseconds)
+                isPlaying = false
+            }
         }
         nowPlaying = path
         nowPlayingI = playerQuery.indexOf(path)
@@ -127,13 +137,8 @@ fun playNextOrPrevious(next: Boolean = true) {
     val add = if (next) 1 else -1
     val count = playerQuery.count()
     var i = (nowPlayingI + add).coerceIn(0, count)
-    if (i == count) {
-        i = 0
-    }
-    setAndPlay(
-        playerQuery[i],
-        false
-    )
+    if (i == count) { i = 0 }
+    setAndPlay(playerQuery[i], false)
 }
 
 inline fun Activity.setupPlayer(crossinline onFinished: () -> Unit = {}) {
@@ -166,12 +171,13 @@ inline fun Activity.setupPlayer(crossinline onFinished: () -> Unit = {}) {
             player.volume = Settings.appVolume
             playerLoop(nm, this)
         }
-        isPlayerLoopStarted = true
 
         if (Settings.waveformDataCapture) {
             setupVisu()
         }
-        onFinished() },
+        onFinished()
+        isPlayerLoopStarted = true
+        },
         ContextCompat.getMainExecutor(this)
     )
 }
@@ -201,10 +207,19 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
 
             // On track changed
             if (nowPlaying != lastNowPlaying) {
+                Settings.dismissMiniPlayer = false
                 canChangeTrack = false
-                PlayerWidget().updateAll(context)
                 nowPlayingTags = Track.getTags(nowPlaying, context)
                 val coverPath = Track.createOrGetThumbnail(nowPlaying!!)
+
+                hasLrc = Track.hasLRC(nowPlaying!!)
+                lrcParser = if (hasLrc) { LrcParser(Track.lrcPath(nowPlaying!!)) } else { null }
+                val notifBtn = listOf(if (Settings.favorites.contains(nowPlaying!!))
+                    favoriteRemoveButton else favoriteAddButton, nextButton, aaa, previousButton)
+                mediaSession?.setMediaButtonPreferences(notifBtn)
+
+                Settings.addRecentsIfNot(nowPlaying!!)
+                duration = player.duration
 
                 if (coverPath != null) {
                     withContext(Dispatchers.IO) {
@@ -232,16 +247,9 @@ fun playerLoop(nm: NotificationManager, context: Activity) = scope.launch {
                     trackCoverPrimary = null
                 }
 
-                hasLrc = Track.hasLRC(nowPlaying!!)
-                lrcParser = if (hasLrc) { LrcParser(Track.lrcPath(nowPlaying!!)) } else { null }
-
-                val notifBtn = listOf(if (Settings.favorites.contains(nowPlaying!!))
-                    favoriteRemoveButton else favoriteAddButton, nextButton, aaa, previousButton)
-                mediaSession?.setMediaButtonPreferences(notifBtn)
-
-                duration = player.duration
                 lastNowPlaying = nowPlaying
                 canChangeTrack = true
+                PlayerWidget().updateAll(context)
             }
         }
 

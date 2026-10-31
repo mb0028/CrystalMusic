@@ -18,11 +18,12 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,7 +31,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -45,15 +45,13 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
@@ -69,6 +67,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -90,6 +89,7 @@ import mb28.crysongs.core.checkForUpdate
 import mb28.crysongs.core.openLink
 import mb28.crysongs.core.scheduleNotifications
 import mb28.crysongs.core.setupPermissions
+import mb28.crysongs.icons.arrow_cool_down
 import mb28.crysongs.icons.menu
 import mb28.crysongs.icons.search
 import mb28.crysongs.icons.settings
@@ -103,9 +103,9 @@ import mb28.crysongs.ui.REQUEST_CODE_FS_PLAYER
 import mb28.crysongs.ui.TracksList
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
+import mb28.crysongs.ui.more_pages.HomePage
 import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
-import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.more_pages.ToolsPage
 import mb28.crysongs.ui.more_pages.customTabHighlightedItem
 import mb28.crysongs.ui.other.CrystalDrawerItem
@@ -142,7 +142,12 @@ class MainActivity : ComponentActivity() {
         Settings.load()
         selectedIndex.intValue = Settings.navTabs[Settings.initTab]
         setupPermissions()
-        setupPlayer()
+        setupPlayer {
+            if (Settings.recents.isNotEmpty() && !isPlayerLoopStarted) {
+                playerQuery.addAll(Settings.recents)
+                setAndPlay(Settings.recents.first(), resetQuery = false, play = false)
+            }
+        }
         super.onCreate(savedInstanceState)
 
         if (noCoverBitmap == null) {
@@ -187,13 +192,13 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     val blur by animateDpAsState(
-                        if (Settings.enableBlur && requestBlur) 8.dp else 0.dp,
+                        if (requestBlur) 8.dp else 0.dp,
                         animationSpec = TweenSpec(
                             300,
                             easing = EaseOutCubic
                         )
                     )
-                    Scaffold( //BottomSheetScaffold
+                    Scaffold(
                         modifier = Modifier
                             .fillMaxSize()
                             .scale(animatedOpacity)
@@ -216,7 +221,6 @@ class MainActivity : ComponentActivity() {
                             }
                             else Column {
                                 MiniPlayer(this@MainActivity)
-                                Spacer(Modifier.height(3.dp))
                                 if (Settings.hideNavBar) {
                                     Spacer(Modifier.navigationBarsPadding())
                                 } else {
@@ -224,20 +228,13 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         },
-//                        sheetContent = {
-//                            MiniPlayer(this@MainActivity)
-//                        },
-//                        sheetSwipeEnabled = false,
-//                        sheetPeekHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 60.dp,
-//                        sheetContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-//                        sheetDragHandle = { },
                         topBar = {
                             Row(
                                 Modifier
                                     .fillMaxWidth()
                                     .statusBarsPadding()
-                                    .padding(start = 15.dp),
-                                Arrangement.Start
+                                    .padding(horizontal = 15.dp),
+                                Arrangement.SpaceBetween
                             ) {
                                 BadgedBox({
                                     if (Settings.updateState == 1) {
@@ -250,11 +247,26 @@ class MainActivity : ComponentActivity() {
                                         }
                                     ) { Icon(menu, null) }
                                 }
-                                FilledTonalIconButton(
-                                    {
-                                        selectedIndex.intValue = 4
+                                Row {
+                                    AnimatedVisibility(
+                                        Settings.dismissMiniPlayer,
+                                        enter = fadeIn() + scaleIn(),
+                                        exit = fadeOut() + slideOutVertically { -50 }
+                                    ) {
+                                        FilledTonalIconButton(
+                                            { Settings.dismissMiniPlayer = false }
+                                        ) {
+                                            Icon(
+                                                arrow_cool_down, null,
+                                                Modifier.rotate(180f)
+                                            )
+                                        }
                                     }
-                                ) { Icon(search, null) }
+
+                                    FilledTonalIconButton(
+                                        { selectedIndex.intValue = 4 }
+                                    ) { Icon(search, null) }
+                                }
                             }
                         }
                     ) {
@@ -318,7 +330,7 @@ class MainActivity : ComponentActivity() {
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
         LazyColumn {
-            items(10) { i ->
+            items(9) { i ->
                 CrystalDrawerItem(
                     getCurrentNavItemName(i),
                     icon = getCurrentNavItemIcon(i),
@@ -356,12 +368,12 @@ fun MainActivity.MainContent() {
         1 -> QueryPage()
         2 -> PlaylistsPage()
         3 -> FoldersPage()
-        4 -> SearchPage(this@MainContent)
+        4 -> HomePage(this@MainContent)
         5 -> CustomTagsPage("artists", this@MainContent)
         6 -> CustomTagsPage("albums", this@MainContent)
         7 -> CustomTagsPage("genres", this@MainContent)
         8 -> CustomTagsPage("bitrates", this@MainContent)
-        9 -> ToolsPage(this@MainContent)
+        9 -> ToolsPage()
         else -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Coming soon!")
@@ -372,42 +384,25 @@ fun MainActivity.MainContent() {
 
 @Composable
 private fun NavBar(selectedIndex: MutableIntState) {
-    @Composable
-    fun navBarItems() {
-        val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+
+    ShortNavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(0.95f)
+    ) {
         AnimatedVisibility(
             state,
             enter = scaleIn() + fadeIn()
         ) {
-            Row {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                Arrangement.SpaceBetween
+            ) {
                 for (i in 0..4)
                     NavTab(
                         i,
                         selectedIndex.intValue == Settings.navTabs[i]
                     ) { selectedIndex.intValue = it }
             }
-        }
-    }
-
-    if (Settings.floatingNavBar) {
-        HorizontalFloatingToolbar(
-            expanded = true,
-            contentPadding = PaddingValues(horizontal = 10.dp),
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(horizontal = 10.dp)
-                .padding(bottom = 2.dp)
-                .height(65.dp),
-            colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
-                toolbarContainerColor = MaterialTheme.colorScheme.surfaceBright.copy(0.95f)
-            ),
-        ) {
-            navBarItems()
-        }
-    }
-    else {
-        NavigationBar {
-            navBarItems()
         }
     }
 }

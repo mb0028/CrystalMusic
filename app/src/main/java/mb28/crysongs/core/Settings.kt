@@ -21,7 +21,9 @@ object Settings {
 
     var loadFont by mutableStateOf(false)
     var updateState by mutableIntStateOf(0)
+    var dismissMiniPlayer by mutableStateOf(false)
 
+    val recents = mutableStateListOf<String>()
     val favorites = mutableStateListOf<String>()
     val playlists = mutableStateListOf<String>()
     val libraryInclude = mutableStateListOf<String>()
@@ -58,11 +60,9 @@ object Settings {
     var paintMode by mutableStateOf(false)
     var twoRowTrackCard by mutableStateOf(false)
     var lyricsAutoScroll by mutableStateOf(false)
-    var floatingNavBar by mutableStateOf(false)
     var fsStyle by mutableIntStateOf(0)
     var minDuration by mutableIntStateOf(30)
     var hideNavBar by mutableStateOf(false)
-    var enableBlur by mutableStateOf(false)
 
     val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
 
@@ -80,7 +80,18 @@ object Settings {
         saveFavorites()
     }
 
+    fun addRecentsIfNot(path: String) {
+        if (!recents.contains(path)) {
+            if (recents.count() >= 15) {
+                recents.remove(recents.last())
+            }
+            recents.add(0, path)
+        }
+        save()
+    }
+
     fun load() {
+        recents.clear()
         favorites.clear()
         playlists.clear()
         navTabs.clear()
@@ -135,16 +146,13 @@ object Settings {
                     s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
                     s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
                     s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
-                    s.startsWith("[floatingNavBar]") -> floatingNavBar = s.removePrefix("[floatingNavBar]").toBooleanStrict()
                     s.startsWith("[FSStyle]") -> fsStyle = s.removePrefix("[FSStyle]").toInt()
                     s.startsWith("[MinDuration]") -> minDuration = s.removePrefix("[MinDuration]").toInt()
                     s.startsWith("[hideNavBar]") -> hideNavBar = s.removePrefix("[hideNavBar]").toBooleanStrict()
-                    s.startsWith("[UIBlur]") -> enableBlur = s.removePrefix("[UIBlur]").toBooleanStrict()
-
-                    s.startsWith("[Favorite]") -> { // TODO: remove in 2027/01
-                        val path = s.removePrefix("[Favorite]")
+                    s.startsWith("[Recent]") -> {
+                        val path = s.removePrefix("[Recent]")
                         if (File(path).exists()) {
-                            favorites.add(path)
+                            recents.add(path)
                         }
                     }
                 }
@@ -215,11 +223,15 @@ object Settings {
         data += "[Paint]$paintMode\n"
         data += "[2RowTrack]$twoRowTrackCard\n"
         data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
-        data += "[floatingNavBar]$floatingNavBar\n"
         data += "[FSStyle]$fsStyle\n"
         data += "[MinDuration]$minDuration\n"
         data += "[hideNavBar]$hideNavBar\n"
-        data += "[UIBlur]$enableBlur\n"
+
+
+        data += "\n"
+        recents.forEach {
+            data += "[Recent]$it\n"
+        }
 
         data += "\n"
         playlists.forEach {

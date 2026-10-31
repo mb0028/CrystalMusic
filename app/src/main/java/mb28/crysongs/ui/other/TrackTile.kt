@@ -121,7 +121,7 @@ fun TrackTile(
             ),
             modifier = modifier
                 .padding(bottom = 3.dp, start = 8.dp, end = 8.dp)
-                .height(if (Settings.twoRowTrackCard) 60.dp else 80.dp),
+                .height(if (Settings.twoRowTrackCard) 65.dp else 80.dp),
             onClick = {
                 onBeforeClick()
                 setAndPlay(path, resetQueryOnClick)
@@ -138,7 +138,7 @@ fun TrackTile(
                     if (Settings.gradientColoring) {
                         Image(
                             cover ?: noCoverBitmap!!,
-                            "Track cover",
+                            null,
                             modifier = Modifier
                                 .size(50.dp)
                                 .scale(4f)
@@ -149,7 +149,7 @@ fun TrackTile(
                     Box(Modifier.clip(defaultPressedShape)) {
                         Image(
                             cover ?: noCoverBitmap!!,
-                            "Track cover",
+                            null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .aspectRatio(1f)
@@ -192,18 +192,20 @@ fun TrackTile(
                         fontSize = 13.sp,
                         modifier = Modifier.weight(0.5f)
                     )
-                    Text(
-                        tagsSpacer,
-                        fontSize = 17.sp,
-                        modifier = Modifier.weight(0.1f)
-                    )
-                    Text(
-                        t?.album ?: "",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(0.5f)
-                    )
+                    if (!Settings.twoRowTrackCard) {
+                        Text(
+                            tagsSpacer,
+                            fontSize = 17.sp,
+                            modifier = Modifier.weight(0.1f)
+                        )
+                        Text(
+                            t?.album ?: "",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 13.sp,
+                            modifier = Modifier.weight(0.5f)
+                        )
+                    }
                 }
 
                 if (!Settings.twoRowTrackCard) {

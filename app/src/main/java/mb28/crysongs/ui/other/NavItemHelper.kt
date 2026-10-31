@@ -8,6 +8,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +30,10 @@ import mb28.crysongs.icons.search
 import mb28.crysongs.icons.theater_comedy
 
 @Composable
-fun RowScope.NavTab(navIndex: Int, selected: Boolean, onClick: (Int) -> Unit) {
+fun NavTab(navIndex: Int, selected: Boolean, onClick: (Int) -> Unit) {
     val i = Settings.navTabs[navIndex]
 
-    NavigationBarItem(
+    ShortNavigationBarItem(
         selected,
         { onClick(i) },
         icon = {
@@ -74,11 +76,11 @@ fun EditNavigationItemPopup(navIndex: Int, onDismissRequired: () -> Unit) {
                         }
                     ) { Text("Set default tab") }
                 }
-                items(10) {
+                items(9) {
                     EasySegmentedListItem(
                        null,
                        getCurrentNavItemName(it),
-                       it, 10,
+                       it, 9,
                        Modifier.padding(horizontal = 15.dp)
                     ) {
                        Settings.navTabs[navIndex] = it
@@ -97,7 +99,7 @@ fun getCurrentNavItemName(i: Int) : String =
         1 -> "Query"
         2 -> "Playlists"
         3 -> "Folders"
-        4 -> "Search"
+        4 -> "Home"
         5 -> "Artists"
         6 -> "Albums"
         7 -> "Genres"
