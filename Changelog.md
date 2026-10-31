@@ -1,3 +1,20 @@
+## v1.6.0-beta1 (Beta)
+
+Mini player:
+- Better mini player & navigation bar
+- Remove next & previous buttons
+- Swipe left/right to change track
+- Swipe Up to open fullscreen player
+- Swipe Down to dismiss mini player
+
+Other:
+- Add home page
+- Add history. last 15 played songs will be recorded.
+- Resumes last played track when app loads
+- Remove floating navigation bar
+- Remove blur option. blur is now always on
+- UI improvements
+
 ## v1.5.22 (Latest)
 - Add search button beside navigation drawer button
 - UI improvements

@@ -17,8 +17,8 @@ android {
         applicationId = "mb28.CrySongs"
         minSdk = 33
         targetSdk = 37
-        versionCode = 19 // Reminder: Don't forget to change Version.txt
-        versionName = "v1.5.22-2026.10.28"
+        versionCode = 20 // Reminder: Don't forget to change Version.txt
+        versionName = "1.6.0-2026.11.01-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,9 +63,6 @@ dependencies {
 
     implementation(libs.material.kolor)
     implementation(libs.androidx.graphics.shapes)
-
-//    implementation(libs.haze)
-//    implementation(libs.haze.blur)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
