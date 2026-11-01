@@ -99,7 +99,7 @@ import mb28.crysongs.ui.LandscapePage
 import mb28.crysongs.ui.MiniPlayer
 import mb28.crysongs.ui.PermissionsPage
 import mb28.crysongs.ui.REQUEST_CODE_FS_PLAYER
-import mb28.crysongs.ui.TracksList
+import mb28.crysongs.ui.TracksPage
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.more_pages.HomePage
@@ -290,7 +290,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) {
-                    TracksList()
+                    TracksPage()
                 }
             }
             1 -> QueryPage()
