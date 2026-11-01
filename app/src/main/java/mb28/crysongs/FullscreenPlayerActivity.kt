@@ -67,7 +67,6 @@ import mb28.crysongs.ui.fullscreen_player.FSLyricsTab
 import mb28.crysongs.ui.fullscreen_player.FSPlayerButtonsRow
 import mb28.crysongs.ui.fullscreen_player.FSProgressBarRow
 import mb28.crysongs.ui.fullscreen_player.FSTagsTab
-import mb28.crysongs.ui.other.fadingEdgeVertical
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
 

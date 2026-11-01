@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -48,6 +50,7 @@ import mb28.crysongs.LrcMakerActivity
 import mb28.crysongs.SoundPickerActivity
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
+import mb28.crysongs.core.pageAnimation
 import mb28.crysongs.isReloading
 import mb28.crysongs.memUsage
 import mb28.crysongs.noCoverBitmap
@@ -58,158 +61,164 @@ import mb28.crysongs.ui.other.CacheCoversCard
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomePage(activity: Activity) {
-    val name = remember {
-        android.provider.Settings.Global.getString(activity.contentResolver, android.provider.Settings.Global.DEVICE_NAME)
-    }
-    LazyColumn(
-        contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        item {
-            Text(
-                "Welcome, $name",
-                textAlign = TextAlign.Center,
-                style = TextStyle(fontSize = 36.sp),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val name = remember { android.provider.Settings.Global.getString(
+            activity.contentResolver, android.provider.Settings.Global.DEVICE_NAME) }
 
-        if (Settings.tips_cacheThumbs) {
+    AnimatedVisibility(
+        visibleState = state,
+        enter = pageAnimation,
+    ) {
+        LazyColumn(
+            contentPadding = PaddingValues(top = 130.dp, bottom = 260.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             item {
-                Spacer(Modifier.height(15.dp))
-                CacheCoversCard(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
+                Text(
+                    "Welcome, $name",
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(fontSize = 36.sp),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-        }
 
-        if (Settings.experimental) {
+            if (Settings.tips_cacheThumbs) {
+                item {
+                    Spacer(Modifier.height(15.dp))
+                    CacheCoversCard(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp)
+                    )
+                }
+            }
+
+            if (Settings.experimental) {
+                item {
+                    Spacer(Modifier.height(15.dp))
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp),
+                        colors = CardDefaults.cardColors(
+                            MaterialTheme.colorScheme.errorContainer,
+                            MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    ) {
+                        Text(
+                            "Experimental features are on\nJVM memory usage: ${memUsage / 1024 / 1024}mb",
+                            modifier = Modifier.padding(12.dp),
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+            }
+
+            if (Settings.recents.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(15.dp))
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "Recently played",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(5.dp))
+                            LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
+                                items(Settings.recents.count()) {
+                                    TrackTileCubic(Settings.recents[it], activity)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            val count = tracks.count()
+            if (count != 0 && !isReloading) {
+                item {
+                    Spacer(Modifier.height(15.dp))
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "Recently added",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(5.dp))
+                            LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
+                                items(count.coerceIn(0..10)) {
+                                    TrackTileCubic(tracks[it], activity)
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                item {
+                    Spacer(Modifier.height(15.dp))
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "Oldest tracks",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(5.dp))
+                            LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
+                                items(count.coerceIn(0..10)) {
+                                    TrackTileCubic(tracks[(count - 1) - it], activity)
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
             item {
+                val result = rememberLauncherForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+                ) { activityResult ->
+                    if (activityResult.resultCode == Activity.RESULT_OK) {
+                        val intent = Intent(activity, LrcMakerActivity::class.java)
+                            .putExtra(EXTRA_PATH, activityResult.data!!.getStringExtra(EXTRA_PATH))
+                        activity.startActivity(intent)
+                    }
+                }
+
                 Spacer(Modifier.height(15.dp))
                 Card(
+                    {
+                        val intent = Intent(activity, SoundPickerActivity::class.java)
+                            .putExtra(Intent.EXTRA_TITLE, "Select track to make lrc for")
+                        result.launch(intent)
+                    },
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 15.dp),
                     colors = CardDefaults.cardColors(
-                        MaterialTheme.colorScheme.errorContainer,
-                        MaterialTheme.colorScheme.onErrorContainer
+                        MaterialTheme.colorScheme.tertiaryContainer,
+                        MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 ) {
-                    Text(
-                        "Experimental features are on\nJVM memory usage: ${memUsage / 1024 / 1024}mb",
-                        modifier = Modifier.padding(12.dp),
-                        fontSize = 18.sp
-                    )
-                }
-            }
-        }
-
-        if (Settings.recents.isNotEmpty()) {
-            item {
-                Spacer(Modifier.height(15.dp))
-                Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
                     Column(Modifier.padding(12.dp)) {
                         Text(
-                            "Recently played",
+                            "LRC Maker",
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(Modifier.height(5.dp))
-                        LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
-                            items(Settings.recents.count()) {
-                                TrackTileCubic(Settings.recents[it], activity)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        val count = tracks.count()
-        if (count != 0 && !isReloading) {
-            item {
-                Spacer(Modifier.height(15.dp))
-                Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
-                    Column(Modifier.padding(12.dp)) {
                         Text(
-                            "Recently added",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold
+                            "Create synced LRC from plain text with just clicking buttons. " +
+                                    "Click to open LRC Maker",
                         )
-                        Spacer(Modifier.height(5.dp))
-                        LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
-                            items(count.coerceIn(0..10)) {
-                                TrackTileCubic(tracks[it], activity)
-                            }
-                        }
                     }
-
                 }
             }
 
-            item {
-                Spacer(Modifier.height(15.dp))
-                Card(Modifier.fillMaxWidth().padding(horizontal = 15.dp)) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text(
-                            "Oldest tracks",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(Modifier.height(5.dp))
-                        LazyRow(Modifier.fillMaxWidth().height(100.dp)) {
-                            items(count.coerceIn(0..10)) {
-                                TrackTileCubic(tracks[(count - 1) - it], activity)
-                            }
-                        }
-                    }
-
-                }
-            }
         }
-
-        item {
-            val result = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) {  activityResult ->
-                if (activityResult.resultCode == Activity.RESULT_OK) {
-                    val intent = Intent(activity, LrcMakerActivity::class.java)
-                        .putExtra(EXTRA_PATH, activityResult.data!!.getStringExtra(EXTRA_PATH))
-                    activity.startActivity(intent)
-                }
-            }
-
-            Spacer(Modifier.height(15.dp))
-            Card(
-                {
-                    val intent = Intent(activity, SoundPickerActivity::class.java)
-                        .putExtra(Intent.EXTRA_TITLE, "Select track to make lrc for")
-                    result.launch(intent)
-                },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
-                colors = CardDefaults.cardColors(
-                    MaterialTheme.colorScheme.tertiaryContainer,
-                    MaterialTheme.colorScheme.onTertiaryContainer
-                )
-            ) {
-                Column(Modifier.padding(12.dp)) {
-                    Text(
-                        "LRC Maker",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        "Create synced LRC from plain text with just clicking buttons. " +
-                            "Click to open LRC Maker",
-                    )
-                }
-            }
-        }
-
     }
 }
 
