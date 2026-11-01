@@ -7,7 +7,7 @@ Android music player app designed for local library, simplicity & performance.
 - 🪶 Simple UI, easy to navigate
 - ✨ Play any audio format
 - 🍃 Material 3 expressive
-- 🧩 Live blur (Experimental) + Mica background blur
+- 🧩 Live blur + Mica-style background blur
 - 🎨 Can change app font to any .ttf font file
 - 🧱 Homescreen widgets
 - 📦 Only 7 megabytes
@@ -20,11 +20,13 @@ Other features:
 - Sound picker for other apps to use
 
 To-Do
+- [ ] Using taglib instead of jaudiotagger
 - [ ] Sleep timer
 - [ ] Add edge lighting effect
-- [ ] Widget settings
-- [ ] Favorite folders/albums/artists
-- [ ] Online lyric finder & downloader
+
+[//]: # (- [ ] Widget settings)
+[//]: # (- [ ] Favorite folders/albums/artists)
+[//]: # (- [ ] Online lyric finder & downloader)
 
 [//]: # (- [x] Better landscape support)
 [//]: # (- [x] Tag editor)
