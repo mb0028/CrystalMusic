@@ -15,6 +15,7 @@ import android.os.Build
 import android.util.Log
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -30,7 +31,7 @@ import org.jsoup.Jsoup
 import kotlin.time.Duration
 
 
-val pageAnimation = scaleIn(initialScale = 0.85f) + fadeIn(initialAlpha = 0.5f)
+val pageAnimation = slideInVertically { 150 } + fadeIn(initialAlpha = 0.5f)
 
 const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
 const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
