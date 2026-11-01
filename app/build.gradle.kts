@@ -9,7 +9,7 @@ android {
     namespace = "mb28.crysongs"
     compileSdk {
         version = release(37) {
-            minorApiLevel = 1
+            minorApiLevel = 2
         }
     }
 
