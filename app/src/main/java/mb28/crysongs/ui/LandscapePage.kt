@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import mb28.crysongs.MainActivity
-import mb28.crysongs.MainContent
 import mb28.crysongs.core.Settings
 import mb28.crysongs.privateNowPlayingCover
 import mb28.crysongs.ui.fullscreen_player.FSLyricsTab

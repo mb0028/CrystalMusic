@@ -56,12 +56,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +81,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
@@ -106,7 +105,7 @@ import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.more_pages.HomePage
 import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
-import mb28.crysongs.ui.more_pages.ToolsPage
+import mb28.crysongs.ui.more_pages.SearchPage
 import mb28.crysongs.ui.more_pages.customTabHighlightedItem
 import mb28.crysongs.ui.other.CrystalDrawerItem
 import mb28.crysongs.ui.other.EdgeLightingEffect
@@ -209,9 +208,13 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             if (isLandscape) {
                                 Row(
-                                    Modifier.fillMaxWidth().padding(bottom = 10.dp, start = 15.dp)
-                                        .padding(end = WindowInsets.navigationBars.asPaddingValues()
-                                            .calculateEndPadding(LayoutDirection.Ltr)),
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 10.dp, start = 15.dp)
+                                        .padding(
+                                            end = WindowInsets.navigationBars.asPaddingValues()
+                                                .calculateEndPadding(LayoutDirection.Ltr)
+                                        ),
                                     Arrangement.End
                                 ) {
                                     Box(Modifier.fillMaxWidth(0.5f)) {
@@ -229,45 +232,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         topBar = {
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .statusBarsPadding()
-                                    .padding(horizontal = 15.dp),
-                                Arrangement.SpaceBetween
-                            ) {
-                                BadgedBox({
-                                    if (Settings.updateState == 1) {
-                                        Badge { Text("Update available")
-                                    } }
-                                }) {
-                                    FilledTonalIconButton(
-                                        {
-                                            CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.open() }
-                                        }
-                                    ) { Icon(menu, null) }
-                                }
-                                Row {
-                                    AnimatedVisibility(
-                                        Settings.dismissMiniPlayer,
-                                        enter = fadeIn() + scaleIn(),
-                                        exit = fadeOut() + slideOutVertically { -50 }
-                                    ) {
-                                        FilledTonalIconButton(
-                                            { Settings.dismissMiniPlayer = false }
-                                        ) {
-                                            Icon(
-                                                arrow_cool_down, null,
-                                                Modifier.rotate(180f)
-                                            )
-                                        }
-                                    }
-
-                                    FilledTonalIconButton(
-                                        { selectedIndex.intValue = 4 }
-                                    ) { Icon(search, null) }
-                                }
-                            }
+                            Topbar(drawerState)
                         }
                     ) {
                         if (isLandscape) {
@@ -308,7 +273,47 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Drawer(drawerState: DrawerState) {
+    fun MainContent() {
+        when (selectedIndex.intValue) {
+            0 -> {
+                var refreshing by remember { mutableStateOf(false) }
+                PullToRefreshBox(
+                    refreshing,
+                    {
+                        lifecycleScope.launch {
+                            refreshing = true
+                            isReloading = true
+                            delay(100.milliseconds)
+                            refreshTracksList(this@MainActivity)
+                            refreshing = false
+                            isReloading = false
+                        }
+                    }
+                ) {
+                    TracksList()
+                }
+            }
+            1 -> QueryPage()
+            2 -> PlaylistsPage()
+            3 -> FoldersPage()
+            4 -> HomePage(this)
+            5 -> CustomTagsPage("artists", this)
+            6 -> CustomTagsPage("albums", this)
+            7 -> CustomTagsPage("genres", this)
+            8 -> CustomTagsPage("bitrates", this)
+            9 -> SearchPage(this)
+            else -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Coming soon!")
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Drawer(drawerState: DrawerState) {
+        val scope = rememberCoroutineScope()
+
         Text("Crystal Songs", Modifier.padding(16.dp), fontSize = 26.sp)
         HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
@@ -337,71 +342,77 @@ class MainActivity : ComponentActivity() {
                     selected = i == selectedIndex.intValue
                 ) {
                     selectedIndex.intValue = i
-                    CoroutineScope(DefaultMonotonicFrameClock).launch { drawerState.close() }
+                    scope.launch { drawerState.close() }
                 }
             }
         }
     }
-}
 
-@Composable
-fun MainActivity.MainContent() {
-    when (selectedIndex.intValue) {
-        0 -> {
-            var refreshing by remember { mutableStateOf(false) }
-            PullToRefreshBox(
-                refreshing,
-                {
-                    lifecycleScope.launch {
-                        refreshing = true
-                        isReloading = true
-                        delay(100.milliseconds)
-                        refreshTracksList(this@MainContent)
-                        refreshing = false
-                        isReloading = false
+    @Composable
+    private fun Topbar(drawerState: DrawerState) {
+        val scope = rememberCoroutineScope()
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 15.dp),
+            Arrangement.SpaceBetween
+        ) {
+            BadgedBox({
+                if (Settings.updateState == 1) {
+                    Badge { Text("Update available")
+                    } }
+            }) {
+                FilledTonalIconButton(
+                    { scope.launch { drawerState.open() } }
+                ) { Icon(menu, null) }
+            }
+            Row {
+                AnimatedVisibility(
+                    Settings.dismissMiniPlayer,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + slideOutVertically { -50 }
+                ) {
+                    FilledTonalIconButton(
+                        { Settings.dismissMiniPlayer = false }
+                    ) {
+                        Icon(
+                            arrow_cool_down, null,
+                            Modifier.rotate(180f)
+                        )
                     }
                 }
-            ) {
-                TracksList()
-            }
-        }
-        1 -> QueryPage()
-        2 -> PlaylistsPage()
-        3 -> FoldersPage()
-        4 -> HomePage(this@MainContent)
-        5 -> CustomTagsPage("artists", this@MainContent)
-        6 -> CustomTagsPage("albums", this@MainContent)
-        7 -> CustomTagsPage("genres", this@MainContent)
-        8 -> CustomTagsPage("bitrates", this@MainContent)
-        9 -> ToolsPage()
-        else -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Coming soon!")
+
+                FilledTonalIconButton(
+                    { selectedIndex.intValue = 9 }
+                ) { Icon(search, null) }
             }
         }
     }
-}
 
-@Composable
-private fun NavBar(selectedIndex: MutableIntState) {
-    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    @Composable
+    private fun NavBar(selectedIndex: MutableIntState) {
+        val state = remember { MutableTransitionState(false).apply { targetState = true } }
 
-    ShortNavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(0.95f)
-    ) {
-        AnimatedVisibility(
-            state,
-            enter = scaleIn() + fadeIn()
+        ShortNavigationBar(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(0.95f)
         ) {
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                Arrangement.SpaceBetween
+            AnimatedVisibility(
+                state,
+                enter = scaleIn() + fadeIn()
             ) {
-                for (i in 0..4)
-                    NavTab(
-                        i,
-                        selectedIndex.intValue == Settings.navTabs[i]
-                    ) { selectedIndex.intValue = it }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    Arrangement.SpaceBetween
+                ) {
+                    for (i in 0..4)
+                        NavTab(
+                            i,
+                            selectedIndex.intValue == Settings.navTabs[i]
+                        ) { selectedIndex.intValue = it }
+                }
             }
         }
     }

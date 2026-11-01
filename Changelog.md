@@ -1,4 +1,4 @@
-## v1.6.0-beta1 (Beta)
+## v1.6.0 (Upcoming)
 
 Mini player:
 - Better mini player & navigation bar

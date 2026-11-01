@@ -1,14 +1,11 @@
 package mb28.crysongs.ui.other
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -24,7 +21,6 @@ import mb28.crysongs.icons.cottage
 import mb28.crysongs.icons.folder
 import mb28.crysongs.icons.fps30_select
 import mb28.crysongs.icons.library_music
-import mb28.crysongs.icons.list_2
 import mb28.crysongs.icons.music_note_2
 import mb28.crysongs.icons.queue_music
 import mb28.crysongs.icons.search
@@ -105,7 +101,7 @@ fun getCurrentNavItemName(i: Int) : String =
         6 -> "Albums"
         7 -> "Genres"
         8 -> "Bitrates"
-        9 -> "Tools"
+        9 -> "Search"
         else -> throw Exception()
     }
 
@@ -120,6 +116,6 @@ fun getCurrentNavItemIcon(i: Int) : ImageVector =
         6 -> album
         7 -> theater_comedy
         8 -> fps30_select
-        9 -> list_2
+        9 -> search
         else -> throw Exception()
     }
