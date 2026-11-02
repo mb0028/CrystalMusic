@@ -18,7 +18,7 @@ Other:
 - Fix some tag editor issues
 - Other bug fixes & performance improvements
 
-## v1.5.22 (Latest)
+## v1.5.22
 - Add search button beside navigation drawer button
 - UI improvements
 
