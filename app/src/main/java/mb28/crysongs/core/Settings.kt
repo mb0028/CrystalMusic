@@ -75,7 +75,7 @@ object Settings {
         if (favorites.contains(path)) {
             favorites.remove(path)
         } else {
-            favorites.add(path)
+            favorites.add(0, path)
         }
         saveFavorites()
     }
