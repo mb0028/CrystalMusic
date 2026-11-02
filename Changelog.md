@@ -15,7 +15,8 @@ Other:
 - Remove blur option. blur is now always on
 - Better page transitions
 - UI improvements
-- Bug fixes & performance improvements
+- Fix some tag editor issues
+- Other bug fixes & performance improvements
 
 ## v1.5.22 (Latest)
 - Add search button beside navigation drawer button

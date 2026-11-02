@@ -55,6 +55,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
+import mb28.crysongs.core.Track
 import mb28.crysongs.icons.arrow_back
 import mb28.crysongs.icons.image_arrow_up
 import mb28.crysongs.icons.save
@@ -221,8 +222,9 @@ private fun Tags(file: AudioFile, activity: TagEditorActivity, path: String) {
                                 }
                             }
                             file.commit()
-                            Toast.makeText(activity, "Tags are saved, but refresh might needed for tags to update in ui",
+                            Toast.makeText(activity, "Tags are saved, but restarting app might needed for tags to update in ui",
                                 Toast.LENGTH_LONG).show()
+                            Track.urisCache.clear()
                             activity.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                                     Uri.fromFile(File(path))))
                             CoroutineScope(Dispatchers.IO).launch {

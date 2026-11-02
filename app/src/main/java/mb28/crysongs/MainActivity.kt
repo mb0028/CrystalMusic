@@ -53,7 +53,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -81,7 +80,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.checkForUpdate
@@ -114,7 +112,6 @@ import mb28.crysongs.ui.other.getCurrentNavItemIcon
 import mb28.crysongs.ui.other.getCurrentNavItemName
 import mb28.crysongs.ui.theme.CrySongsTheme
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration.Companion.milliseconds
 
 var noCoverBitmap: ImageBitmap? = null
 var notificationColor: Int? = null
@@ -275,24 +272,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainContent() {
         when (selectedIndex.intValue) {
-            0 -> {
-                var refreshing by remember { mutableStateOf(false) }
-                PullToRefreshBox(
-                    refreshing,
-                    {
-                        lifecycleScope.launch {
-                            refreshing = true
-                            isReloading = true
-                            delay(100.milliseconds)
-                            refreshTracksList(this@MainActivity)
-                            refreshing = false
-                            isReloading = false
-                        }
-                    }
-                ) {
-                    TracksPage()
-                }
-            }
+            0 -> TracksPage(this)
             1 -> QueryPage()
             2 -> PlaylistsPage()
             3 -> FoldersPage()

@@ -68,7 +68,7 @@ data class Track(
             MediaStore.Audio.Media.YEAR,
         )
 
-        private val uris = Collections.synchronizedMap(
+        val urisCache = Collections.synchronizedMap(
             object : LinkedHashMap<String, Uri>(200, 0.75f, true) {
                 override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Uri>): Boolean = size > 200
             }
@@ -76,7 +76,7 @@ data class Track(
 
         suspend fun getTags(path: String?, context: Context) : Track = withContext(Dispatchers.IO) {
             if (path != null) {
-                val uri = uris[path] ?: getUri(path, context)?.also { uris[path] = it }
+                val uri = urisCache[path] ?: getUri(path, context)?.also { urisCache[path] = it }
                 if (uri != null) {
                     context.contentResolver.query(
                         uri, projection,
