@@ -3,8 +3,14 @@ package mb28.crysongs.ui.fullscreen_player
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -13,6 +19,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
@@ -115,6 +123,101 @@ fun FSPlayerButtonsRow() {
             modifier = Modifier.scale(0.8f)
         ) {
             Icon(if (loopTrack) repeat_on else repeat, null)
+        }
+    }
+}
+
+@Composable
+fun FSPlayerButtonsRowMaterial() {
+    val roundingAnim by animateDpAsState(
+        if (isPlaying) 12.dp else 20.dp,
+        SpringSpec(
+            stiffness = Spring.StiffnessMedium
+        )
+    )
+    val widthAnim by animateDpAsState(
+        if (isPlaying) 170.dp else 90.dp,
+        SpringSpec(
+            Spring.DampingRatioMediumBouncy,
+            Spring.StiffnessLow
+        )
+    )
+    Column(
+        Modifier.fillMaxWidth(),
+        Arrangement.Center,
+        Alignment.CenterHorizontally
+    ) {
+        FilledIconButton(
+            {
+                if (player.isPlaying) {
+                    player.pause()
+                } else {
+                    player.play()
+                }
+                isPlaying = player.isPlaying
+            },
+            shape = RoundedCornerShape(roundingAnim),
+            modifier = Modifier.scale(1.5f).width(widthAnim)
+        ) {
+            Icon(
+                if (isPlaying) painterResource(R.drawable.pause)
+                else painterResource(R.drawable.play),
+                "Play / Pause",
+                Modifier.padding(5.dp),
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(Modifier.padding(vertical = 10.dp).scale(1.4f)) {
+            FilledTonalIconButton({
+                if (nowPlaying != null) {
+                    Settings.addOrRemoveFavorite(nowPlaying!!)
+                }
+            }) {
+                if (nowPlaying != null) {
+                    Icon(
+                        if (Settings.favorites.contains(nowPlaying!!)) favorite else heart_plus,
+                        null
+                    )
+                } else {
+                    Icon(heart_plus, null, modifier = Modifier.alpha(0.5f))
+                }
+
+            }
+
+            FilledIconButton(
+                {
+                    playNextOrPrevious(false)
+                },
+                enabled = playerQuery.isNotEmpty() && canChangeTrack,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
+                Icon(painterResource(R.drawable.skip_previous_24px), null)
+            }
+
+            FilledIconButton(
+                { playNextOrPrevious() },
+                enabled = playerQuery.isNotEmpty() && canChangeTrack,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    MaterialTheme.colorScheme.tertiary,
+                    MaterialTheme.colorScheme.onTertiary
+                )
+            ) { Icon(painterResource(R.drawable.skip_next_24px), null) }
+
+            FilledTonalIconButton(
+                {
+                    loopTrack = !loopTrack
+                    player.repeatMode = if (loopTrack) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+                    Settings.save()
+                },
+            ) {
+                Icon(if (loopTrack) repeat_on else repeat, null)
+            }
+
         }
     }
 }

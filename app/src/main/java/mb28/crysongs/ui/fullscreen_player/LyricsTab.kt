@@ -125,7 +125,7 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true, scro
                 Modifier.navigationBarsPadding().padding(bottom = 5.dp),
                 colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
                     MaterialTheme.colorScheme.primaryContainer.copy(
-                        if (Settings.fsStyle == 0) 0.8f else 1f)
+                        if (Settings.fsStyle == 0) 0.95f else 1f)
                 )
             ) {
                 IconButton(
@@ -152,8 +152,8 @@ fun FSLyricsTab(modifier: Modifier = Modifier, showButtons: Boolean = true, scro
                     },
                 ) {
                     Icon(
-                        if (isPlaying) painterResource(R.drawable.pause)
-                        else painterResource(R.drawable.play),
+                        if (isPlaying) painterResource(R.drawable.pause_24px)
+                        else painterResource(R.drawable.play_arrow_24px),
                         "Play / Pause",
                     )
                 }
