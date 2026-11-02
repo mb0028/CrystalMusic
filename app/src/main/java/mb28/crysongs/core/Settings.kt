@@ -81,12 +81,13 @@ object Settings {
     }
 
     fun addRecentsIfNot(path: String) {
-        if (!recents.contains(path)) {
-            if (recents.count() >= 15) {
-                recents.remove(recents.last())
-            }
-            recents.add(0, path)
+        if (recents.contains(path)) {
+            recents.remove(path)
         }
+        if (recents.count() >= 15) {
+            recents.remove(recents.last())
+        }
+        recents.add(0, path)
         save()
     }
 
