@@ -1,4 +1,4 @@
-## v1.6.0 (Upcoming)
+## v1.6.0 (Latest)
 
 Mini player:
 - Better mini player & navigation bar
