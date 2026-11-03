@@ -16,7 +16,7 @@ Android music player app designed for local library, simplicity & performance.
 
 Other features:
 - Tag editor (Experimental)
-- LRC maker
+- LRC maker & finder
 - Sound picker for other apps to use
 
 To-Do

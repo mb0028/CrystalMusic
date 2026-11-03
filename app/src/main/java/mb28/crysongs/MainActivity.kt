@@ -101,6 +101,7 @@ import mb28.crysongs.ui.TracksPage
 import mb28.crysongs.ui.more_pages.CustomTagsPage
 import mb28.crysongs.ui.more_pages.FoldersPage
 import mb28.crysongs.ui.more_pages.HomePage
+import mb28.crysongs.ui.more_pages.LrcFinderPage
 import mb28.crysongs.ui.more_pages.PlaylistsPage
 import mb28.crysongs.ui.more_pages.QueryPage
 import mb28.crysongs.ui.more_pages.SearchPage
@@ -282,6 +283,7 @@ class MainActivity : ComponentActivity() {
             7 -> CustomTagsPage("genres", this)
             8 -> CustomTagsPage("bitrates", this)
             9 -> SearchPage(this)
+            10 -> LrcFinderPage(this)
             else -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Coming soon!")

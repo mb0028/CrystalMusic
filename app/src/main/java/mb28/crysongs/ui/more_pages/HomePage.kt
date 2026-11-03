@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mb28.crysongs.EXTRA_PATH
 import mb28.crysongs.LrcMakerActivity
+import mb28.crysongs.MainActivity
 import mb28.crysongs.SoundPickerActivity
 import mb28.crysongs.core.Settings
 import mb28.crysongs.core.Track
@@ -60,7 +61,7 @@ import mb28.crysongs.ui.other.CacheCoversCard
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun HomePage(activity: Activity) {
+fun HomePage(activity: MainActivity) {
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
     val name = remember { android.provider.Settings.Global.getString(
             activity.contentResolver, android.provider.Settings.Global.DEVICE_NAME) }
@@ -174,6 +175,33 @@ fun HomePage(activity: Activity) {
                             }
                         }
 
+                    }
+                }
+            }
+
+            item {
+                Spacer(Modifier.height(15.dp))
+                Card(
+                    {
+                        activity.selectedIndex.intValue = 10
+                    },
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    colors = CardDefaults.cardColors(
+                        MaterialTheme.colorScheme.tertiaryContainer,
+                        MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            "LRC Finder",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Search for lyrics using lrclib.net APIs",
+                        )
                     }
                 }
             }
