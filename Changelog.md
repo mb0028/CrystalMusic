@@ -1,5 +1,5 @@
 ## v1.6.1 (Latest)
-- New tool in home page: lyric finder. uses [lrclib.net](lrclib.net) to find and download lyrics.
+- New tool in home page: lyric finder. uses [lrclib](https://lrclib.net/) to find and download lyrics.
 - Adding track to favorites now adds at start of the list instead of end.
 - UI improvements
 
