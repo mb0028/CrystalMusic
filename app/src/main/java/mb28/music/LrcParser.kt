@@ -1,0 +1,152 @@
+@file:Suppress("PropertyName", "FunctionName", "ControlFlowWithEmptyBody", "unused",
+    "PrivatePropertyName"
+)
+
+package mb28.music
+
+import java.io.File
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
+
+class LrcParser {
+    val LyricLines = mutableListOf<LyricLine>()
+    val Count: Int get() = LyricLines.count()
+    val Duration: Float get() = LyricLines.last().TimeStomp
+    var IsGettingLineInRealtimePossible = false
+
+    private val Has0Timestomps: Boolean get() {
+        var noTimedLines = 0
+        LyricLines.forEach {
+            if (it.TimeStomp == -1f) {
+                noTimedLines++
+            }
+        }
+        return noTimedLines == Count
+    }
+
+    constructor(text: String, boolean: Boolean) {
+        text.split('\n').forEach {
+            if (it.IsTimedSection()) {
+                LyricLines.add(LyricLine.FromString(it))
+            } else {
+                LyricLines.add(LyricLine(0f, it))
+            }
+        }
+    }
+
+    // This is a bit funky but it works
+    constructor(path: String) {
+        val linesWithTime = mutableMapOf<Float, MutableList<String>>()
+        val lines = File(path).readLines()
+        lines.forEach { line ->
+            if (line.isNotBlank()) {
+                if (line.IsTimedSection()) {
+                    val lyric = LyricLine.FromString(line)
+                    val i = linesWithTime[lyric.TimeStomp]
+                    when {
+                        i == null -> linesWithTime[lyric.TimeStomp] = mutableListOf(lyric.Lyric)
+                        i.count() == 1 -> linesWithTime[lyric.TimeStomp]!!.add(lyric.Lyric)
+                        i.count() == 2 -> linesWithTime[lyric.TimeStomp]!!.add(lyric.Lyric)
+                    }
+                } else if (line.IsTagsSection()) {
+
+                } else {
+                    LyricLines.add(LyricLine(-1f, line))
+                }
+            }
+        }
+
+        linesWithTime.forEach { (ts, lines) ->
+            when(lines.count()) {
+                1 -> LyricLines.add(LyricLine(ts, lines.first()))
+                2 -> {
+                    val l = LyricLine(ts, lines.first())
+                    l.Lyric2 = lines[1]
+                    LyricLines.add(l)
+                }
+                3 -> {
+                    val l = LyricLine(ts, lines.first())
+                    l.Lyric2 = lines[1]
+                    l.Lyric3 = lines.last()
+                    LyricLines.add(l)
+                }
+            }
+        }
+        IsGettingLineInRealtimePossible = !Has0Timestomps
+    }
+
+    fun String.IsTimedSection() : Boolean {
+        return this.startsWith('[') && this.contains(':') && this.contains('.')
+    }
+
+    fun String.IsTagsSection(): Boolean {
+        return this.startsWith("[re:") || this.startsWith("[ti:") || this.startsWith("[ar:") ||
+            this.startsWith("[offset:") || this.startsWith("[au:") || this.startsWith("[al:")
+    }
+
+    fun LineByAudioPosition(audioPosInMillisecond: Long): String {
+        if (IsGettingLineInRealtimePossible) {
+            val audioPosInSeconds = audioPosInMillisecond / 1000f
+            if (audioPosInSeconds <= LyricLines.first().TimeStomp)
+                return ""
+            if (audioPosInSeconds >= LyricLines.last().TimeStomp)
+                return LyricLines.last().Lyric
+            return LyricLines[LyricLines.indexOf(LyricLines.find { audioPosInSeconds <= it.TimeStomp }) - 1].Lyric
+        }
+        return "No lyrics..."
+    }
+
+    fun LineIndex(audioPosInMillisecond: Long): Int {
+        if (IsGettingLineInRealtimePossible) {
+            val audioPosInSeconds = audioPosInMillisecond / 1000f
+            if (audioPosInSeconds <= LyricLines.first().TimeStomp)
+                return 0
+            if (audioPosInSeconds >= LyricLines.last().TimeStomp)
+                return LyricLines.count() - 1
+            return LyricLines.indexOf(LyricLines.find { audioPosInSeconds <= it.TimeStomp }) - 1
+        }
+        return -1
+    }
+
+    override fun toString(): String {
+        var lrc = ""
+        val count = Count
+        LyricLines.forEachIndexed { i, ll ->
+            (ll.TimeStomp * 1000f).roundToInt().milliseconds.toComponents { minutes, seconds, nanoseconds ->
+                lrc += "[${minutes.toString().padStart(2, '0')}" +
+                        ":${seconds.toString().padStart(2, '0')}" +
+                        ".${nanoseconds.toString().padStart(3, '0').substring(0, 2)}]" +
+                        ll.Lyric
+                if (i != count - 1) {
+                    lrc += "\n"
+                }
+            }
+
+        }
+        return lrc
+    }
+}
+
+data class LyricLine(var TimeStomp: Float, var Lyric: String) {
+    var Lyric2: String? = null
+    var Lyric3: String? = null
+    companion object {
+        fun FromString(text: String) : LyricLine {
+            val time = text.substring(0, text.indexOf(']')).removePrefix("[") // xx:xx.xx?
+            val sec = (time.substring(0, 2).toFloat() * 60f) + time.substring(3).toFloat()
+
+            return if (text.indexOf('[') + 1 != text.count()) {
+                LyricLine(
+                    sec,
+                    text.substring(text.indexOf(']') + 1).trimStart()
+                )
+            } else {
+                LyricLine(sec, "")
+            }
+        }
+    }
+
+    override fun toString(): String {
+        return "$TimeStomp | $Lyric | $Lyric2 | $Lyric3"
+    }
+}

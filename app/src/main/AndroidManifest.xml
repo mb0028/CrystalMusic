@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="AllFilesAccessPolicy,ScopedStorage" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="mb28.crysongs.controlPlayback" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ForegroundServicesPolicy" />
+
+    <permission
+        android:name="mb28.crysongs.controlPlayback"
+        android:protectionLevel="normal"
+        android:label="Control Crystal Songs playback" />
+
+    <application
+        android:allowBackup="true"
+        android:appCategory="audio"
+        android:banner="@mipmap/banner_icon"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/app_icon"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CrySongs">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_MUSIC" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FullscreenPlayerActivity"
+            android:exported="false"
+            android:label="@string/title_activity_fullscreen_player"
+            android:theme="@style/Theme.Transparent"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PlayerExportedActivity"
+            android:exported="true"
+            android:label="Play Song"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".TagEditorActivity"
+            android:exported="false"
+            android:label="@string/title_activity_tag_editor"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".SoundPickerActivity"
+            android:exported="true"
+            android:label="@string/soundpickeractivity"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter android:label="Sound Picker">
+                <action android:name="android.intent.action.PICK" />
+                <action android:name="android.intent.action.CHOOSER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".LrcMakerActivity"
+            android:exported="false"
+            android:label="@string/lrcMakerActivity"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize" />
+
+        <receiver
+            android:name=".glance.PlayerWidgetReceiver"
+            android:exported="true"
+            android:label="Control Playback">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/player_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".glance.TurntableReceiver"
+            android:exported="true"
+            android:label="Turntable">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/turntable_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".core.PlayerService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".core.TodaysTrackNotif"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".CacheCoversActivity"
+            android:exported="false"
+            android:label="@string/title_activity_cache_covers"
+            android:theme="@style/Theme.CrySongs"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
+
+</manifest>

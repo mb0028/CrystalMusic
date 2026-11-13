@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Crystal Songs</string>
+    <string name="title_activity_fullscreen_player">Crystal Songs Player</string>
+    <string name="title_activity_settings">Settings Activity</string>
+    <string name="title_activity_tag_editor">Tag Editor Activity</string>
+    <string name="title_activity_cache_covers">CacheCoversActivity</string>
+    <string name="soundpickeractivity">SoundPickerActivity</string>
+    <string name="lrcMakerActivity">LrcMakerActivity</string>
+</resources>

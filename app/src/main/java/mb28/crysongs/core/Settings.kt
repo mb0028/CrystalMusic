@@ -1,0 +1,260 @@
+@file:Suppress("ConstPropertyName")
+
+package mb28.crysongs.core
+
+import android.annotation.SuppressLint
+import android.os.Environment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import java.io.File
+
+object Settings {
+    @SuppressLint("SdCardPath")
+    const val appFolder = "/sdcard/Documents/.Crystal"
+    const val appCacheThumbsFolder = "$appFolder/Covers"
+    const val settingsFile = "$appFolder/Songs Settings.txt"
+    const val favoritesFile = "$appFolder/Songs Favorites.txt"
+
+    var loadFont by mutableStateOf(false)
+    var updateState by mutableIntStateOf(0)
+    var dismissMiniPlayer by mutableStateOf(false)
+
+    val recents = mutableStateListOf<String>()
+    val favorites = mutableStateListOf<String>()
+    val playlists = mutableStateListOf<String>()
+    val libraryInclude = mutableStateListOf<String>()
+    val libraryExclude = mutableStateListOf<String>()
+    val navTabs = mutableStateListOf<Int>()
+    var initTab by mutableIntStateOf(0)
+
+    var loopTrack by mutableStateOf(false)
+    var verticalLyrics by mutableStateOf(false)
+    var appVolume by mutableFloatStateOf(1f)
+    var coverShapeMode by mutableIntStateOf(3)
+    var sortBy = 0
+    var sortOrderDesc by mutableStateOf(true)
+    var tagsSpacer by mutableStateOf(" • ")
+    var backgroundBlurRadius by mutableIntStateOf(45)
+    var useCoverColor by mutableStateOf(false)
+    var experimental by mutableStateOf(false)
+    var whiteText by mutableStateOf(false)
+    var gradientColoring by mutableStateOf(false)
+    var coverParallax by mutableStateOf(true)
+    var edgeLighting by mutableStateOf(false)
+    var edgeLightingSaturation by mutableFloatStateOf(0.6f)
+    var edgeLightingLightness by mutableFloatStateOf(0.75f)
+    var edgeLightingHue1 by mutableFloatStateOf(0f)
+    var edgeLightingHue2 by mutableFloatStateOf(90f)
+    var edgeLightingHue3 by mutableFloatStateOf(180f)
+    var edgeLightingHue4 by mutableFloatStateOf(320f)
+    var waveformDataCapture by mutableStateOf(false)
+    var windEffect by mutableStateOf(false)
+    var hierarchyView by mutableStateOf(false)
+    var hideSystemSounds by mutableStateOf(false)
+    var tips_cacheThumbs by mutableStateOf(true)
+    var mica by mutableStateOf(false)
+    var paintMode by mutableStateOf(false)
+    var twoRowTrackCard by mutableStateOf(false)
+    var lyricsAutoScroll by mutableStateOf(false)
+    var fsStyle by mutableIntStateOf(0)
+    var minDuration by mutableIntStateOf(30)
+    var hideNavBar by mutableStateOf(false)
+
+    val getSorting get() = if (sortOrderDesc) "DESC" else "ASC"
+
+    fun resetFirstTimeTips() {
+        tips_cacheThumbs = true
+        save()
+    }
+
+    fun addOrRemoveFavorite(path: String) {
+        if (favorites.contains(path)) {
+            favorites.remove(path)
+        } else {
+            favorites.add(0, path)
+        }
+        saveFavorites()
+    }
+
+    fun addRecentsIfNot(path: String) {
+        if (recents.contains(path)) {
+            recents.remove(path)
+        }
+        if (recents.count() >= 15) {
+            recents.remove(recents.last())
+        }
+        recents.add(0, path)
+        save()
+    }
+
+    fun load() {
+        recents.clear()
+        favorites.clear()
+        playlists.clear()
+        navTabs.clear()
+        libraryInclude.clear()
+        libraryExclude.clear()
+        val a = File(appFolder)
+        val atc = File(appCacheThumbsFolder)
+        if (!a.exists() || !atc.exists()) {
+            atc.mkdirs()
+        }
+
+        val file = File(settingsFile)
+        if (file.exists()) {
+            file.readLines().forEach { s ->
+                when {
+                    s.startsWith("[crym3u]") -> {
+                        val path = s.removePrefix("[crym3u]")
+                        if (File(path).exists()) {
+                            playlists.add(path)
+                        }
+                    }
+                    s.startsWith("[Nav]") -> navTabs.add(s.removePrefix("[Nav]").toInt())
+                    s.startsWith("[LibI]") -> libraryInclude.add(s.removePrefix("[LibI]"))
+                    s.startsWith("[LibX]") -> libraryExclude.add(s.removePrefix("[LibX]"))
+                    s.startsWith("[SortBy]") -> sortBy = s.removePrefix("[SortBy]").toInt()
+                    s.startsWith("[SortOrderDesc]") -> sortOrderDesc = s.removePrefix("[SortOrderDesc]").toBooleanStrict()
+                    s.startsWith("[Loop]") -> loopTrack = s.removePrefix("[Loop]").toBooleanStrict()
+                    s.startsWith("[VerticalLyrics]") -> verticalLyrics = s.removePrefix("[VerticalLyrics]").toBooleanStrict()
+                    s.startsWith("[TagsSpacer]") -> tagsSpacer = s.removePrefix("[TagsSpacer]")
+                    s.startsWith("[Volume]") -> appVolume = s.removePrefix("[Volume]").toFloat()
+                    s.startsWith("[CoverShape]") -> coverShapeMode = s.removePrefix("[CoverShape]").toInt()
+                    s.startsWith("[FSBlur]") -> backgroundBlurRadius = s.removePrefix("[FSBlur]").toInt()
+                    s.startsWith("[UseCoverColor]") -> useCoverColor = s.removePrefix("[UseCoverColor]").toBooleanStrict()
+                    s.startsWith("[FeatureFlags]") -> experimental = s.removePrefix("[FeatureFlags]").toBooleanStrict()
+                    s.startsWith("[WhiteTexts]") -> whiteText = s.removePrefix("[WhiteTexts]").toBooleanStrict()
+                    s.startsWith("[GradientColoring]") -> gradientColoring = s.removePrefix("[GradientColoring]").toBooleanStrict()
+                    s.startsWith("[EdgeLighting]") -> edgeLighting = s.removePrefix("[EdgeLighting]").toBooleanStrict()
+                    s.startsWith("[ELSaturation]") -> edgeLightingSaturation = s.removePrefix("[ELSaturation]").toFloat()
+                    s.startsWith("[ELLightness]") -> edgeLightingLightness = s.removePrefix("[ELLightness]").toFloat()
+                    s.startsWith("[ELHue1]") -> edgeLightingHue1 = s.removePrefix("[ELHue1]").toFloat()
+                    s.startsWith("[ELHue2]") -> edgeLightingHue2 = s.removePrefix("[ELHue2]").toFloat()
+                    s.startsWith("[ELHue3]") -> edgeLightingHue3 = s.removePrefix("[ELHue3]").toFloat()
+                    s.startsWith("[ELHue4]") -> edgeLightingHue4 = s.removePrefix("[ELHue4]").toFloat()
+                    s.startsWith("[SCWEL]") -> coverParallax = s.removePrefix("[SCWEL]").toBooleanStrict()
+                    s.startsWith("[WaveCapture]") -> waveformDataCapture = s.removePrefix("[WaveCapture]").toBooleanStrict()
+                    s.startsWith("[Wind]") -> windEffect = s.removePrefix("[Wind]").toBooleanStrict()
+                    s.startsWith("[Hierarchy]") -> hierarchyView = s.removePrefix("[Hierarchy]").toBooleanStrict()
+                    s.startsWith("[TipsCacheCovers]") -> tips_cacheThumbs = s.removePrefix("[TipsCacheCovers]").toBooleanStrict()
+                    s.startsWith("[InitTab]") -> initTab = s.removePrefix("[InitTab]").toInt()
+                    s.startsWith("[HierarchyCompact]") -> hideSystemSounds = s.removePrefix("[HierarchyCompact]").toBooleanStrict()
+                    s.startsWith("[Wallpaper]") -> mica = s.removePrefix("[Wallpaper]").toBooleanStrict()
+                    s.startsWith("[Paint]") -> paintMode = s.removePrefix("[Paint]").toBooleanStrict()
+                    s.startsWith("[2RowTrack]") -> twoRowTrackCard = s.removePrefix("[2RowTrack]").toBooleanStrict()
+                    s.startsWith("[lyricsAutoScroll]") -> lyricsAutoScroll = s.removePrefix("[lyricsAutoScroll]").toBooleanStrict()
+                    s.startsWith("[FSStyle]") -> fsStyle = s.removePrefix("[FSStyle]").toInt()
+                    s.startsWith("[MinDuration]") -> minDuration = s.removePrefix("[MinDuration]").toInt()
+                    s.startsWith("[hideNavBar]") -> hideNavBar = s.removePrefix("[hideNavBar]").toBooleanStrict()
+                    s.startsWith("[Recent]") -> {
+                        val path = s.removePrefix("[Recent]")
+                        if (File(path).exists()) {
+                            recents.add(path)
+                        }
+                    }
+                }
+            }
+        } else {
+            val ex = Environment.getExternalStorageDirectory().path
+            libraryExclude.addAll(arrayOf("$ex/Alarms", "$ex/Notifications", "$ex/Ringtones"))
+            file.createNewFile()
+            save()
+        }
+
+        val favFile = File(favoritesFile)
+        if (favFile.exists()) {
+            favFile.readLines().forEach { path ->
+                if (File(path).exists()) {
+                    favorites.add(path)
+                }
+            }
+        } else {
+            favFile.createNewFile()
+            saveFavorites()
+            save()
+        }
+
+        if (navTabs.count() != 10) {
+            for (i in 0..9)
+                navTabs.add(i)
+        }
+        if (File("${Environment.getExternalStorageDirectory().path}/Documents/.Crystal/UI Font.ttf").exists()) {
+            loadFont = true
+        }
+    }
+
+    fun saveFavorites() {
+        var favData = ""
+        favorites.forEach {
+            favData += "$it\n"
+        }
+        val favFile = File(favoritesFile)
+        favFile.writeText(favData)
+    }
+
+    fun save() {
+        var data = "[SortBy]$sortBy\n"
+        data += "[SortOrderDesc]$sortOrderDesc\n"
+        data += "[Loop]$loopTrack\n"
+        data += "[Volume]$appVolume\n"
+        data += "[TagsSpacer]$tagsSpacer\n"
+        data += "[CoverShape]$coverShapeMode\n"
+        data += "[VerticalLyrics]$verticalLyrics\n"
+        data += "[UseCoverColor]$useCoverColor\n"
+        data += "[FeatureFlags]$experimental\n"
+        data += "[WhiteTexts]$whiteText\n"
+        data += "[FSBlur]$backgroundBlurRadius\n"
+        data += "[GradientColoring]$gradientColoring\n"
+
+        data += "[WaveCapture]$waveformDataCapture\n"
+        data += "[SCWEL]$coverParallax\n[Wind]$windEffect\n"
+        data += "[EdgeLighting]$edgeLighting\n"
+        data += "[ELSaturation]$edgeLightingSaturation\n[ELLightness]$edgeLightingLightness\n"
+        data += "[ELHue1]$edgeLightingHue1\n[ELHue2]$edgeLightingHue2\n"
+        data += "[ELHue3]$edgeLightingHue3\n[ELHue4]$edgeLightingHue4\n"
+
+        data += "[Hierarchy]$hierarchyView\n"
+        data += "[HierarchyCompact]$hideSystemSounds\n"
+        data += "[TipsCacheCovers]$tips_cacheThumbs\n"
+        data += "[Wallpaper]$mica\n"
+        data += "[Paint]$paintMode\n"
+        data += "[2RowTrack]$twoRowTrackCard\n"
+        data += "[lyricsAutoScroll]$lyricsAutoScroll\n"
+        data += "[FSStyle]$fsStyle\n"
+        data += "[MinDuration]$minDuration\n"
+        data += "[hideNavBar]$hideNavBar\n"
+
+
+        data += "\n"
+        recents.forEach {
+            data += "[Recent]$it\n"
+        }
+
+        data += "\n"
+        playlists.forEach {
+            data += "[crym3u]$it\n"
+        }
+
+        data += "\n"
+        libraryInclude.forEach {
+            data += "[LibI]$it\n"
+        }
+
+        data += "\n"
+        libraryExclude.forEach {
+            data += "[LibX]$it\n"
+        }
+
+        data += "[InitTab]$initTab\n"
+        navTabs.forEach {
+            data += "[Nav]$it\n"
+        }
+
+        val file = File(settingsFile)
+        file.writeText(data)
+    }
+}

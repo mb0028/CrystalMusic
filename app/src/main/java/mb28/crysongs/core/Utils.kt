@@ -1,0 +1,149 @@
+package mb28.crysongs.core
+
+
+import android.Manifest
+import android.app.Activity
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.icu.util.Calendar
+import android.os.Build
+import android.util.Log
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.getSystemService
+import androidx.core.graphics.drawable.IconCompat
+import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import mb28.crysongs.FullscreenPlayerActivity
+import mb28.crysongs.R
+import mb28.crysongs.notificationColor
+import org.jsoup.Jsoup
+import kotlin.time.Duration
+
+
+val pageAnimation = slideInVertically { 150 } + fadeIn(initialAlpha = 0.5f)
+
+const val CHANNEL_NOW_PLAYING = "MusicPlayerLive"
+const val CHANNEL_TODAYS_MUSIC = "TodaysMusic"
+
+suspend fun checkForUpdate(context: Context) = withContext(Dispatchers.IO) {
+    Log.d("Crystal Songs Updater", "Checking for updates...")
+    try {
+        val web = Jsoup.connect("https://raw.githubusercontent.com/mb0028/CrystalMusic/refs/heads/main/Version.txt").get().text()
+        val ver = web.toLongOrNull()
+
+        val crystalSongs: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        if (ver!= null && ver > crystalSongs.versionCode) {
+            Settings.updateState = 1
+        }
+    } catch (e: Exception) {
+        Log.e("Crystal Songs Updater", e.toString())
+        Settings.updateState = -1
+    }
+}
+
+
+fun formatDurationMs(d: Duration) : String {
+    val hours = d.inWholeHours
+    return (if(hours > 0) "$hours:".padStart(2, '0') else "") +
+            d.inWholeMinutes.rem(60).toString().padStart(2, '0') +
+            ":${d.inWholeSeconds.rem(60).toString().padStart(2, '0')}"
+}
+
+var nIcon: IconCompat? = null
+private const val colWhite = 0xffaaaaaa.toInt()
+
+fun updateNotification(nm: NotificationManager, context: Activity, lyric: String, id: Int = 0) {
+    if (nIcon == null) {
+        nIcon = IconCompat.createWithResource(context, R.drawable.now_playing_icon)
+    }
+
+    val n = NotificationCompat.Builder(context, CHANNEL_NOW_PLAYING)
+        .setSmallIcon(nIcon!!)
+        .setColor(notificationColor ?: colWhite)
+        .setContentTitle(lyric)
+        .setShortCriticalText(lyric)
+        .setOngoing(true)
+        .setRequestPromotedOngoing(true)
+        .setContentIntent(
+            context.createPendingResult( //TODO: fix
+                800,
+                Intent(context, FullscreenPlayerActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        )
+        .build()
+
+    if (context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        nm.notify(id, n)
+    }
+}
+
+fun Activity.setupPermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+        }
+    }
+
+    val nm = NotificationManagerCompat.from(this)
+    val channel = NotificationChannelCompat.Builder(CHANNEL_NOW_PLAYING, NotificationManagerCompat.IMPORTANCE_LOW)
+        .setName("Now playing lyrics")
+        .setDescription("Shows lyrics in a live notification")
+        .build()
+    val channelTM = NotificationChannelCompat.Builder(CHANNEL_TODAYS_MUSIC, NotificationManagerCompat.IMPORTANCE_DEFAULT)
+        .setName("Today's music")
+        .setDescription("Shows a notification everyday at 7 AM that suggests a random music")
+        .build()
+
+    nm.createNotificationChannel(channel)
+    nm.createNotificationChannel(channelTM)
+}
+
+fun scheduleNotifications(context: Context) {
+    val alarmManager = context.getSystemService<AlarmManager>()
+    val intent = Intent(context, TodaysTrackNotif::class.java)
+    val pendingIntent = PendingIntent.getBroadcast(context, 28, intent,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis()
+        set(Calendar.HOUR_OF_DAY, 7)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+
+        if (before(Calendar.getInstance())) {
+            add(Calendar.DATE, 1)
+        }
+    }
+
+    alarmManager?.set(
+        AlarmManager.RTC_WAKEUP,
+        calendar.timeInMillis,
+        pendingIntent
+    )
+}
+
+fun inverseLerp(a: Float, b: Float, value: Float): Float {
+    if (a != b)
+        return ((value - a) / (b - a)).coerceIn(0f, 1f)
+    return 0f
+}
+
+fun openLink(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
+}
+
+

@@ -1,0 +1,166 @@
+package mb28.crysongs.ui.fullscreen_player
+
+import android.app.Activity
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
+import mb28.crysongs.core.Settings
+import mb28.crysongs.icons.arrow_back
+import mb28.crysongs.icons.arrow_cool_down
+import mb28.crysongs.icons.sound_detection_loud_sound
+import mb28.crysongs.player
+import kotlin.math.roundToInt
+
+private val tabs = listOf("Details", "Player", "Lyrics")
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FSChangePageRow(modifier: Modifier = Modifier, selectedTab: PagerState, activity: Activity) {
+    var showVolSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (Settings.fsStyle != 0) {
+        TopAppBar(
+            {
+                Row {
+                    tabs.fastForEachIndexed { i, t ->
+                        Text(t, Modifier.padding(end = 10.dp)
+                            .alpha(if ( i == selectedTab.currentPage) 1f else 0.35f )
+                            .clickable { selectedTab.requestScrollToPage(i) })
+                    }
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                Color.Transparent
+            ),
+            navigationIcon = {
+                if (Settings.fsStyle == 2) {
+                    IconButton(
+                        { activity.finish() },
+                        Modifier.padding(end = 15.dp)
+                    ) {
+                        Icon(arrow_cool_down, null)
+                    }
+                } else {
+                    IconButton(
+                        { activity.finish() },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            MaterialTheme.colorScheme.surfaceContainerHigh
+                        ),
+                        modifier = Modifier.padding(horizontal = 15.dp)
+                    ) { Icon(arrow_back, null) }
+                }
+            },
+            actions = {
+                IconButton(
+                    { showVolSheet = true }
+                ) {
+                    Icon(sound_detection_loud_sound, null)
+                }
+            }
+        )
+    } else {
+        Row(
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            Arrangement.SpaceBetween,
+            Alignment.CenterVertically
+        ) {
+            IconButton(
+                { activity.finish() }
+            ) {
+                Icon(arrow_cool_down, null)
+            }
+
+            Row(
+                Modifier
+                    .size(270.dp, 40.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
+                        RoundedCornerShape(35.dp)
+                    ),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                tabs.forEachIndexed { i, tab ->
+                    val corners by animateDpAsState(if (selectedTab.currentPage == i) 10.dp else 20.dp)
+                    Surface(
+                        onClick = { selectedTab.requestScrollToPage(i) },
+                        modifier = Modifier.size(80.dp, 30.dp),
+                        color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.surface.copy(0.5f),
+                        shape = RoundedCornerShape(corners)
+                    ) {
+                        Text(
+                            tab,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxSize().padding(top = 2.dp),
+                            color = if (selectedTab.currentPage == i) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
+                }
+            }
+
+            IconButton(
+                { showVolSheet = true }
+            ) {
+                Icon(sound_detection_loud_sound, null)
+            }
+        }
+    }
+
+    if (showVolSheet) {
+        ModalBottomSheet(
+            {
+                showVolSheet = false
+            }
+        ) {
+            Text("Volume: ${(Settings.appVolume * 100f).roundToInt() / 100f}", modifier = Modifier.padding(horizontal = 25.dp))
+            Slider(
+                Settings.appVolume,
+                {
+                    Settings.appVolume = it
+                    player.volume = Settings.appVolume
+                },
+                onValueChangeFinished = {
+                    Settings.save()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 15.dp)
+            )
+        }
+    }
+}

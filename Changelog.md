@@ -1,0 +1,216 @@
+## v1.6.4 (Latest)
+- No changes. just making sure app is up to date after resetting repo
+
+## v1.6.3
+- New fullscreen player style: Clean
+- Add "Go to artist" and "Go to album" in track more options popup
+- Add option to add search tab in navigation bar
+- UI improvements
+- "Always run in background" permission is now optional
+
+## v1.6.2
+- Bug fixes
+
+## v1.6.1
+- New tool in home page: lyric finder. uses [lrclib](https://lrclib.net/) to find and download lyrics.
+- Adding track to favorites now adds at start of the list instead of end.
+- UI improvements
+
+## v1.6.0
+
+Mini player:
+- Better mini player & navigation bar
+- Remove next & previous buttons
+- Swipe left/right to change track
+- Swipe Up to open fullscreen player
+- Swipe Down to dismiss mini player
+
+Other:
+- Add home page
+- Add history. last 15 played songs will be recorded.
+- Resumes last played track when app loads
+- Remove floating navigation bar
+- Remove blur option. blur is now always on
+- Better page transitions
+- UI improvements
+- Fix some tag editor issues
+- Other bug fixes & performance improvements
+
+## v1.5.22
+- Add search button beside navigation drawer button
+- UI improvements
+
+## v1.5.21
+- UI improvements
+
+## v1.5.20
+- Fix: ui doesn't update when reordering playlist songs
+- Add Mica background
+- Background changes now applies to all activities (except Sound Picker)
+
+Other:
+- Landscape mode improvements
+- Other ui improvements & bug fixes
+- App now only supports arm64-v8a.
+  - Around 99% of android 13+ devices are support arm64-v8a
+
+## v1.5.10
+- Add LRC Maker. can be found in tools tab
+- Add sound picker
+- Add option to filter tracks by duration
+- Add option to exclude folders
+- Add option hide navigation bar
+- Clicking on artist/album in fullscreen player opens it
+- Other improvements
+- Fix app crashes when searching too fast
+
+## v1.5.0
+- Massive UI improvements. some:
+  - Instead of two-layout navigation bar, other tabs are now accessible in the new navigation drawer
+  - Fullscreen player now have 2 styles that can be changed in settings
+  - Preview in settings menu
+  - Add option to switch between default and floating navigation bar
+  - Mini player improvements
+  - Replaced some dialogs with bottom sheets to matches Pixel phones design
+  - Adjusts font size
+  - Add favorite button beside track tiles
+  - Landscape mode improvements
+  - Moved gradient coloring out of experimental
+- Performance improvements
+- Fix app crashes when opening fullscreen player and track has no tags
+
+## v1.4.0
+- Improve landscape mode
+- UI improvements
+- Add next & previous button in lyrics panel
+- Small bug fixes
+- Fixed [#3](https://github.com/mb0028/CrystalMusic/issues/3)
+- Changed min supported android version back to 13
+
+## v1.3.10
+- Lyrics are now auto-scrolls if they have timestomp
+- Audio resumes when clicking timed lyric if paused
+- Add play/pause button in lyrics panel
+
+## v1.3.2
+- Searching is now 20 times faster
+- Fix visual glitches
+
+## v1.3.1
+- App can now check for updates
+- Change app font by copying any .ttf file in 0/Documents/.Crystal/UI Font.ttf
+- Add 3 new settings:
+  - Make track tile smaller
+  - Use wallpaper as app background
+  - Full white or black background based on light/dark mode
+- Settings ui improvements
+- Lot of bug fixes. Some:
+  - Mediastore will be refreshes when editing tags
+  - Using media store to load artists/albums/genres/bitrates (at least 50 times faster than before)
+
+## v1.3.0
+Performance:
+- App ram usage reduced by 80%
+- Refreshing time reduced by 75%. Closed [#1](https://github.com/mb0028/CrystalMusic/issues/1)
+- App performance is now 5 times better
+- Add option to cache all thumbnails with one click
+
+Changes:
+- Add tag editor
+- Fullscreen player now shows all now playing tags
+- Query is now restarts when it reaches the end instead of looping last track
+- Navigation back button/gesture now works when a playlist/folder/album/... is opened
+- Add option to change order and default navigation tab. Closed [#2](https://github.com/mb0028/CrystalMusic/issues/2)
+- Add hierarchy mode for folders tab. Closed [#2](https://github.com/mb0028/CrystalMusic/issues/2)
+- Insane amount of improvements. Some:
+  - Add predictive back animations
+  - Seekbar improvements
+  - Fix permissions page background is always white
+  - Massive widgets improvements
+  - Update material design library to 1.5.0-alpha29
+  - Artwork's extracted color now will be cached for x10 faster loading
+
+## v1.2.1
+- Move some settings out of experimental
+- UI improvements
+- Fix notification's color bug
+
+## v1.2.0
+- Screen stays on when Fullscreen player is visible
+- New feature, music of the day: A notification that everyday around 7 AM suggests a random music
+- New setting: Background cover blur radius
+- Option 'Use artwork color for ui' is no longer freezes ui for ~1s when now playing changes
+- UI improvements
+
+## v1.1.1
+- App now supports Android 12 and 11
+- Playback control notification buttons are now works correctly & added 3 more buttons: Next - Add/Remove favorite - Seek +15s
+- Fix app crashes when full adaptive coloring is on and track has no cover art
+- Fix saved volume is not applied after load
+
+## v1.1.0
+App now uses ExoPlayer instead of Media player
+
+- App now correctly runs in background
+- Notification is now separated into 2:
+  - 1: Android's default media player notification for controlling playback
+  - 2: Small live notification that shows lyrics if available
+- New: 2 Homescreen widgets that inspired by YT Music app
+- Add settings page for more customization
+- Add option to clear covers cache
+- Add option to use now playing cover accent color for UI
+- Add experimental features
+- UI improvements
+- Performance improvements
+- Fix folders are includes subfolder files too
+- Fix app crashes if lyric contains more than one '\[' or '\]'
+- Update material library to v1.5.0-alpha28
+
+## v1.0.0
+First stable release!
+
+- Rename playlists with the new button
+- Added delete button for playlist items
+- Play music from other apps using open with
+- Folders, artists, albums, genres, composer tabs are now works
+- Added an option to show lyrics vertically
+- New: Click on cover in fullscreen player to change its shape (5 shapes available)
+- UI improvements
+- Better app icon & notification icons
+- Better notification progress bar
+- Lot of bug fixes & improvements
+  - Fix duplicate query causes infinity loop
+
+## v0.0.4-pre-release
+- Fix app crashes after song ends
+- Add ignore battery optimization so app stays open a bit longer. Next update foreground service will be added too
+- New: Create playlists
+- New: Add tracks to favorites and access them in playlists tab
+- Open more actions panel by clicking track cover
+- Add support for multi-language LRC files (max 3 lang)
+- Fullscreen player corners are now rounded
+- Wavy slider for fullscreen player
+- App now shows a permissions page instead of closing app if permissions are now granted
+- Query randomize button will now correctly randomize query
+- Lot of bug fixes & improvements
+
+## v0.0.3-pre-release
+- Swipe down to exit fullscreen player
+- Add animations for opening/closing fullscreen player
+- Add track details in fullscreen player
+- Toggle repeat mode on or off
+- Add a slider for changing app volume
+- Next track will start playing after track is finished
+- Add search tab. Search tracks by entering title or artist
+- Switch between 2 navigation bar rows with ↔️️ button
+- Lot of bug fixes & improvements
+
+## v0.0.2-pre-release
+- Add fullscreen player
+- Mini-player improvements
+- Better app performance
+- UI improvements
+- Fixed a lot of bugs
+
+## v0.0.1-pre-release
+- First test version
