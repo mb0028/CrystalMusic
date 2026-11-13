@@ -1,3 +1,6 @@
+## v1.6.5 (Upcoming)
+- Fix opening audio files from other apps issues
+
 ## v1.6.4 (Latest)
 - No changes. just making sure app is up to date after resetting repo
 
